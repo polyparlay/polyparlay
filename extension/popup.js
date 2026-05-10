@@ -559,25 +559,26 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('addCurrent').addEventListener('click', addCurrentTab);
 
-  // Pro panel — every locked feature is a clickable upgrade trigger.
-  // The query param lets future analytics attribute conversions to specific features.
-  document.getElementById('proCta').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=panel-cta' });
-  });
-  document.querySelectorAll('.pro-feat').forEach((el) => {
-    el.addEventListener('click', () => {
-      const feature = el.getAttribute('data-pro') || 'unknown';
-      chrome.tabs.create({ url: `https://polyparlay.io/upgrade?from=feat-${encodeURIComponent(feature)}` });
+  // Single Pro upgrade CTA at the bottom of the consolidated Pro section
+  const mainCta = document.getElementById('proMainCta');
+  if (mainCta) {
+    mainCta.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=main-cta' });
     });
-  });
+  }
 
-  // Slip-level Pro hooks (blurred ROI, run-sim, decision-data mini-rows)
+  // Every Pro feature element with a data-pro attribute opens the upgrade page
+  // with feature attribution, so future analytics can track which surface drove the click.
+  // Covers .pro-card, .pro-preview-row, and .pro-more-row uniformly.
   document.querySelectorAll('[data-pro]').forEach((el) => {
-    if (el.classList.contains('pro-feat')) return; // already wired above
     el.addEventListener('click', (e) => {
+      // Don't intercept clicks on the CTA button itself (handled above)
+      if (el.id === 'proMainCta') return;
       e.preventDefault();
       const feature = el.getAttribute('data-pro') || 'unknown';
-      chrome.tabs.create({ url: `https://polyparlay.io/upgrade?from=slip-${encodeURIComponent(feature)}` });
+      chrome.tabs.create({
+        url: `https://polyparlay.io/upgrade?from=slip-${encodeURIComponent(feature)}`
+      });
     });
   });
 
