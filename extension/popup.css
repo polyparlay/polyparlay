@@ -895,19 +895,17 @@ body.state-expired .run-sim-box .pro-tag {
 .pro-tier-indicator.tier-paid { background: var(--pro); color: #0b0d12; }
 .pro-tier-indicator.tier-expired { background: rgba(239,68,68,0.2); color: var(--red); }
 
-/* Improve Odds — standalone always-visible row above the Run Sim button.
+/* Improve Odds — lives at the bottom of the Monte Carlo sim panel so the
+   connection to the simulation is visually unmistakable.
    Free state: feature pitch (Apply auto-starts trial).
-   Trial/Paid: specific live recommendation.
-   Huge upgrade lever — title + Apply always clear, description swaps. */
+   Trial/Paid: specific live recommendation. */
 .improve-odds {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 12px 8px;
-  padding: 10px 12px;
-  background: rgba(34, 197, 94, 0.07);
-  border: 1px solid rgba(34, 197, 94, 0.28);
-  border-radius: 8px;
+  padding: 12px;
+  background: rgba(34, 197, 94, 0.10);
+  border-top: 1px solid rgba(34, 197, 94, 0.28);
 }
 .improve-odds-info { flex: 1; min-width: 0; }
 .improve-odds-title {

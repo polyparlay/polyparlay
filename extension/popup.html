@@ -70,19 +70,11 @@
       </div>
     </section>
 
-    <div id="improveOdds" class="improve-odds hidden">
-      <div class="improve-odds-info">
-        <div class="improve-odds-title">↗ Improve odds</div>
-        <div class="improve-odds-desc" id="improveOddsDesc"></div>
-      </div>
-      <button class="improve-odds-apply" id="improveOddsApply" type="button">Apply</button>
-    </div>
-
     <button class="run-sim-box" id="runSimBtn" type="button">
       <span class="run-sim-icon" aria-hidden="true">🎲</span>
       <span class="run-sim-content">
-        <span class="run-sim-title">Run 10,000-outcome simulation</span>
-        <span class="run-sim-desc" id="runSimDesc">Distribution of payouts, win rate, drawdown — runs in your browser</span>
+        <span class="run-sim-title">Run Monte Carlo + Improve Odds</span>
+        <span class="run-sim-desc" id="runSimDesc">10K outcomes simulated · algorithm rebalances weak legs</span>
       </span>
       <span class="pro-tag">PRO</span>
     </button>
@@ -96,6 +88,13 @@
       <div class="sim-foot">
         Each iteration: independent bernoulli per leg using market-implied probabilities.
         Payout assumes atomic parlay (all legs must hit).
+      </div>
+      <div id="improveOdds" class="improve-odds hidden">
+        <div class="improve-odds-info">
+          <div class="improve-odds-title">↗ Improve odds</div>
+          <div class="improve-odds-desc" id="improveOddsDesc"></div>
+        </div>
+        <button class="improve-odds-apply" id="improveOddsApply" type="button">Apply</button>
       </div>
     </section>
 

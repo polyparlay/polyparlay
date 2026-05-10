@@ -764,9 +764,9 @@ function renderSummary() {
   } else {
     toggleHidden('cardWrap', true);
   }
-
-  // Refresh the standalone Improve Odds row (async — state-dependent text)
-  renderImproveOdds();
+  // Improve Odds now lives at the bottom of the sim results panel (so its
+  // connection to Monte Carlo is visual). It refreshes from renderSimResults,
+  // not from here.
 }
 
 // ---------- actions ----------
@@ -1382,6 +1382,10 @@ function renderSimResults(r) {
   ).join('');
   setText('simHeadLabel', `Monte Carlo · ${itLabel} sims`);
   toggleHidden('simResults', false);
+
+  // Render Improve Odds at the bottom of the panel after sim results render
+  renderImproveOdds();
+
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -1447,6 +1451,8 @@ async function renderImproveOdds() {
       if (resp && resp.ok) currentSlip = resp.slip;
       renderLegs();
       renderSummary();
+      // Re-run sim so user sees the improved outcome
+      runAndShowSim();
     } finally {
       apply.disabled = false;
       apply.textContent = prevText;
