@@ -94,12 +94,14 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
 
 .leg {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto 36px;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
+  transition: background 0.12s ease;
 }
+.leg:hover { background: rgba(255, 255, 255, 0.015); }
 .leg .q {
   color: var(--text-strong);
   font-weight: 500;
@@ -108,11 +110,12 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  line-height: 1.3;
 }
 .leg .meta {
   font-size: 11px;
   color: var(--muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 .leg .price {
   font-weight: 700;
@@ -124,24 +127,55 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   font-size: 10px;
   color: var(--muted);
   font-weight: 500;
+  margin-top: 2px;
 }
-.leg .leg-actions {
+.leg .leg-secondary {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: 6px;
+  margin-top: 6px;
 }
-.leg .leg-actions button {
+.leg .leg-secondary button {
   background: transparent;
   border: 1px solid var(--line);
   color: var(--muted);
   border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 10px;
+  padding: 3px 8px;
+  font-size: 11px;
   cursor: pointer;
+  font-weight: 500;
 }
-.leg .leg-actions button:hover { color: var(--text-strong); }
-.leg .dir-yes { color: var(--green); }
-.leg .dir-no { color: var(--red); }
+.leg .leg-secondary button:hover {
+  color: var(--text-strong);
+  border-color: #2c3142;
+}
+.leg-remove {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.12s ease;
+  align-self: center;
+}
+.leg-remove:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--red);
+  border-color: var(--red);
+}
+.leg-remove:active {
+  transform: scale(0.95);
+}
+.leg .dir-yes { color: var(--green); font-weight: 600; }
+.leg .dir-no { color: var(--red); font-weight: 600; }
 
 .locked {
   padding: 12px;
@@ -279,3 +313,89 @@ footer a { color: var(--muted); text-decoration: none; }
 footer a:hover { color: var(--text-strong); }
 
 .hidden { display: none !important; }
+
+/* Pro features panel — always visible, items shown but locked */
+.pro-panel {
+  margin: 0 12px 12px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.05), rgba(245, 158, 11, 0));
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 10px;
+}
+.pro-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pro-tag {
+  background: var(--pro);
+  color: #1f2937;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+.pro-panel-title {
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 12px;
+}
+.pro-feat {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 6px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.12s ease, background 0.12s ease;
+}
+.pro-feat:hover {
+  opacity: 1;
+  background: rgba(245, 158, 11, 0.06);
+}
+.pro-icon {
+  font-size: 14px;
+  align-self: start;
+  margin-top: 1px;
+}
+.pro-feat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pro-feat-title {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.2;
+}
+.pro-feat-desc {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.pro-cta {
+  width: 100%;
+  margin-top: 10px;
+  background: var(--pro);
+  color: #1f2937;
+  border: 0;
+  padding: 9px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+.pro-cta:hover {
+  filter: brightness(1.06);
+}

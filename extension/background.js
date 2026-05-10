@@ -56,8 +56,12 @@ function normalizeMarket(m, parentEvent) {
 
 async function getSlip() {
   const { slip } = await chrome.storage.local.get(['slip']);
-  if (slip && Array.isArray(slip.legs)) return slip;
-  return { legs: [], stake: 10, createdAt: Date.now() };
+  const defaults = { legs: [], stake: 10, createdAt: Date.now() };
+  if (slip && Array.isArray(slip.legs)) {
+    // Merge defaults so legacy slips (pre-v0.1.2) get a stake fallback.
+    return { ...defaults, ...slip, stake: slip.stake != null ? Number(slip.stake) : 10 };
+  }
+  return defaults;
 }
 
 async function setSlip(slip) {

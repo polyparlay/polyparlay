@@ -99,23 +99,23 @@ function renderLeg(leg, idx) {
   const dirClass = leg.direction === 'YES' ? 'dir-yes' : 'dir-no';
   const dirLabel = leg.direction || 'YES';
   div.innerHTML = `
-    <div>
+    <div class="leg-body">
       <div class="q">${escapeHtml(leg.question)}</div>
       <div class="meta">
         <span class="${dirClass}">${dirLabel}</span>
         ${leg.category ? ' · ' + escapeHtml(leg.category) : ''}
         ${leg.endDate ? ' · resolves ' + new Date(leg.endDate).toLocaleDateString() : ''}
       </div>
+      <div class="leg-secondary">
+        <button data-flip="${leg.id}" title="Switch this leg between YES and NO">Flip to ${leg.direction === 'YES' ? 'NO' : 'YES'}</button>
+        <button data-open="${leg.id}" title="Open on Polymarket">Open ↗</button>
+      </div>
     </div>
     <div class="price">
       ${fmt$(leg.price)}
       <small>leg ${idx + 1}</small>
     </div>
-    <div class="leg-actions">
-      <button data-open="${leg.id}" title="Open on Polymarket">↗</button>
-      <button data-flip="${leg.id}">Flip</button>
-      <button data-remove="${leg.id}">×</button>
-    </div>
+    <button class="leg-remove" data-remove="${leg.id}" title="Remove leg" aria-label="Remove leg ${idx + 1}">×</button>
   `;
   return div;
 }
@@ -129,15 +129,18 @@ function escapeHtml(s) {
 function renderSummary() {
   // Only count free-tier legs in summary (the locked-leg multiplier is visible in the locked block)
   const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
+  // Defensive: stake can be undefined on legacy slips. Always fall back to 10.
+  const stake = Number(currentSlip.stake);
+  const safeStake = isFinite(stake) && stake >= 0 ? stake : 10;
   const cost = combinedCost(eligible);
   const mult = multiplier(eligible);
-  const payout = maxPayout(eligible, currentSlip.stake);
+  const payout = maxPayout(eligible, safeStake);
 
   document.getElementById('combinedCost').textContent =
     cost == null ? '—' : (cost * 100).toFixed(1) + '¢ / $1';
   document.getElementById('multiplier').textContent = fmtMult(mult);
   document.getElementById('maxPayout').textContent = fmt$(payout);
-  document.getElementById('stake').value = currentSlip.stake;
+  document.getElementById('stake').value = safeStake;
 
   const hasLegs = eligible.length > 0;
   document.getElementById('generate').disabled = !hasLegs;
@@ -396,9 +399,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('share').addEventListener('click', shareToX);
   document.getElementById('open').addEventListener('click', openViewer);
   document.getElementById('upgrade').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://polyparlay.io/upgrade' });
+    chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=leg-gate' });
   });
   document.getElementById('addCurrent').addEventListener('click', addCurrentTab);
+
+  // Pro panel — every locked feature is a clickable upgrade trigger.
+  // The query param lets future analytics attribute conversions to specific features.
+  document.getElementById('proCta').addEventListener('click', () => {
+    chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=panel-cta' });
+  });
+  document.querySelectorAll('.pro-feat').forEach((el) => {
+    el.addEventListener('click', () => {
+      const feature = el.getAttribute('data-pro') || 'unknown';
+      chrome.tabs.create({ url: `https://polyparlay.io/upgrade?from=feat-${encodeURIComponent(feature)}` });
+    });
+  });
 });
 
 async function addCurrentTab() {
