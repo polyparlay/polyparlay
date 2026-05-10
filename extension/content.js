@@ -23,33 +23,39 @@
     'feed', 'activity', 'rewards', 'referral', 'earn', 'wallet'
   ]);
 
-  function extractSlug() {
-    const path = window.location.pathname;
+  // Read og:url meta as canonical fallback — PM sets this on every market page
+  // and it often contains the cleanest slug even when the visible URL has been
+  // rewritten (e.g. live game pages with extra path segments).
+  function ogUrl() {
+    const meta = document.querySelector('meta[property="og:url"]');
+    if (!meta) return null;
+    const href = meta.getAttribute('content');
+    if (!href) return null;
+    try {
+      return new URL(href, window.location.origin);
+    } catch {
+      return null;
+    }
+  }
 
+  function extractSlugFromPath(path) {
     // 1. /event/<slug> or /event/<event-slug>/<sub-market-slug>
     const eventMatch = path.match(/^\/event\/([^/?#]+)(?:\/([^/?#]+))?/);
     if (eventMatch) {
       return { kind: eventMatch[2] ? 'submarket' : 'event', slug: eventMatch[2] || eventMatch[1] };
     }
-
     // 2. /market/<slug> or /markets/<slug>
     const marketMatch = path.match(/^\/markets?\/([^/?#]+)/);
     if (marketMatch) return { kind: 'market', slug: marketMatch[1] };
-
-    // 3. Category-prefixed URLs: /sports/<slug>, /crypto/<slug>, /elections/<slug>,
-    //    /politics/<slug>, /odds/<slug>, /games/<slug>, etc.
-    //    These all follow the same pattern: a category bucket then a market slug.
+    // 3. Category-prefixed URLs
     const categoryMatch = path.match(/^\/([a-z-]+)\/([^/?#]+)(?:\/([^/?#]+))?/);
     if (categoryMatch) {
       const [, category, first, second] = categoryMatch;
-      // Don't double-count standard paths handled above
       if (!RESERVED_PM_PATHS.has(category)) {
         return { kind: category, slug: second || first };
       }
     }
-
-    // 4. Generic fallback: try the deepest segment if it looks like a slug.
-    //    Catches edge cases like /<slug-with-dashes> at root or unusual routes.
+    // 4. Generic last-segment fallback
     const parts = path.split('/').filter(Boolean);
     if (parts.length >= 1) {
       const candidate = parts[parts.length - 1];
@@ -61,7 +67,20 @@
         return { kind: 'guess', slug: candidate };
       }
     }
+    return null;
+  }
 
+  function extractSlug() {
+    // Try the visible URL first
+    const fromVisible = extractSlugFromPath(window.location.pathname);
+    if (fromVisible) return fromVisible;
+    // Fallback to og:url meta — catches sports/live pages where the visible URL
+    // has been client-side rewritten but the canonical og:url is still clean
+    const og = ogUrl();
+    if (og) {
+      const fromOg = extractSlugFromPath(og.pathname);
+      if (fromOg) return fromOg;
+    }
     return null;
   }
 
@@ -292,10 +311,19 @@
       } else {
         const errMsg = (resp && resp.error) || 'Could not add';
         flashButton(errMsg, '#dc2626');
-        // Show current slip even when THIS add failed (e.g. 'Already in slip',
-        // 'Not found in Gamma'). User has legs from before and wants to see them.
+        // ALWAYS console.warn with diagnostic data so the user can paste back
+        // when sports/live markets fail. DevTools console > popup status reports.
+        // eslint-disable-next-line no-console
+        console.warn('[PolyParlay] Add failed', {
+          error: errMsg,
+          detectedSlug: detected,
+          pageUrl: window.location.href,
+          pathname: window.location.pathname,
+          pageTitle: document.title,
+          ogUrlMeta: document.querySelector('meta[property="og:url"]')?.getAttribute('content') || null
+        });
         const { slip } = await chrome.storage.local.get(['slip']);
-        showPreview(slip || null, errMsg);
+        showPreview(slip || null, errMsg + ' · check DevTools for details');
       }
     } catch (err) {
       log('addLeg error', err);

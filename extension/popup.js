@@ -342,25 +342,28 @@ async function applyProState() {
   const cta = document.getElementById('proMainCta');
   if (cta) {
     if (state.tier === 'free') {
+      // Loss-aversion framing: emphasize what they'll miss + early-adopter lock-in
       cta.innerHTML =
-        '<span class="pro-cta-line1">Start 7-day free trial</span>' +
-        '<span class="pro-cta-line2">$149/year after · cancel anytime · no card during trial</span>';
+        '<span class="pro-cta-line1">Try Pro free for 7 days</span>' +
+        '<span class="pro-cta-line2">$149/yr after · early-adopter price locks in · no card required</span>';
     } else if (state.tier === 'trial') {
       const dayLabel = state.daysLeft === 1 ? '1 day' : state.daysLeft + ' days';
       const hourLabel = state.hoursLeft <= 24 ? state.hoursLeft + 'h' : null;
+      // Urgency: time-bounded, with concrete loss framing
       cta.innerHTML =
-        `<span class="pro-cta-line1">Trial · ${hourLabel || dayLabel} left</span>` +
-        '<span class="pro-cta-line2">Pay $149 now to lock in Pro · cancel anytime</span>';
+        `<span class="pro-cta-line1">Trial · ${hourLabel || dayLabel} left → lock in Pro</span>` +
+        '<span class="pro-cta-line2">Keep Monte Carlo + Improve Odds · $149/yr · cancel anytime</span>';
     } else if (state.tier === 'paid') {
       const d = new Date(state.expiresAt);
       const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
       cta.innerHTML =
-        '<span class="pro-cta-line1">Pro active</span>' +
-        `<span class="pro-cta-line2">Until ${dateStr}</span>`;
+        '<span class="pro-cta-line1">Pro active ✓</span>' +
+        `<span class="pro-cta-line2">Until ${dateStr} · thanks for supporting PolyParlay</span>`;
     } else {
+      // Expired — loss-aversion + recovery
       cta.innerHTML =
-        '<span class="pro-cta-line1">Trial expired · Pay $149/year</span>' +
-        '<span class="pro-cta-line2">Cancel anytime</span>';
+        '<span class="pro-cta-line1">Renew Pro — your simulator + rebalancer are locked</span>' +
+        '<span class="pro-cta-line2">$149/yr · pay once on Polygon · cancel anytime</span>';
     }
   }
 
@@ -940,14 +943,29 @@ function drawCard() {
   ctx.font = '600 13px -apple-system, sans-serif';
   ctx.fillText('MONTE CARLO + ODDS OPTIMIZER', 88, 96);
 
-  // Timestamp top right
-  const now = new Date();
-  const dateStr = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  ctx.fillStyle = '#6b7280';
-  ctx.font = '500 13px -apple-system, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText(dateStr.toUpperCase(), W - 60, 73);
-  ctx.textAlign = 'left';
+  // Top-right corner — for Pro users, show a gold PRO badge instead of the
+  // date stamp. Creates a visual status symbol that free users see in shared
+  // cards (aspirational lever for upgrade).
+  const isPro = document.body.classList.contains('state-paid') ||
+                document.body.classList.contains('state-trial');
+  if (isPro) {
+    ctx.fillStyle = '#fbbf24';
+    roundRect(ctx, W - 110, 50, 60, 28, 6);
+    ctx.fill();
+    ctx.fillStyle = '#0a0c14';
+    ctx.font = '900 14px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('PRO', W - 80, 70);
+    ctx.textAlign = 'left';
+  } else {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '500 13px -apple-system, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(dateStr.toUpperCase(), W - 60, 73);
+    ctx.textAlign = 'left';
+  }
 
   // --- LEGS ---
   const startY = 160;

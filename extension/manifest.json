@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PolyParlay — Parlay Builder for Polymarket",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "Build multi-leg parlays from Polymarket markets. See combined multiplier and max payout. Generate shareable slip cards. Information only — no execution.",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
