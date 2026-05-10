@@ -623,9 +623,21 @@ function renderSummary() {
     toggleHidden('concentrationWarn', true);
   }
 
-  // Pro section is now feature-card based — values aren't piped here, they
-  // sit blurred inside each card as illustrative tease until v1.0 ships the
-  // Smart Money infrastructure (curated wallet list + continuous monitoring).
+  // Real Pro analytics — 3 open rows (computed live from public data)
+  const risk = riskScore(eligible);
+  setText('proRisk', risk || '—');
+  const slipVol = totalVolume24h(eligible);
+  setText('proVol24', slipVol != null ? fmtCompactDollar(slipVol) : '—');
+  const drift = avg24hDrift(eligible);
+  if (drift != null) {
+    const sign = drift >= 0 ? '+' : '';
+    setText('proDrift', sign + (drift * 100).toFixed(1) + 'pp');
+  } else {
+    setText('proDrift', '—');
+  }
+  // The 6 blurred locked rows ship with illustrative sample values in HTML —
+  // they unblur in Preview Pro mode so the user can see the full UX. Real
+  // data piping for those (smart money, signal archive, etc.) ships in v1.0.
 
   const hasLegs = eligible.length > 0;
   const shareBtn = document.getElementById('shareX');
@@ -887,10 +899,30 @@ async function shareToX() {
 }
 
 // ---------- wiring ----------
+function systemPrefersLight() {
+  try {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  } catch {
+    return false;
+  }
+}
+
 async function applyTheme() {
   try {
     const { pmTheme } = await chrome.storage.local.get(['pmTheme']);
-    document.body.setAttribute('data-theme', pmTheme === 'light' ? 'light' : 'dark');
+    // Priority: PM theme (synced via content script) > system preference > dark default
+    let theme = pmTheme;
+    if (!theme) theme = systemPrefersLight() ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', theme);
+  } catch {
+    document.body.setAttribute('data-theme', systemPrefersLight() ? 'light' : 'dark');
+  }
+}
+
+// Live-react to OS theme changes even before PM syncs
+if (window.matchMedia) {
+  try {
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', applyTheme);
   } catch {}
 }
 
@@ -940,9 +972,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Pro Preview always-on for now (v1.0 will gate via worker verification).
-  // The body class keeps blur off on the card teases so the visual hierarchy works.
-  document.body.classList.add('preview-pro');
+  // Run Sim button — runs Monte Carlo locally and shows results
+  const simBtn = document.getElementById('runSimBtn');
+  if (simBtn) {
+    simBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      runAndShowSim();
+    });
+  }
+  const simClose = document.getElementById('simClose');
+  if (simClose) {
+    simClose.addEventListener('click', () => {
+      toggleHidden('simResults', true);
+    });
+  }
+
+  // Pro Preview toggle — defaults ON so the user can see every feature unlocked
+  const previewToggle = document.getElementById('proPreview');
+  if (previewToggle) {
+    chrome.storage.local.get(['proPreview']).then(({ proPreview }) => {
+      const enabled = proPreview === undefined ? true : !!proPreview;
+      previewToggle.checked = enabled;
+      document.body.classList.toggle('preview-pro', enabled);
+      if (proPreview === undefined) chrome.storage.local.set({ proPreview: true });
+    });
+    previewToggle.addEventListener('change', () => {
+      const on = previewToggle.checked;
+      document.body.classList.toggle('preview-pro', on);
+      chrome.storage.local.set({ proPreview: on });
+    });
+  }
 });
 
 async function loadAndRenderLeaderboard() {
