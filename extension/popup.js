@@ -398,7 +398,61 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('upgrade').addEventListener('click', () => {
     chrome.tabs.create({ url: 'https://polyparlay.io/upgrade' });
   });
+  document.getElementById('addCurrent').addEventListener('click', addCurrentTab);
 });
+
+async function addCurrentTab() {
+  const btn = document.getElementById('addCurrent');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Reading current tab…';
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab || !tab.url) {
+      btn.textContent = 'No active tab';
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1400);
+      return;
+    }
+    const url = new URL(tab.url);
+    if (!/(?:^|\.)polymarket\.com$/.test(url.hostname)) {
+      btn.textContent = 'Open a Polymarket tab first';
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1800);
+      return;
+    }
+    const path = url.pathname;
+    const eventMatch = path.match(/^\/event\/([^/?#]+)(?:\/([^/?#]+))?/);
+    const marketMatch = path.match(/^\/markets?\/([^/?#]+)/);
+    let detected = null;
+    if (eventMatch) {
+      detected = { kind: eventMatch[2] ? 'submarket' : 'event', slug: eventMatch[2] || eventMatch[1] };
+    } else if (marketMatch) {
+      detected = { kind: 'market', slug: marketMatch[1] };
+    }
+    if (!detected) {
+      btn.textContent = 'No market in URL';
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1800);
+      return;
+    }
+    const resp = await chrome.runtime.sendMessage({
+      type: 'addLeg',
+      detected,
+      pageTitle: tab.title || 'Polymarket market',
+      url: tab.url
+    });
+    if (resp && resp.ok) {
+      btn.textContent = resp.message || 'Added';
+      currentSlip = (await chrome.runtime.sendMessage({ type: 'getSlip' })).slip;
+      renderLegs();
+      renderSummary();
+    } else {
+      btn.textContent = (resp && resp.error) || 'Could not add';
+    }
+    setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1400);
+  } catch (err) {
+    btn.textContent = 'Error: ' + (err.message || err);
+    setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1800);
+  }
+}
 
 // React to background storage changes
 chrome.storage.onChanged.addListener((changes) => {

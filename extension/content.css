@@ -60,3 +60,42 @@
   line-height: 18px !important;
   text-align: center !important;
 }
+#polyparlay-floating-btn.pw-disabled {
+  opacity: 0.6 !important;
+  background: #1a2030 !important;
+}
+#polyparlay-floating-btn.pw-disabled .pw-plus {
+  background: #374151 !important;
+}
+#polyparlay-floating-btn.pw-disabled:hover {
+  opacity: 0.85 !important;
+}
+
+.polyparlay-inline-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  margin-left: 6px !important;
+  padding: 4px 8px !important;
+  background: #6366f1 !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+  letter-spacing: 0.2px !important;
+  text-transform: none !important;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.35) !important;
+}
+.polyparlay-inline-btn:hover {
+  filter: brightness(1.1) !important;
+}
+.polyparlay-inline-btn:active {
+  transform: translateY(1px) !important;
+}

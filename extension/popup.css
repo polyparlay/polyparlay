@@ -57,6 +57,30 @@ button.ghost {
 }
 button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
 
+.add-current {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.add-current-btn {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.add-current-btn:hover {
+  color: var(--text-strong);
+  border-color: var(--accent);
+}
+.add-current-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .legs {
   max-height: 280px;
   overflow-y: auto;
