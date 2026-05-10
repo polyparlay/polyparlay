@@ -210,6 +210,28 @@ async function refreshSlipPrices() {
   return slip;
 }
 
+// Open the extension popup if the API is available (Chrome 127+),
+// otherwise fall back to opening popup.html in a new tab.
+async function openExtensionUI() {
+  // chrome.action.openPopup() requires a recent Chrome AND a user gesture
+  // that propagated from the content-script click through sendMessage.
+  if (chrome.action && typeof chrome.action.openPopup === 'function') {
+    try {
+      await chrome.action.openPopup();
+      return { ok: true, method: 'popup' };
+    } catch (err) {
+      // fall through to tab fallback
+    }
+  }
+  try {
+    const url = chrome.runtime.getURL('popup.html');
+    await chrome.tabs.create({ url });
+    return { ok: true, method: 'tab' };
+  } catch (err) {
+    return { ok: false, error: String(err && err.message ? err.message : err) };
+  }
+}
+
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     try {
@@ -234,6 +256,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           break;
         case 'refreshPrices':
           sendResponse({ ok: true, slip: await refreshSlipPrices() });
+          break;
+        case 'openPopup':
+          sendResponse(await openExtensionUI());
           break;
         default:
           sendResponse({ ok: false, error: 'Unknown message type' });

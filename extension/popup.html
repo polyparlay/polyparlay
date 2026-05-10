@@ -47,39 +47,60 @@
         </div>
       </div>
 
-      <button class="pro-blur" data-pro="roi" type="button" aria-label="Unlock expected ROI">
-        <div class="pro-blur-content">
-          <div class="pro-blur-label">Expected ROI</div>
-          <div class="pro-blur-value">+14.2%</div>
-          <div class="pro-blur-sub">on $10 stake · 12.4× kelly</div>
-        </div>
-        <div class="pro-blur-overlay">
+      <div class="pro-analytics">
+        <div class="pro-analytics-head">
           <span class="pro-tag">PRO</span>
-          <div class="pro-blur-msg">EV from your wallet history + smart money + spread cost</div>
+          <span class="pro-analytics-title">Pre-trade decision data</span>
+          <span class="pro-analytics-preview">preview · launches v1.0</span>
         </div>
-      </button>
+        <button class="pro-metric" data-pro="roi" type="button">
+          <span class="pro-metric-label">Expected ROI</span>
+          <span class="pro-metric-value pro-blurred">+14.2%</span>
+        </button>
+        <button class="pro-metric" data-pro="winprob" type="button">
+          <span class="pro-metric-label">Win probability <span class="row-hint">with your edge</span></span>
+          <span class="pro-metric-value pro-blurred">42.8%</span>
+        </button>
+        <button class="pro-metric" data-pro="risk" type="button">
+          <span class="pro-metric-label">Risk score <span class="row-hint">vs bankroll</span></span>
+          <span class="pro-metric-value pro-blurred">MODERATE</span>
+        </button>
+        <button class="pro-metric" data-pro="kelly" type="button">
+          <span class="pro-metric-label">Kelly-optimal stake</span>
+          <span class="pro-metric-value pro-blurred">$8.40</span>
+        </button>
+        <button class="pro-metric" data-pro="smart-agree" type="button">
+          <span class="pro-metric-label">Smart money agreement</span>
+          <span class="pro-metric-value pro-blurred">7 / 10 agree</span>
+        </button>
+        <button class="pro-metric" data-pro="slippage-est" type="button">
+          <span class="pro-metric-label">True fill price <span class="row-hint">at your stake</span></span>
+          <span class="pro-metric-value pro-blurred">$0.024</span>
+        </button>
+        <button class="pro-metric" data-pro="drift-24h" type="button">
+          <span class="pro-metric-label">24h price drift</span>
+          <span class="pro-metric-value pro-blurred">+30pp</span>
+        </button>
+        <button class="pro-metric" data-pro="exit-signal" type="button">
+          <span class="pro-metric-label">Mass-exit signal</span>
+          <span class="pro-metric-value pro-blurred">3 wallets out</span>
+        </button>
+        <button class="pro-metric" data-pro="user-record" type="button">
+          <span class="pro-metric-label">Your record on this type</span>
+          <span class="pro-metric-value pro-blurred">4-9 (31%)</span>
+        </button>
+        <button class="pro-cta-inline" id="proAnalyticsCta" type="button">Unlock all — $29.99/mo</button>
+      </div>
 
       <div class="summary-section analytics-section">
-        <div class="section-label">Live analytics · Free</div>
+        <div class="section-label">Free · Mechanical &amp; logistics</div>
         <div class="row">
-          <span>Loss probability <span class="row-hint">any leg misses</span></span>
-          <span id="lossProb">—</span>
-        </div>
-        <div class="row">
-          <span>Independent payout <span class="row-hint">no parlay</span></span>
+          <span>Independent payout <span class="row-hint">no parlay, even split</span></span>
           <span id="indSum">—</span>
-        </div>
-        <div class="row">
-          <span>Implied joint prob</span>
-          <span id="combinedCost">—</span>
         </div>
         <div class="row">
           <span>Resolves by</span>
           <span id="lastReso">—</span>
-        </div>
-        <div class="row">
-          <span>Liquidity <span class="row-hint">24h vol</span></span>
-          <span id="volSum">—</span>
         </div>
         <div class="warning hidden" id="concentrationWarn">
           <span class="warn-icon">⚠</span>
@@ -96,46 +117,6 @@
         <span class="pro-tag">PRO</span>
       </button>
 
-      <div class="summary-section pro-mini-section">
-        <div class="section-label pro-section-label">
-          <span class="pro-tag">PRO</span> Decision data — hidden from other tools
-        </div>
-        <button class="pro-mini-row" data-pro="smart">
-          <span class="pro-mini-lock">🔒</span>
-          <span class="pro-mini-label">
-            <span class="pro-mini-title">Smart money agreement</span>
-            <span class="pro-mini-desc">"7 of top 10 profitable wallets are YES here. 1 is NO. 2 sat out." Public on-chain data, surfaced at the moment you decide.</span>
-          </span>
-        </button>
-        <button class="pro-mini-row" data-pro="slippage">
-          <span class="pro-mini-lock">🔒</span>
-          <span class="pro-mini-label">
-            <span class="pro-mini-title">True fill price at your stake</span>
-            <span class="pro-mini-desc">"$50 fills at $0.024, not the $0.021 displayed — orderbook depth costs you 14%." Numbers PM doesn't surface.</span>
-          </span>
-        </button>
-        <button class="pro-mini-row" data-pro="drift">
-          <span class="pro-mini-lock">🔒</span>
-          <span class="pro-mini-label">
-            <span class="pro-mini-title">Recent price drift</span>
-            <span class="pro-mini-desc">"Up 30pp in 24h, up 45pp in 7d — you're chasing momentum." Or: "Flat for 5 days — fresh entry."</span>
-          </span>
-        </button>
-        <button class="pro-mini-row" data-pro="exit">
-          <span class="pro-mini-lock">🔒</span>
-          <span class="pro-mini-label">
-            <span class="pro-mini-title">Mass-exit alert</span>
-            <span class="pro-mini-desc">"3 of top 10 wallets exited this position in the last 6 hours." Strong negative signal nobody else surfaces.</span>
-          </span>
-        </button>
-        <button class="pro-mini-row" data-pro="basrate">
-          <span class="pro-mini-lock">🔒</span>
-          <span class="pro-mini-label">
-            <span class="pro-mini-title">Your record on this bet type</span>
-            <span class="pro-mini-desc">"You're 4-9 on weather YES at $0.60+ entries. You don't win this structure." Calibrated from your own wallet.</span>
-          </span>
-        </button>
-      </div>
     </section>
 
     <section class="actions">
@@ -169,7 +150,7 @@
     <section class="pro-panel" id="proPanel">
       <div class="pro-panel-head">
         <span class="pro-tag">PRO</span>
-        <span class="pro-panel-title">Coming in Pro · $29.99/mo</span>
+        <span class="pro-panel-title">Pro features · $29.99/mo · launches v1.0</span>
       </div>
       <button class="pro-feat" data-pro="smart-money">
         <span class="pro-icon" aria-hidden="true">🔒</span>

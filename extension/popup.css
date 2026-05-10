@@ -377,75 +377,98 @@ summary.execute-summary {
   margin-right: 0;
 }
 
-/* Blurred Expected ROI panel — the curiosity hook */
-.pro-blur {
-  position: relative;
-  display: block;
-  width: calc(100% - 24px);
+/* Pre-trade decision data — labels clear, values blurred.
+   Idea: tease the categories (so the user knows what they unlock) without
+   revealing the actual numbers (which is the point of the paywall). */
+.pro-analytics {
   margin: 12px;
-  padding: 18px 14px;
+  padding: 12px 14px;
   background-color: var(--surface-2);
-  background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(99, 102, 241, 0.06));
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(99, 102, 241, 0.04));
+  border: 1px solid rgba(245, 158, 11, 0.28);
   border-radius: 10px;
-  cursor: pointer;
-  overflow: hidden;
-  font-family: inherit;
-  text-align: center;
   color: var(--text);
-  transition: border-color 0.18s ease, transform 0.12s ease;
 }
-.pro-blur:hover {
-  border-color: rgba(245, 158, 11, 0.5);
+.pro-analytics-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.15);
 }
-.pro-blur:active {
-  transform: scale(0.99);
+.pro-analytics-title {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-strong);
 }
-.pro-blur-content {
-  filter: blur(7px);
-  pointer-events: none;
+.pro-analytics-preview {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.pro-metric {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px;
+  background-color: transparent;
+  background-image: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text);
+  transition: background-color 0.12s ease;
+}
+.pro-metric:hover {
+  background-color: rgba(245, 158, 11, 0.07);
+}
+.pro-metric:hover .pro-metric-label {
+  color: var(--text-strong);
+}
+.pro-metric-label {
+  color: var(--muted);
+  flex: 1;
+  text-align: left;
+}
+.pro-metric-value {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-strong);
+}
+/* The actual blur — values stay rendered so the tease is visible
+   but unreadable. user-select disabled so highlight-to-read doesn't work. */
+.pro-blurred {
+  filter: blur(5.5px);
+  -webkit-filter: blur(5.5px);
   user-select: none;
+  pointer-events: none;
   opacity: 0.85;
 }
-.pro-blur-label {
-  font-size: 10px;
-  letter-spacing: 0.7px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 4px;
-  font-weight: 700;
-}
-.pro-blur-value {
-  font-size: 32px;
+.pro-cta-inline {
+  width: 100%;
+  margin-top: 10px;
+  background-color: var(--pro);
+  background-image: none;
+  color: #1f2937;
+  border: 0;
+  padding: 9px;
+  border-radius: 6px;
   font-weight: 800;
-  color: var(--green);
-  line-height: 1;
-  margin-bottom: 4px;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: filter 0.12s ease;
 }
-.pro-blur-sub {
-  font-size: 11px;
-  color: var(--muted);
-}
-.pro-blur-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: rgba(11, 13, 18, 0.55);
-  padding: 12px;
-  text-align: center;
-}
-.pro-blur-overlay .pro-tag {
-  font-size: 10px;
-}
-.pro-blur-msg {
-  font-size: 11px;
-  color: var(--text);
-  line-height: 1.4;
-  font-weight: 500;
+.pro-cta-inline:hover {
+  filter: brightness(1.06);
 }
 
 /* Inline analytics rows — free tier, live-updating */
