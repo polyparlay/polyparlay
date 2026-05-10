@@ -47,90 +47,60 @@
         </div>
       </div>
 
+      <button class="run-sim-box" data-pro="simulation" type="button">
+        <span class="run-sim-icon" aria-hidden="true">🎲</span>
+        <span class="run-sim-content">
+          <span class="run-sim-title">Run 10,000-outcome simulation</span>
+          <span class="run-sim-desc">Distribution of payouts, percentile bands, edge sensitivity</span>
+        </span>
+        <span class="pro-tag">PRO</span>
+      </button>
+
       <section class="pro-section">
         <div class="pro-head">
           <span class="pro-tag">PRO</span>
           <span class="pro-meta">$29.99/mo · launches v1.0</span>
         </div>
 
-        <button class="pro-card pro-primary" data-pro="simulation" type="button">
-          <span class="pro-card-icon" aria-hidden="true">🎲</span>
-          <span class="pro-card-body">
-            <span class="pro-card-title">Run 10,000-outcome simulation</span>
-            <span class="pro-card-desc">Distribution of payouts, percentile bands, edge sensitivity</span>
-          </span>
+        <button class="pro-row" data-pro="roi" type="button">
+          <span class="pro-row-label">Expected ROI</span>
+          <span class="pro-row-value">+14.2%</span>
+        </button>
+        <button class="pro-row" data-pro="risk" type="button">
+          <span class="pro-row-label">Risk score</span>
+          <span class="pro-row-value">MODERATE</span>
+        </button>
+        <button class="pro-row" data-pro="slippage" type="button">
+          <span class="pro-row-label">True fill price</span>
+          <span class="pro-row-value">$0.024</span>
         </button>
 
-        <button class="pro-card" data-pro="smart-money" type="button">
-          <span class="pro-card-icon" aria-hidden="true">📊</span>
-          <span class="pro-card-body">
-            <span class="pro-card-title">Smart Money Feed</span>
-            <span class="pro-card-desc">Real-time positions from top profitable PM wallets — one-click add to slip</span>
-            <span class="pro-card-tease">agreement on this slip: <span class="pro-blurred">7 of 10</span></span>
-          </span>
+        <div class="pro-divider"><span>Unlock 6 more</span></div>
+
+        <button class="pro-row pro-row-locked" data-pro="smart-money" type="button">
+          <span class="pro-row-label">Smart money agreement</span>
+          <span class="pro-row-value pro-blurred">7 of 10</span>
         </button>
-
-        <button class="pro-card" data-pro="record" type="button">
-          <span class="pro-card-icon" aria-hidden="true">📈</span>
-          <span class="pro-card-body">
-            <span class="pro-card-title">Your record by bet type</span>
-            <span class="pro-card-desc">Win rate by category, leg count, entry price — auto-tracked from your wallet</span>
-            <span class="pro-card-tease">on this type: <span class="pro-blurred">4-9 (31%)</span></span>
-          </span>
+        <button class="pro-row pro-row-locked" data-pro="record" type="button">
+          <span class="pro-row-label">Your record on this type</span>
+          <span class="pro-row-value pro-blurred">4-9 (31%)</span>
         </button>
-
-        <button class="pro-card" data-pro="partial" type="button">
-          <span class="pro-card-icon" aria-hidden="true">⚡</span>
-          <span class="pro-card-body">
-            <span class="pro-card-title">Partial win calculator</span>
-            <span class="pro-card-desc">Sell legs mid-parlay at live prices — exit strategy, demonstrated</span>
-          </span>
+        <button class="pro-row pro-row-locked" data-pro="winprob" type="button">
+          <span class="pro-row-label">Win probability w/ edge</span>
+          <span class="pro-row-value pro-blurred">42.8%</span>
         </button>
-
-        <div class="pro-preview" aria-label="Open preview metrics">
-          <button class="pro-preview-row" data-pro="roi" type="button">
-            <span class="pro-preview-label">Expected ROI</span>
-            <span class="pro-preview-value" id="proRoi">+14.2%</span>
-          </button>
-          <button class="pro-preview-row" data-pro="risk" type="button">
-            <span class="pro-preview-label">Risk score</span>
-            <span class="pro-preview-value" id="proRisk">MODERATE</span>
-          </button>
-          <button class="pro-preview-row" data-pro="slippage" type="button">
-            <span class="pro-preview-label">True fill price</span>
-            <span class="pro-preview-value" id="proFill">$0.024</span>
-          </button>
-        </div>
-
-        <details class="pro-more">
-          <summary class="pro-more-summary">
-            <span>+ 7 more decision metrics</span>
-            <span class="pro-caret" aria-hidden="true">▾</span>
-          </summary>
-          <div class="pro-more-list">
-            <button class="pro-more-row" data-pro="winprob" type="button">
-              <span>Win probability with your edge</span><span class="pro-blurred">42.8%</span>
-            </button>
-            <button class="pro-more-row" data-pro="kelly" type="button">
-              <span>Kelly-optimal stake</span><span class="pro-blurred">$8.40</span>
-            </button>
-            <button class="pro-more-row" data-pro="lossprob" type="button">
-              <span>Loss probability</span><span class="pro-blurred">99.95%</span>
-            </button>
-            <button class="pro-more-row" data-pro="jointprob" type="button">
-              <span>Implied joint probability</span><span class="pro-blurred">0.05%</span>
-            </button>
-            <button class="pro-more-row" data-pro="liquidity" type="button">
-              <span>Liquidity 24h vol</span><span class="pro-blurred">$205</span>
-            </button>
-            <button class="pro-more-row" data-pro="drift" type="button">
-              <span>24h price drift</span><span class="pro-blurred">+30pp</span>
-            </button>
-            <button class="pro-more-row" data-pro="exit" type="button">
-              <span>Mass-exit signal</span><span class="pro-blurred">3 out</span>
-            </button>
-          </div>
-        </details>
+        <button class="pro-row pro-row-locked" data-pro="kelly" type="button">
+          <span class="pro-row-label">Kelly-optimal stake</span>
+          <span class="pro-row-value pro-blurred">$8.40</span>
+        </button>
+        <button class="pro-row pro-row-locked" data-pro="drift" type="button">
+          <span class="pro-row-label">24h price drift</span>
+          <span class="pro-row-value pro-blurred">+30pp</span>
+        </button>
+        <button class="pro-row pro-row-locked" data-pro="exit" type="button">
+          <span class="pro-row-label">Mass-exit signal</span>
+          <span class="pro-row-value pro-blurred">3 out</span>
+        </button>
 
         <button class="pro-cta-main" id="proMainCta" type="button">Unlock Pro — $29.99/mo</button>
       </section>

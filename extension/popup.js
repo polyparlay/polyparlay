@@ -231,6 +231,23 @@ function escapeHtml(s) {
   }[c]));
 }
 
+// No-op setter so removed/renamed elements don't throw and stop rendering.
+// (v0.1.6 removed several rows but renderSummary kept setting their textContent,
+// which threw before multiplier and payout were rendered — hence the blanks.)
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value;
+}
+function toggleHidden(id, hide) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('hidden', !!hide);
+}
+
 function renderSummary() {
   // Only count free-tier legs in summary (the locked-leg multiplier is visible in the locked block)
   const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
@@ -241,44 +258,44 @@ function renderSummary() {
   const mult = multiplier(eligible);
   const payout = maxPayout(eligible, safeStake);
 
-  document.getElementById('combinedCost').textContent =
-    cost == null ? '—' : fmtPercent(cost, cost < 0.01 ? 3 : 2);
-  document.getElementById('multiplier').textContent = fmtMult(mult);
-  document.getElementById('maxPayout').textContent = fmt$(payout);
-  document.getElementById('stake').value = safeStake;
+  setText('combinedCost', cost == null ? '—' : fmtPercent(cost, cost < 0.01 ? 3 : 2));
+  setText('multiplier', fmtMult(mult));
+  setText('maxPayout', fmt$(payout));
+  setValue('stake', safeStake);
 
-  // Live analytics — free tier
+  // Live analytics — free tier (some IDs may not exist depending on layout)
   const lossP = lossProbability(eligible);
-  document.getElementById('lossProb').textContent = fmtPercent(lossP, 2);
+  setText('lossProb', fmtPercent(lossP, 2));
 
   const indPay = independentMaxPayout(eligible, safeStake);
-  document.getElementById('indSum').textContent = indPay != null ? fmt$(indPay) + ' max' : '—';
+  setText('indSum', indPay != null ? fmt$(indPay) + ' max' : '—');
 
   const lastReso = lastResolutionDate(eligible);
-  document.getElementById('lastReso').textContent = lastReso ? fmtRelativeDate(lastReso) : '—';
+  setText('lastReso', lastReso ? fmtRelativeDate(lastReso) : '—');
 
   const vol = totalVolume24h(eligible);
-  document.getElementById('volSum').textContent = vol != null ? fmtCompactDollar(vol) : 'data unavailable';
+  setText('volSum', vol != null ? fmtCompactDollar(vol) : 'data unavailable');
 
   const conc = categoryConcentration(eligible);
-  const warn = document.getElementById('concentrationWarn');
   if (conc) {
-    warn.classList.remove('hidden');
-    document.getElementById('concentrationText').textContent = conc.message;
+    toggleHidden('concentrationWarn', false);
+    setText('concentrationText', conc.message);
   } else {
-    warn.classList.add('hidden');
+    toggleHidden('concentrationWarn', true);
   }
 
   const hasLegs = eligible.length > 0;
-  document.getElementById('shareX').disabled = !hasLegs;
-  document.getElementById('downloadTop').disabled = !hasLegs;
+  const shareBtn = document.getElementById('shareX');
+  if (shareBtn) shareBtn.disabled = !hasLegs;
+  const downloadBtn = document.getElementById('downloadTop');
+  if (downloadBtn) downloadBtn.disabled = !hasLegs;
 
   // Auto-render the slip card when there are legs so the user always sees what they're about to share
   if (hasLegs) {
     drawCard();
-    document.getElementById('cardWrap').classList.remove('hidden');
+    toggleHidden('cardWrap', false);
   } else {
-    document.getElementById('cardWrap').classList.add('hidden');
+    toggleHidden('cardWrap', true);
   }
 }
 
