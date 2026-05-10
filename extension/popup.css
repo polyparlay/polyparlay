@@ -520,6 +520,101 @@ summary.execute-summary {
 .pro-cta-main:hover { filter: brightness(1.06); }
 .pro-cta-main:active { transform: scale(0.99); }
 
+/* Monte Carlo sim results panel — opens after the Run Sim button is clicked.
+   Renders entirely client-side (no server), so the user can test the simulation
+   without a Pro subscription. */
+.sim-results {
+  margin: 0 12px 12px;
+  padding: 0;
+  background-color: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.sim-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(245, 158, 11, 0.10));
+  border-bottom: 1px solid var(--line);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-strong);
+}
+.sim-close {
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.sim-close:hover { color: var(--text-strong); }
+.sim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.sim-cell {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+.sim-cell:nth-child(2n) { border-right: 0; }
+.sim-cell-label {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+.sim-cell-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+.sim-cell-value.pos { color: var(--green); }
+.sim-cell-value.neg { color: var(--red); }
+.sim-foot {
+  padding: 8px 12px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.4;
+  background: var(--surface-2);
+}
+
+/* Preview Pro toggle — unblurs locked values for local testing */
+.dev-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+.dev-toggle input {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+.dev-toggle:hover { color: var(--text-strong); }
+
+/* Preview Pro mode: removes blur on all locked values + visual hint */
+body.preview-pro .pro-blurred {
+  filter: none !important;
+  -webkit-filter: none !important;
+  user-select: text !important;
+  pointer-events: auto !important;
+}
+body.preview-pro .pro-row-locked {
+  border-left: 2px solid var(--pro);
+}
+
 /* Inline analytics rows — free tier, live-updating */
 .analytics-section .row {
   padding: 3px 0;

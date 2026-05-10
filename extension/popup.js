@@ -128,6 +128,113 @@ function fmtPercent(n, decimals) {
   if (n == null || isNaN(n)) return '—';
   return (Number(n) * 100).toFixed(decimals != null ? decimals : 2) + '%';
 }
+// Real-data Pro analytics — computed from public Gamma data, no backend needed.
+
+// Risk score heuristic. Reads:
+// - leg count (more legs = higher risk)
+// - combined cost (lower = lottery-style, riskier)
+// - minimum leg liquidity (thinly traded leg = exit risk)
+function riskScore(legs) {
+  if (!legs.length) return null;
+  const cost = combinedCost(legs);
+  const vols = legs.map((l) => Number(l.volume24h) || 0).filter((v) => v > 0);
+  const minVol = vols.length ? Math.min(...vols) : null;
+  let score = 0;
+  if (legs.length >= 4) score += 2;
+  else if (legs.length >= 3) score += 1;
+  if (cost != null && cost < 0.10) score += 1;       // lottery-style
+  if (cost != null && cost < 0.02) score += 1;       // extreme long shot
+  if (minVol != null && minVol < 1000) score += 1;   // thin leg
+  if (minVol != null && minVol < 100) score += 1;    // very thin leg
+  if (score >= 4) return 'EXTREME';
+  if (score >= 2) return 'HIGH';
+  if (score >= 1) return 'MODERATE';
+  return 'LOW';
+}
+
+// Average 24h price drift across legs in absolute price points.
+// Positive = legs have moved up; negative = moved down.
+function avg24hDrift(legs) {
+  const drifts = legs.map((l) => l.priceChange24h).filter((d) => d != null && !isNaN(d));
+  if (!drifts.length) return null;
+  return drifts.reduce((a, b) => a + b, 0) / drifts.length;
+}
+
+// Monte Carlo simulator — runs entirely client-side, ~10ms for 10K iterations.
+// Each iteration: bernoulli trial per leg using market-implied probability.
+// All-or-nothing parlay model (atomic — all legs must hit for payout).
+function runMonteCarlo(legs, stake, iterations = 10000) {
+  if (!legs.length || !stake) return null;
+  const probs = legs.map((l) => Math.max(0, Math.min(1, Number(l.price) || 0)));
+  const cost = probs.reduce((a, b) => a * b, 1);
+  if (cost <= 0) return null;
+  const mult = 1 / cost;
+  const winPayout = stake * mult;
+
+  let wins = 0;
+  let totalReturn = 0;
+  let curWinStreak = 0;
+  let curLossStreak = 0;
+  let maxWinStreak = 0;
+  let maxLossStreak = 0;
+  let cumPnl = 0;
+  let peakPnl = 0;
+  let maxDD = 0;
+
+  for (let i = 0; i < iterations; i++) {
+    let allHit = true;
+    for (let j = 0; j < probs.length; j++) {
+      if (Math.random() > probs[j]) {
+        allHit = false;
+        break;
+      }
+    }
+    if (allHit) {
+      wins++;
+      totalReturn += winPayout - stake;
+      cumPnl += winPayout - stake;
+      curWinStreak++;
+      if (curWinStreak > maxWinStreak) maxWinStreak = curWinStreak;
+      curLossStreak = 0;
+    } else {
+      totalReturn += -stake;
+      cumPnl += -stake;
+      curLossStreak++;
+      if (curLossStreak > maxLossStreak) maxLossStreak = curLossStreak;
+      curWinStreak = 0;
+    }
+    if (cumPnl > peakPnl) peakPnl = cumPnl;
+    const dd = peakPnl - cumPnl;
+    if (dd > maxDD) maxDD = dd;
+  }
+
+  const winRate = wins / iterations;
+  const avgReturn = totalReturn / iterations;
+  const expectedRoi = avgReturn / stake;
+  const totalStaked = stake * iterations;
+  const overallRoi = totalReturn / totalStaked;
+
+  return {
+    iterations,
+    legs: legs.length,
+    stake,
+    multiplier: mult,
+    winPayout,
+    wins,
+    losses: iterations - wins,
+    winRate,
+    impliedWinRate: cost,
+    avgReturnPerParlay: avgReturn,
+    expectedRoi,
+    totalReturn,
+    totalStaked,
+    overallRoi,
+    maxWinStreak,
+    maxLossStreak,
+    maxDrawdown: maxDD
+  };
+}
+
 function fmtRelativeDate(d) {
   if (!d) return '—';
   const now = new Date();
@@ -282,6 +389,24 @@ function renderSummary() {
     setText('concentrationText', conc.message);
   } else {
     toggleHidden('concentrationWarn', true);
+  }
+
+  // Real Pro analytics — open rows
+  const risk = riskScore(eligible);
+  setText('proRisk', risk || '—');
+  const slipVol = totalVolume24h(eligible);
+  setText('proVol24', slipVol != null ? fmtCompactDollar(slipVol) : '—');
+  const drift = avg24hDrift(eligible);
+  if (drift != null) {
+    const sign = drift >= 0 ? '+' : '';
+    setText('proDrift', sign + (drift * 100).toFixed(1) + 'pp');
+    const driftEl = document.getElementById('proDrift');
+    if (driftEl) {
+      driftEl.classList.toggle('drift-up', drift > 0);
+      driftEl.classList.toggle('drift-down', drift < 0);
+    }
+  } else {
+    setText('proDrift', '—');
   }
 
   const hasLegs = eligible.length > 0;
@@ -586,10 +711,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Every Pro feature element with a data-pro attribute opens the upgrade page
   // with feature attribution, so future analytics can track which surface drove the click.
-  // Covers .pro-card, .pro-preview-row, and .pro-more-row uniformly.
   document.querySelectorAll('[data-pro]').forEach((el) => {
     el.addEventListener('click', (e) => {
-      // Don't intercept clicks on the CTA button itself (handled above)
       if (el.id === 'proMainCta') return;
       e.preventDefault();
       const feature = el.getAttribute('data-pro') || 'unknown';
@@ -599,30 +722,109 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Execute menu — open all current legs on Polymarket (each in a new tab, with referral)
-  const openAllBtn = document.getElementById('openAllLegs');
-  if (openAllBtn) {
-    openAllBtn.addEventListener('click', (e) => {
+  // Run Sim button — runs Monte Carlo locally and shows results
+  const simBtn = document.getElementById('runSimBtn');
+  if (simBtn) {
+    simBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
-      const refUrls = eligible
-        .map((l) => l.url)
-        .filter(Boolean)
-        .map((u) => withRef(u));
-      if (!refUrls.length) {
-        setShareStatus('No leg URLs to open. Add at least one leg first.', '#f59e0b');
-        return;
-      }
-      // Open each in a new tab. Chrome may prompt about multiple tabs but the
-      // user-gesture context here typically allows it.
-      refUrls.forEach((u, i) => {
-        // Stagger slightly to avoid Chrome blocking the burst
-        setTimeout(() => chrome.tabs.create({ url: u, active: i === 0 }), i * 80);
-      });
-      const menu = document.getElementById('executeMenu');
-      if (menu) menu.removeAttribute('open');
+      e.stopPropagation();
+      runAndShowSim();
     });
   }
+  const simClose = document.getElementById('simClose');
+  if (simClose) {
+    simClose.addEventListener('click', () => {
+      toggleHidden('simResults', true);
+    });
+  }
+
+  // Pro Preview toggle — local-only flag for testing the paid UX without paying.
+  // Unblurs locked values + ensures real-data rows compute. Persists in chrome.storage.
+  const previewToggle = document.getElementById('proPreview');
+  if (previewToggle) {
+    chrome.storage.local.get(['proPreview']).then(({ proPreview }) => {
+      previewToggle.checked = !!proPreview;
+      document.body.classList.toggle('preview-pro', !!proPreview);
+    });
+    previewToggle.addEventListener('change', () => {
+      const on = previewToggle.checked;
+      document.body.classList.toggle('preview-pro', on);
+      chrome.storage.local.set({ proPreview: on });
+    });
+  }
+});
+
+function runAndShowSim() {
+  const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
+  if (!eligible.length) return;
+  const stake = Number(currentSlip.stake) || 10;
+  const desc = document.getElementById('runSimDesc');
+  if (desc) desc.textContent = 'Running…';
+
+  // Defer to next tick so the UI updates before the (fast) compute hogs the thread
+  setTimeout(() => {
+    const result = runMonteCarlo(eligible, stake, 10000);
+    if (desc) desc.textContent = 'Distribution of payouts, win rate, drawdown — runs in your browser';
+    renderSimResults(result);
+  }, 30);
+}
+
+function renderSimResults(r) {
+  const panel = document.getElementById('simResults');
+  const grid = document.getElementById('simGrid');
+  if (!panel || !grid) return;
+  if (!r) {
+    grid.innerHTML = '<div class="sim-cell" style="grid-column: 1 / -1; text-align: center; color: var(--muted);">No data — add at least one leg with a price.</div>';
+    toggleHidden('simResults', false);
+    return;
+  }
+  const cells = [
+    { label: 'Win rate (sim)', value: (r.winRate * 100).toFixed(2) + '%', cls: '' },
+    { label: 'Implied win rate', value: (r.impliedWinRate * 100).toFixed(2) + '%', cls: '' },
+    { label: 'Multiplier', value: r.multiplier.toFixed(2) + '×', cls: '' },
+    { label: 'Win payout', value: '$' + r.winPayout.toFixed(2), cls: 'pos' },
+    { label: 'Wins / 10K', value: r.wins.toLocaleString(), cls: 'pos' },
+    { label: 'Losses / 10K', value: r.losses.toLocaleString(), cls: 'neg' },
+    { label: 'Avg P&L per parlay', value: (r.avgReturnPerParlay >= 0 ? '+' : '') + '$' + r.avgReturnPerParlay.toFixed(2), cls: r.avgReturnPerParlay >= 0 ? 'pos' : 'neg' },
+    { label: 'Expected ROI', value: (r.expectedRoi >= 0 ? '+' : '') + (r.expectedRoi * 100).toFixed(2) + '%', cls: r.expectedRoi >= 0 ? 'pos' : 'neg' },
+    { label: 'Longest win streak', value: r.maxWinStreak.toString(), cls: '' },
+    { label: 'Longest loss streak', value: r.maxLossStreak.toString(), cls: 'neg' },
+    { label: 'Max drawdown', value: '$' + r.maxDrawdown.toFixed(0), cls: 'neg' },
+    { label: 'Cumulative P&L (10K)', value: (r.totalReturn >= 0 ? '+' : '') + '$' + r.totalReturn.toFixed(0), cls: r.totalReturn >= 0 ? 'pos' : 'neg' }
+  ];
+  grid.innerHTML = cells.map((c) =>
+    `<div class="sim-cell">
+      <div class="sim-cell-label">${c.label}</div>
+      <div class="sim-cell-value ${c.cls}">${c.value}</div>
+    </div>`
+  ).join('');
+  toggleHidden('simResults', false);
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Execute menu — open all current legs on Polymarket (each in a new tab, with referral).
+// Top-level since popup.js loads after DOM (script tag at end of body).
+document.addEventListener('DOMContentLoaded', () => {
+  const openAllBtn = document.getElementById('openAllLegs');
+  if (!openAllBtn) return;
+  openAllBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
+    const refUrls = eligible
+      .map((l) => l.url)
+      .filter(Boolean)
+      .map((u) => withRef(u));
+    if (!refUrls.length) {
+      setShareStatus('No leg URLs to open. Add at least one leg first.', '#f59e0b');
+      return;
+    }
+    refUrls.forEach((u, i) => {
+      // Stagger slightly to avoid Chrome blocking the burst of tabs
+      setTimeout(() => chrome.tabs.create({ url: u, active: i === 0 }), i * 80);
+    });
+    const menu = document.getElementById('executeMenu');
+    if (menu) menu.removeAttribute('open');
+  });
 });
 
 async function addCurrentTab() {

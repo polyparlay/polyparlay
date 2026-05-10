@@ -47,14 +47,26 @@
         </div>
       </div>
 
-      <button class="run-sim-box" data-pro="simulation" type="button">
+      <button class="run-sim-box" id="runSimBtn" type="button">
         <span class="run-sim-icon" aria-hidden="true">🎲</span>
         <span class="run-sim-content">
           <span class="run-sim-title">Run 10,000-outcome simulation</span>
-          <span class="run-sim-desc">Distribution of payouts, percentile bands, edge sensitivity</span>
+          <span class="run-sim-desc" id="runSimDesc">Distribution of payouts, win rate, drawdown — runs in your browser</span>
         </span>
         <span class="pro-tag">PRO</span>
       </button>
+
+      <section id="simResults" class="sim-results hidden">
+        <div class="sim-head">
+          <span>Monte Carlo · 10,000 sims</span>
+          <button id="simClose" class="sim-close" type="button" aria-label="Close">×</button>
+        </div>
+        <div class="sim-grid" id="simGrid"></div>
+        <div class="sim-foot">
+          Each iteration: independent bernoulli per leg using market-implied probabilities.
+          Payout assumes atomic parlay (all legs must hit).
+        </div>
+      </section>
 
       <section class="pro-section">
         <div class="pro-head">
@@ -62,17 +74,17 @@
           <span class="pro-meta">$29.99/mo · launches v1.0</span>
         </div>
 
-        <button class="pro-row" data-pro="roi" type="button">
-          <span class="pro-row-label">Expected ROI</span>
-          <span class="pro-row-value">+14.2%</span>
-        </button>
         <button class="pro-row" data-pro="risk" type="button">
           <span class="pro-row-label">Risk score</span>
-          <span class="pro-row-value">MODERATE</span>
+          <span class="pro-row-value" id="proRisk">—</span>
         </button>
-        <button class="pro-row" data-pro="slippage" type="button">
-          <span class="pro-row-label">True fill price</span>
-          <span class="pro-row-value">$0.024</span>
+        <button class="pro-row" data-pro="vol24" type="button">
+          <span class="pro-row-label">Slip 24h volume</span>
+          <span class="pro-row-value" id="proVol24">—</span>
+        </button>
+        <button class="pro-row" data-pro="drift" type="button">
+          <span class="pro-row-label">24h price drift <span class="row-hint">avg across legs</span></span>
+          <span class="pro-row-value" id="proDrift">—</span>
         </button>
 
         <div class="pro-divider"><span>Unlock 6 more</span></div>
@@ -93,13 +105,13 @@
           <span class="pro-row-label">Kelly-optimal stake</span>
           <span class="pro-row-value pro-blurred">$8.40</span>
         </button>
-        <button class="pro-row pro-row-locked" data-pro="drift" type="button">
-          <span class="pro-row-label">24h price drift</span>
-          <span class="pro-row-value pro-blurred">+30pp</span>
-        </button>
         <button class="pro-row pro-row-locked" data-pro="exit" type="button">
           <span class="pro-row-label">Mass-exit signal</span>
           <span class="pro-row-value pro-blurred">3 out</span>
+        </button>
+        <button class="pro-row pro-row-locked" data-pro="expected-roi" type="button">
+          <span class="pro-row-label">Expected ROI <span class="row-hint">w/ edge calibration</span></span>
+          <span class="pro-row-value pro-blurred">+14.2%</span>
         </button>
 
         <button class="pro-cta-main" id="proMainCta" type="button">Unlock Pro — $29.99/mo</button>
@@ -157,7 +169,10 @@
     </section>
 
     <footer>
-      <span>Information only · No execution</span>
+      <label class="dev-toggle" title="Local preview — unblurs Pro values for testing">
+        <input id="proPreview" type="checkbox" />
+        <span>Preview Pro</span>
+      </label>
       <a id="visit" href="https://polymarket.com" target="_blank">Polymarket ↗</a>
     </footer>
 
