@@ -50,6 +50,10 @@ function normalizeMarket(m, parentEvent) {
     m.oneDayPriceChange, m.priceChange24h, m.priceChange24Hr,
     m.priceChange1d, m.dailyPriceChange
   ]);
+  const priceChange7d = pickNumber([
+    m.oneWeekPriceChange, m.priceChange7d, m.priceChange7Day,
+    m.weeklyPriceChange, m.priceChangeWeek
+  ]);
 
   return {
     id: m.id || m.conditionId || m.slug,
@@ -62,7 +66,8 @@ function normalizeMarket(m, parentEvent) {
     eventSlug: parentEvent ? parentEvent.slug : null,
     volume24h: vol24,
     liquidity,
-    priceChange24h
+    priceChange24h,
+    priceChange7d
   };
 }
 
@@ -129,6 +134,7 @@ async function addLeg({ detected, pageTitle, url }) {
     volume24h: market.volume24h,
     liquidity: market.liquidity,
     priceChange24h: market.priceChange24h,
+    priceChange7d: market.priceChange7d,
     url
   });
 
@@ -195,6 +201,7 @@ async function refreshSlipPrices() {
         leg.volume24h = fresh.volume24h;
         leg.liquidity = fresh.liquidity;
         leg.priceChange24h = fresh.priceChange24h;
+        leg.priceChange7d = fresh.priceChange7d;
         leg.endDate = fresh.endDate || leg.endDate;
         leg.category = fresh.category || leg.category;
         // Preserve selection if possible — match by label first, fall back to index

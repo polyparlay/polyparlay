@@ -155,11 +155,43 @@ function riskScore(legs) {
 }
 
 // Average 24h price drift across legs in absolute price points.
-// Positive = legs have moved up; negative = moved down.
 function avg24hDrift(legs) {
   const drifts = legs.map((l) => l.priceChange24h).filter((d) => d != null && !isNaN(d));
   if (!drifts.length) return null;
   return drifts.reduce((a, b) => a + b, 0) / drifts.length;
+}
+
+// Average 7d price drift — same as 24h but weekly. Used for "trend strength".
+function avg7dDrift(legs) {
+  const drifts = legs.map((l) => l.priceChange7d).filter((d) => d != null && !isNaN(d));
+  if (!drifts.length) return null;
+  return drifts.reduce((a, b) => a + b, 0) / drifts.length;
+}
+
+// Resolution confidence — heuristic blend of:
+//   - days until soonest leg resolves (closer = higher confidence)
+//   - minimum leg liquidity (more = lower oracle-dispute risk)
+// Returns 'HIGH' / 'MED' / 'LOW' / null when data missing.
+function resolutionConfidence(legs) {
+  if (!legs.length) return null;
+  const now = Date.now();
+  const daysToResolve = legs
+    .map((l) => l.endDate ? (new Date(l.endDate).getTime() - now) / (1000 * 60 * 60 * 24) : null)
+    .filter((d) => d != null && !isNaN(d));
+  if (!daysToResolve.length) return null;
+  const maxDays = Math.max(...daysToResolve); // when the LAST leg resolves
+  const liquidities = legs.map((l) => Number(l.liquidity) || 0).filter((v) => v > 0);
+  const minLiq = liquidities.length ? Math.min(...liquidities) : null;
+
+  let score = 0;
+  if (maxDays <= 7) score += 2;
+  else if (maxDays <= 30) score += 1;
+  if (minLiq != null && minLiq >= 5000) score += 2;
+  else if (minLiq != null && minLiq >= 1000) score += 1;
+
+  if (score >= 3) return 'HIGH';
+  if (score >= 2) return 'MED';
+  return 'LOW';
 }
 
 // Monte Carlo simulator — runs entirely client-side, ~10ms for 10K iterations.
@@ -256,6 +288,47 @@ let currentSlip = { legs: [], stake: 10 };
 // Leaderboard cache: array of { addr, label, profit, winRate, positions }
 let smartMoneyCache = null;
 let smartMoneyLoadedAt = 0;
+
+// Suggest a rebalance: identify the leg whose removal yields the best
+// risk-adjusted improvement. Heuristic: remove the leg with the lowest price.
+// Lowest-priced leg contributes the smallest factor to the joint probability,
+// so its removal multiplies the win rate by 1/leg.price (the biggest bump).
+//
+// Returns null when there's nothing to optimize (≤ 1 leg, or no candidate
+// improves win rate meaningfully).
+function suggestRebalance(legs) {
+  if (!legs.length || legs.length <= 1) return null;
+  let worstIdx = 0;
+  let worstPrice = Number(legs[0].price) || 1;
+  for (let i = 1; i < legs.length; i++) {
+    const p = Number(legs[i].price) || 1;
+    if (p < worstPrice) {
+      worstPrice = p;
+      worstIdx = i;
+    }
+  }
+  // Don't suggest removing if the worst price is already > 0.20 (parlay is
+  // not "lottery-shaped" enough to need rebalancing).
+  if (worstPrice >= 0.20) return null;
+
+  const remaining = legs.filter((_, i) => i !== worstIdx);
+  const oldCost = legs.reduce((acc, l) => acc * (Number(l.price) || 0), 1);
+  const newCost = remaining.reduce((acc, l) => acc * (Number(l.price) || 0), 1);
+  if (oldCost <= 0 || newCost <= 0) return null;
+
+  return {
+    removeIdx: worstIdx,
+    removeLegId: legs[worstIdx].id,
+    removedQuestion: legs[worstIdx].question,
+    removedPrice: worstPrice,
+    oldWinRate: oldCost,
+    newWinRate: newCost,
+    oldMultiplier: 1 / oldCost,
+    newMultiplier: 1 / newCost,
+    winRateDelta: newCost - oldCost,
+    multDelta: 1 / oldCost - 1 / newCost
+  };
+}
 
 // Smart Money: top 3 reference wallets the user can look at.
 // Tries the Polymarket leaderboard API first, falls back to a curated stub
@@ -550,46 +623,9 @@ function renderSummary() {
     toggleHidden('concentrationWarn', true);
   }
 
-  // Real Pro analytics — open rows
-  const risk = riskScore(eligible);
-  setText('proRisk', risk || '—');
-  const slipVol = totalVolume24h(eligible);
-  setText('proVol24', slipVol != null ? fmtCompactDollar(slipVol) : '—');
-  const drift = avg24hDrift(eligible);
-  if (drift != null) {
-    const sign = drift >= 0 ? '+' : '';
-    setText('proDrift', sign + (drift * 100).toFixed(1) + 'pp');
-    const driftEl = document.getElementById('proDrift');
-    if (driftEl) {
-      driftEl.classList.toggle('drift-up', drift > 0);
-      driftEl.classList.toggle('drift-down', drift < 0);
-    }
-  } else {
-    setText('proDrift', '—');
-  }
-
-  // Pro analytics derived from auto-data — no user input required.
-  // Smart money agreement / mass exit / whale entries / etc all depend on the
-  // smartMoneyCache (top 3 leaderboard wallets and their positions). If the
-  // leaderboard hasn't loaded yet OR wallets aren't configured, show '—'.
-  if (smartMoneyCache && smartMoneyCache.length && eligible.length) {
-    const agree = smartMoneyAgreement(eligible, smartMoneyCache);
-    if (agree && agree.possible > 0) {
-      setText('proSmart', `${agree.agree} / ${agree.possible}`);
-    } else {
-      setText('proSmart', '—');
-    }
-  } else {
-    setText('proSmart', smartMoneyCache === null ? '—' : 'configure');
-  }
-
-  // Mass-exit / Whale entries / Trend / Resolution confidence / Your record
-  // all need infrastructure not yet built. Honest placeholder.
-  setText('proExit', smartMoneyCache && smartMoneyCache.length ? 'tracking' : 'v1.0');
-  setText('proWhaleEntries', smartMoneyCache && smartMoneyCache.length ? 'tracking' : 'v1.0');
-  setText('proTrend', '7d data');
-  setText('proConfidence', 'oracle');
-  setText('proRecord', 'wallet flow');
+  // Pro section is now feature-card based — values aren't piped here, they
+  // sit blurred inside each card as illustrative tease until v1.0 ships the
+  // Smart Money infrastructure (curated wallet list + continuous monitoring).
 
   const hasLegs = eligible.length > 0;
   const shareBtn = document.getElementById('shareX');
@@ -904,44 +940,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Run Sim button — runs Monte Carlo locally and shows results
-  const simBtn = document.getElementById('runSimBtn');
-  if (simBtn) {
-    simBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      runAndShowSim();
-    });
-  }
-  const simClose = document.getElementById('simClose');
-  if (simClose) {
-    simClose.addEventListener('click', () => {
-      toggleHidden('simResults', true);
-    });
-  }
-
-  // Pro Preview toggle — defaults ON so the user can try every feature unlocked.
-  const previewToggle = document.getElementById('proPreview');
-  if (previewToggle) {
-    chrome.storage.local.get(['proPreview']).then(({ proPreview }) => {
-      // Default to true if the key has never been set
-      const enabled = proPreview === undefined ? true : !!proPreview;
-      previewToggle.checked = enabled;
-      document.body.classList.toggle('preview-pro', enabled);
-      if (proPreview === undefined) {
-        chrome.storage.local.set({ proPreview: true });
-      }
-    });
-    previewToggle.addEventListener('change', () => {
-      const on = previewToggle.checked;
-      document.body.classList.toggle('preview-pro', on);
-      chrome.storage.local.set({ proPreview: on });
-    });
-  }
-
-  // Load smart money leaderboard once on open and render whenever ready.
-  // No user input required — leaderboard auto-populates.
-  loadAndRenderLeaderboard();
+  // Pro Preview always-on for now (v1.0 will gate via worker verification).
+  // The body class keeps blur off on the card teases so the visual hierarchy works.
+  document.body.classList.add('preview-pro');
 });
 
 async function loadAndRenderLeaderboard() {

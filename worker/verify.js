@@ -13,8 +13,9 @@
 // See ./README.md for setup.
 
 const USDC_CONTRACT = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'; // Polygon mainnet USDC
-const REQUIRED_AMOUNT_RAW = '99000000'; // 99 USDC, 6 decimals
+const REQUIRED_AMOUNT_RAW = '149000000'; // 149 USDC, 6 decimals (annual Pro)
 const ONE_YEAR_SECONDS = 365 * 24 * 60 * 60;
+const TRIAL_SECONDS = 7 * 24 * 60 * 60; // 7-day free trial window
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',

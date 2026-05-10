@@ -25,14 +25,17 @@
     <section id="locked" class="locked hidden">
       <div class="locked-title">Leg 4+ — Pro</div>
       <div id="lockedPreview" class="locked-preview"></div>
-      <button id="upgrade" class="upgrade">Unlock Pro — $29.99/mo</button>
+      <button id="upgrade" class="upgrade">Start 7-day free trial</button>
     </section>
 
     <section class="summary">
       <div class="summary-section">
         <div class="row big">
-          <span>Multiplier <span class="row-hint">if all legs hit</span></span>
-          <span id="multiplier">—</span>
+          <span class="row-label-stack">
+            <span>Multiplier</span>
+            <span class="row-hint">if all legs hit</span>
+          </span>
+          <span id="multiplier" class="value-accent">—</span>
         </div>
         <div class="row stake-row">
           <label for="stake">Stake</label>
@@ -42,90 +45,67 @@
           </div>
         </div>
         <div class="row big payout">
-          <span>Max payout</span>
+          <span class="row-label-stack">
+            <span>Max payout</span>
+            <span class="row-hint">if all hit</span>
+          </span>
           <span id="maxPayout">—</span>
         </div>
       </div>
 
-      <button class="run-sim-box" id="runSimBtn" type="button">
-        <span class="run-sim-icon" aria-hidden="true">🎲</span>
-        <span class="run-sim-content">
-          <span class="run-sim-title">Run 10,000-outcome simulation</span>
-          <span class="run-sim-desc" id="runSimDesc">Distribution of payouts, win rate, drawdown — runs in your browser</span>
-        </span>
-        <span class="pro-tag">PRO</span>
-      </button>
-
-      <section id="simResults" class="sim-results hidden">
-        <div class="sim-head">
-          <span id="simHeadLabel">Monte Carlo simulation</span>
-          <button id="simClose" class="sim-close" type="button" aria-label="Close">×</button>
-        </div>
-        <div class="sim-grid" id="simGrid"></div>
-        <div class="sim-foot">
-          Each iteration: independent bernoulli per leg using market-implied probabilities.
-          Payout assumes atomic parlay (all legs must hit).
-        </div>
-      </section>
-
       <section class="pro-section">
         <div class="pro-head">
           <span class="pro-tag">PRO</span>
-          <span class="pro-meta">$29.99/mo · launches v1.0</span>
+          <span class="pro-meta">7-day free trial</span>
         </div>
 
-        <div class="pro-leaderboard">
-          <div class="pro-lb-head">
-            <span class="pro-lb-title">Smart Money · top 3 (last 30d)</span>
-            <span class="pro-lb-status" id="lbStatus">…</span>
-          </div>
-          <div class="pro-lb-list" id="lbList">
-            <div class="pro-lb-row pro-lb-loading">Loading leaderboard…</div>
-          </div>
-          <div class="pro-lb-foot" id="lbAgreement"></div>
+        <div class="pro-headline">
+          Smart Money signals from the top profitable PM wallets — live, on every market in your slip.
         </div>
 
-        <button class="pro-row" data-pro="risk" type="button">
-          <span class="pro-row-label">Risk score</span>
-          <span class="pro-row-value" id="proRisk">—</span>
-        </button>
-        <button class="pro-row" data-pro="vol24" type="button">
-          <span class="pro-row-label">Slip 24h volume</span>
-          <span class="pro-row-value" id="proVol24">—</span>
-        </button>
-        <button class="pro-row" data-pro="drift" type="button">
-          <span class="pro-row-label">24h price drift <span class="row-hint">avg across legs</span></span>
-          <span class="pro-row-value" id="proDrift">—</span>
+        <button class="pro-card" data-pro="feed" type="button">
+          <span class="pro-card-icon" aria-hidden="true">📡</span>
+          <span class="pro-card-body">
+            <span class="pro-card-title">Smart Money Feed</span>
+            <span class="pro-card-desc">Real-time positions from top PM wallets — one-click add to slip when they move on a market you're watching.</span>
+            <span class="pro-card-tease">today · <span class="pro-blurred">23 signals</span></span>
+          </span>
         </button>
 
-        <div class="pro-divider"><span>Unlock 6 more</span></div>
-
-        <button class="pro-row pro-row-locked" data-pro="smart-agree" type="button">
-          <span class="pro-row-label">Smart money agreement <span class="row-hint">top 10 wallets</span></span>
-          <span class="pro-row-value pro-blurred" id="proSmart">—</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="exit" type="button">
-          <span class="pro-row-label">Mass-exit signal <span class="row-hint">last 6h</span></span>
-          <span class="pro-row-value pro-blurred" id="proExit">—</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="whale-entries" type="button">
-          <span class="pro-row-label">Whale entries <span class="row-hint">last 24h</span></span>
-          <span class="pro-row-value pro-blurred" id="proWhaleEntries">—</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="record" type="button">
-          <span class="pro-row-label">Your record <span class="row-hint">paste wallet to enable</span></span>
-          <span class="pro-row-value pro-blurred" id="proRecord">v1.0</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="trend" type="button">
-          <span class="pro-row-label">7d trend strength</span>
-          <span class="pro-row-value pro-blurred" id="proTrend">—</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="resolution-confidence" type="button">
-          <span class="pro-row-label">Resolution confidence</span>
-          <span class="pro-row-value pro-blurred" id="proConfidence">—</span>
+        <button class="pro-card pro-card-anchor" data-pro="archive" type="button">
+          <span class="pro-card-icon" aria-hidden="true">📚</span>
+          <span class="pro-card-body">
+            <span class="pro-card-title">Signal Archive <span class="pro-card-flag">your data</span></span>
+            <span class="pro-card-desc">Every signal you see during trial stays in your archive — entry price + current price tracked. You'll need this to manage positions you act on.</span>
+            <span class="pro-card-tease">archive · <span class="pro-blurred">47 signals · 7 days</span></span>
+          </span>
         </button>
 
-        <button class="pro-cta-main" id="proMainCta" type="button">Unlock Pro — $29.99/mo</button>
+        <button class="pro-card" data-pro="performance" type="button">
+          <span class="pro-card-icon" aria-hidden="true">📈</span>
+          <span class="pro-card-body">
+            <span class="pro-card-title">Signal Performance</span>
+            <span class="pro-card-desc">Pre-resolution proof: entry price vs current. See whether the wallets you're following are actually right before you commit.</span>
+            <span class="pro-card-tease">live · <span class="pro-blurred">9/12 up · +8.4pp avg</span></span>
+          </span>
+        </button>
+
+        <button class="pro-card" data-pro="live-parlays" type="button">
+          <span class="pro-card-icon" aria-hidden="true">⚡</span>
+          <span class="pro-card-body">
+            <span class="pro-card-title">Live Saved Parlays</span>
+            <span class="pro-card-desc">Your built slips keep prices updating. After trial: prices freeze. Renew to see whether your open positions are still at good entries.</span>
+            <span class="pro-card-tease">saved · <span class="pro-blurred">3 active</span></span>
+          </span>
+        </button>
+
+        <button class="pro-cta-main" id="proMainCta" type="button">
+          <span class="pro-cta-line1">Start 7-day free trial</span>
+          <span class="pro-cta-line2">$149/year after · cancel anytime · no card during trial</span>
+        </button>
+
+        <div class="pro-footer-note">All Pro features launch v1.0 — trial is a preview window.</div>
+      </section>
       </section>
 
       <div class="summary-section analytics-section">
@@ -180,10 +160,7 @@
     </section>
 
     <footer>
-      <label class="dev-toggle" title="Local preview — unblurs Pro values for testing">
-        <input id="proPreview" type="checkbox" />
-        <span>Preview Pro</span>
-      </label>
+      <span>Information only · No execution</span>
       <a id="visit" href="https://polymarket.com" target="_blank">Polymarket ↗</a>
     </footer>
 
