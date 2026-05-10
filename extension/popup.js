@@ -24,12 +24,14 @@ function fmt$(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   return '$' + Number(n).toFixed(2);
 }
-// Adaptive precision for prices: low-priced legs (under $0.10) need 3 decimals
-// so the user can mentally verify the multiplier. $0.02 vs $0.025 changes the math
-// by ~20% on a single leg, more on a multi-leg parlay.
+// Adaptive precision for prices.
+// Sub-penny ($0.0005, $0.0001) needs 4 decimals so the multiplier math ties out;
+// otherwise users see "$0.001 × $0.69 = 23021×" and can't reverse-engineer the
+// joint prob. Below $0.01 → 4 decimals; below $0.10 → 3; otherwise 2.
 function fmtPrice(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   const v = Number(n);
+  if (v > 0 && v < 0.01) return '$' + v.toFixed(4);
   if (v < 0.10) return '$' + v.toFixed(3);
   return '$' + v.toFixed(2);
 }
@@ -254,11 +256,14 @@ let currentSlip = { legs: [], stake: 10 };
 let userInputs = { edge: 0, bankroll: 1000, wallet: '' };
 let walletPositionsCache = null; // populated when wallet pasted
 
-// True per-leg probability after applying user edge (clamped to keep math sane)
+// True per-leg probability after applying user edge.
+// Clamps are tight (1e-6) — only to prevent NaN/Infinity downstream. Real PM
+// markets do trade sub-penny (e.g. $0.0005), so a 0.001 floor would inflate the
+// true prob and create a phantom positive EV when edge=0.
 function trueProb(legPrice, edgePp) {
   const p = (Number(legPrice) || 0) + (Number(edgePp) || 0) / 100;
-  if (p <= 0.001) return 0.001;
-  if (p >= 0.999) return 0.999;
+  if (p <= 1e-6) return 1e-6;
+  if (p >= 1 - 1e-6) return 1 - 1e-6;
   return p;
 }
 
@@ -484,7 +489,7 @@ function renderSummary() {
   // Real Pro analytics — locked rows that depend on user inputs (edge / bankroll / wallet)
   const edgePp = Number(userInputs.edge) || 0;
   const winP = jointTrueProb(eligible, edgePp);
-  setText('proWinProb', winP != null ? (winP * 100).toFixed(2) + '%' : '—');
+  setText('proWinProb', fmtPercentSmart(winP));
 
   const evRoi = expectedRoi(eligible, edgePp);
   if (evRoi != null) {
@@ -927,14 +932,36 @@ function runAndShowSim() {
   if (!eligible.length) return;
   const stake = Number(currentSlip.stake) || 10;
   const desc = document.getElementById('runSimDesc');
-  if (desc) desc.textContent = 'Running…';
 
-  // Defer to next tick so the UI updates before the (fast) compute hogs the thread
+  // Adaptive iteration count: scale up for very low joint probabilities so
+  // we get a non-zero win count to display. Below 0.01% needs ~1M sims for
+  // ~100 expected wins; below 0.1% needs ~100K. Cap at 1M to stay <500ms.
+  const cost = combinedCost(eligible);
+  let iterations = 10000;
+  let label = '10,000';
+  if (cost != null) {
+    if (cost < 0.0001) { iterations = 1000000; label = '1,000,000'; }
+    else if (cost < 0.001) { iterations = 100000; label = '100,000'; }
+    else if (cost < 0.01) { iterations = 50000; label = '50,000'; }
+  }
+  if (desc) desc.textContent = `Running ${label}…`;
+
   setTimeout(() => {
-    const result = runMonteCarlo(eligible, stake, 10000);
+    const result = runMonteCarlo(eligible, stake, iterations);
     if (desc) desc.textContent = 'Distribution of payouts, win rate, drawdown — runs in your browser';
     renderSimResults(result);
   }, 30);
+}
+
+function fmtPercentSmart(p) {
+  // Show enough precision to be non-zero. 0.000043 → "0.0043%" not "0.00%".
+  if (p == null || isNaN(p)) return '—';
+  const pct = p * 100;
+  if (pct === 0) return '0.00%';
+  if (pct >= 1) return pct.toFixed(2) + '%';
+  if (pct >= 0.01) return pct.toFixed(3) + '%';
+  if (pct >= 0.0001) return pct.toFixed(5) + '%';
+  return pct.toExponential(2) + '%';
 }
 
 function renderSimResults(r) {
@@ -946,19 +973,20 @@ function renderSimResults(r) {
     toggleHidden('simResults', false);
     return;
   }
+  const itLabel = r.iterations.toLocaleString();
   const cells = [
-    { label: 'Win rate (sim)', value: (r.winRate * 100).toFixed(2) + '%', cls: '' },
-    { label: 'Implied win rate', value: (r.impliedWinRate * 100).toFixed(2) + '%', cls: '' },
+    { label: 'Win rate (sim)', value: fmtPercentSmart(r.winRate), cls: '' },
+    { label: 'Implied win rate', value: fmtPercentSmart(r.impliedWinRate), cls: '' },
     { label: 'Multiplier', value: r.multiplier.toFixed(2) + '×', cls: '' },
     { label: 'Win payout', value: '$' + r.winPayout.toFixed(2), cls: 'pos' },
-    { label: 'Wins / 10K', value: r.wins.toLocaleString(), cls: 'pos' },
-    { label: 'Losses / 10K', value: r.losses.toLocaleString(), cls: 'neg' },
+    { label: `Wins / ${itLabel}`, value: r.wins.toLocaleString(), cls: r.wins > 0 ? 'pos' : '' },
+    { label: `Losses / ${itLabel}`, value: r.losses.toLocaleString(), cls: 'neg' },
     { label: 'Avg P&L per parlay', value: (r.avgReturnPerParlay >= 0 ? '+' : '') + '$' + r.avgReturnPerParlay.toFixed(2), cls: r.avgReturnPerParlay >= 0 ? 'pos' : 'neg' },
     { label: 'Expected ROI', value: (r.expectedRoi >= 0 ? '+' : '') + (r.expectedRoi * 100).toFixed(2) + '%', cls: r.expectedRoi >= 0 ? 'pos' : 'neg' },
     { label: 'Longest win streak', value: r.maxWinStreak.toString(), cls: '' },
     { label: 'Longest loss streak', value: r.maxLossStreak.toString(), cls: 'neg' },
     { label: 'Max drawdown', value: '$' + r.maxDrawdown.toFixed(0), cls: 'neg' },
-    { label: 'Cumulative P&L (10K)', value: (r.totalReturn >= 0 ? '+' : '') + '$' + r.totalReturn.toFixed(0), cls: r.totalReturn >= 0 ? 'pos' : 'neg' }
+    { label: `Cumulative P&L (${itLabel})`, value: (r.totalReturn >= 0 ? '+' : '') + '$' + r.totalReturn.toFixed(0), cls: r.totalReturn >= 0 ? 'pos' : 'neg' }
   ];
   grid.innerHTML = cells.map((c) =>
     `<div class="sim-cell">
@@ -966,6 +994,7 @@ function renderSimResults(r) {
       <div class="sim-cell-value ${c.cls}">${c.value}</div>
     </div>`
   ).join('');
+  setText('simHeadLabel', `Monte Carlo · ${itLabel} sims`);
   toggleHidden('simResults', false);
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
