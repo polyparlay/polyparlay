@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <span class="dot"></span>
+        <span class="name">PolyParlay</span>
+      </div>
+      <div class="head-actions">
+        <button id="refresh" class="ghost" title="Refresh prices">↻</button>
+        <button id="clear" class="ghost" title="Clear slip">×</button>
+      </div>
+    </header>
+
+    <section id="legs" class="legs"></section>
+
+    <section id="locked" class="locked hidden">
+      <div class="locked-title">Leg 4+ — Pro</div>
+      <div id="lockedPreview" class="locked-preview"></div>
+      <button id="upgrade" class="upgrade">Unlock Pro — $29.99/mo</button>
+    </section>
+
+    <section class="summary">
+      <div class="row">
+        <span>Combined cost</span>
+        <span id="combinedCost">—</span>
+      </div>
+      <div class="row big">
+        <span>Multiplier</span>
+        <span id="multiplier">—</span>
+      </div>
+      <div class="row stake-row">
+        <label for="stake">Stake</label>
+        <div class="stake-input">
+          <span class="dollar">$</span>
+          <input id="stake" type="number" min="0" step="1" value="10" />
+        </div>
+      </div>
+      <div class="row big payout">
+        <span>Max payout</span>
+        <span id="maxPayout">—</span>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button id="generate" class="primary">Generate slip card</button>
+      <button id="share" class="secondary" disabled>Share</button>
+      <button id="open" class="secondary" disabled>Open viewer</button>
+    </section>
+
+    <section id="cardWrap" class="card-wrap hidden">
+      <canvas id="card" width="1200" height="630"></canvas>
+      <div class="card-actions">
+        <button id="download" class="secondary">Download PNG</button>
+        <button id="copyLink" class="secondary">Copy link</button>
+      </div>
+    </section>
+
+    <footer>
+      <span>Information only · No execution</span>
+      <a id="visit" href="https://polymarket.com" target="_blank">Polymarket ↗</a>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

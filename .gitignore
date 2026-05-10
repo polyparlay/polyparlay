@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (if added later)
+node_modules/
+npm-debug.log*
+
+# Build artifacts
+dist/
+*.zip
+
+# Local secrets
+.env
+.env.local
+
+# Icon source files (keep PNGs, ignore raw)
+extension/icons/raw/
+*.psd
+*.sketch
+*.fig

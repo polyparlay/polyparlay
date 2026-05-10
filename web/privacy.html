@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PolyParlay — Privacy Policy</title>
+    <style>
+      body {
+        margin: 0; padding: 40px 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0a0c12; color: #e5e7eb;
+        line-height: 1.6;
+      }
+      .wrap { max-width: 720px; margin: 0 auto; }
+      h1 { color: #f9fafb; margin-bottom: 6px; }
+      h2 { color: #f9fafb; margin-top: 32px; }
+      .updated { color: #6b7280; font-size: 13px; margin-bottom: 32px; }
+      a { color: #6366f1; }
+      ul li { margin-bottom: 6px; }
+      strong { color: #f9fafb; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>PolyParlay Privacy Policy</h1>
+      <div class="updated">Last updated: 2026-05-10</div>
+
+      <p>
+        PolyParlay ("we", "the extension") is a Chrome browser extension that helps users build
+        multi-leg parlays from Polymarket markets. This privacy policy explains what data the extension
+        accesses, how it is used, and what is never collected.
+      </p>
+
+      <h2>What the extension accesses</h2>
+      <ul>
+        <li>
+          <strong>Polymarket page URLs and DOM</strong> — when you click "Add to slip" on a Polymarket
+          market page, the extension reads the URL slug to identify the market. It does not read any
+          other browsing activity.
+        </li>
+        <li>
+          <strong>Public Polymarket Gamma API</strong> — the extension queries
+          <a href="https://gamma-api.polymarket.com" target="_blank" rel="noopener">gamma-api.polymarket.com</a>
+          to fetch market metadata (question text, current YES/NO prices, resolution date). This is
+          public on-chain data; no authentication is involved.
+        </li>
+        <li>
+          <strong>Local browser storage</strong> — the parlay slip you build (selected markets and stake
+          amount) is saved in <code>chrome.storage.local</code> on your device only. It is not transmitted
+          to any server.
+        </li>
+      </ul>
+
+      <h2>What we never collect</h2>
+      <ul>
+        <li>Your Polymarket login, password, or session credentials</li>
+        <li>Your wallet private keys or seed phrases (PolyParlay never asks for these)</li>
+        <li>Your browsing history outside Polymarket</li>
+        <li>Personally identifying information (name, address, phone)</li>
+        <li>Any data on third-party servers (the free tier has no backend)</li>
+      </ul>
+
+      <h2>Shareable slip links</h2>
+      <p>
+        When you generate a shareable slip link, the slip data (markets, prices, stake) is encoded in
+        the URL hash fragment (e.g., <code>polyparlay.io/slip#&lt;encoded&gt;</code>). The hash is
+        readable to anyone who has the link. The hash is never sent to our servers — by design,
+        URL fragments stay client-side.
+      </p>
+
+      <h2>Email capture</h2>
+      <p>
+        If you submit your email on <a href="https://polyparlay.io" target="_blank" rel="noopener">polyparlay.io</a>
+        for Pro launch notifications, your email is stored only for that purpose and will not be sold
+        or shared. You can request deletion at any time by emailing the address below.
+      </p>
+
+      <h2>Future Pro tier data handling</h2>
+      <p>
+        The forthcoming Pro tier will read your public Polymarket wallet address (you provide it; the
+        extension never accesses any wallet). Wallet position data is fetched from public APIs and
+        processed client-side or in our backend solely to provide the features you subscribe to.
+        We will not sell, share, or use this data for any purpose other than the features described.
+      </p>
+
+      <h2>Permissions explained</h2>
+      <ul>
+        <li>
+          <strong>storage</strong> — to save your slip on your device
+        </li>
+        <li>
+          <strong>activeTab</strong> — to detect when you're on a Polymarket market page
+        </li>
+        <li>
+          <strong>host_permissions for Polymarket and Gamma API</strong> — to inject the "+ Add to slip"
+          button on Polymarket pages and fetch market data
+        </li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p>
+        Questions or deletion requests: hello@polyparlay.io (placeholder — replace before publishing)
+      </p>
+
+      <p style="margin-top: 40px;"><a href="/">← Back</a></p>
+    </div>
+  </body>
+</html>

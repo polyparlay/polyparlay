@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PolyParlay — Multi-leg parlay builder for Polymarket</title>
+    <meta name="description" content="Build multi-leg parlays from Polymarket markets. See your combined multiplier and max payout. Generate shareable slip cards. Free Chrome extension." />
+    <meta property="og:title" content="PolyParlay — Multi-leg parlay builder for Polymarket" />
+    <meta property="og:description" content="Build, see, share. The parlay builder Polymarket doesn't have." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --surface: #11141a;
+        --line: #1e2230;
+        --muted: #6b7280;
+        --text: #e5e7eb;
+        --strong: #f9fafb;
+        --accent: #6366f1;
+        --green: #22c55e;
+        --pro: #f59e0b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(1200px 600px at 50% -100px, rgba(99,102,241,0.15), transparent 70%), #0a0c12;
+        color: var(--text);
+        min-height: 100vh;
+      }
+      .nav {
+        max-width: 1080px; margin: 0 auto;
+        padding: 20px 24px;
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      .brand {
+        display: flex; align-items: center; gap: 10px;
+        font-weight: 800; letter-spacing: 0.4px; color: var(--strong);
+      }
+      .brand .dot {
+        width: 12px; height: 12px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 16px rgba(99,102,241,0.6);
+      }
+      .nav a {
+        color: var(--text); text-decoration: none; margin-left: 16px;
+        font-size: 14px;
+      }
+      .nav a:hover { color: var(--strong); }
+
+      .hero {
+        max-width: 1080px; margin: 0 auto;
+        padding: 60px 24px 80px;
+        text-align: center;
+      }
+      h1 {
+        font-size: clamp(32px, 5vw, 56px);
+        line-height: 1.1;
+        color: var(--strong);
+        margin: 0 0 18px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 .accent { color: var(--accent); }
+      .sub {
+        color: var(--muted);
+        font-size: clamp(15px, 1.6vw, 18px);
+        max-width: 640px;
+        margin: 0 auto 32px;
+      }
+      .cta-row {
+        display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-weight: 700; font-size: 15px;
+        text-decoration: none;
+        cursor: pointer; border: 0;
+      }
+      .btn.primary { background: var(--accent); color: white; }
+      .btn.primary:hover { filter: brightness(1.08); }
+      .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+      .btn.ghost:hover { color: var(--strong); border-color: #2c3142; }
+      .micro { font-size: 12px; color: var(--muted); }
+
+      .features {
+        max-width: 1080px; margin: 0 auto;
+        padding: 0 24px 60px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .feat {
+        background: rgba(17, 20, 26, 0.7);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 22px;
+      }
+      .feat h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+        color: var(--strong);
+      }
+      .feat p { color: var(--muted); margin: 0; font-size: 14px; line-height: 1.5; }
+      .feat .tag {
+        display: inline-block; font-size: 10px; letter-spacing: 0.6px;
+        text-transform: uppercase; padding: 2px 6px; border-radius: 3px;
+        background: rgba(245,158,11,0.15); color: var(--pro);
+        margin-bottom: 10px; font-weight: 700;
+      }
+      .feat .tag.free { background: rgba(34,197,94,0.15); color: var(--green); }
+
+      .email {
+        max-width: 560px; margin: 0 auto;
+        padding: 0 24px 80px;
+        text-align: center;
+      }
+      .email h2 { color: var(--strong); margin: 0 0 8px; font-size: 22px; }
+      .email p { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+      .email form {
+        display: flex; gap: 8px;
+      }
+      .email input {
+        flex: 1;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 14px;
+        color: var(--strong);
+        font-size: 14px;
+      }
+      .email input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+      .footer {
+        max-width: 1080px; margin: 0 auto;
+        padding: 24px 24px 40px;
+        display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+        border-top: 1px solid var(--line);
+        font-size: 12px; color: var(--muted);
+      }
+      .footer a { color: var(--text); text-decoration: none; margin-left: 14px; }
+      .footer a:hover { color: var(--strong); }
+
+      @media (max-width: 720px) {
+        .features { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="brand"><span class="dot"></span> PolyParlay</div>
+      <div>
+        <a href="#features">Features</a>
+        <a href="https://polymarket.com" target="_blank" rel="noopener">Polymarket ↗</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <h1>Build <span class="accent">multi-leg parlays</span><br />on Polymarket.</h1>
+      <p class="sub">
+        Polymarket doesn't let you build your own parlays. PolyParlay does — right inside the page, with a
+        live multiplier and a shareable slip card. Free Chrome extension.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" id="installCta" href="#">Install — Chrome Web Store</a>
+        <a class="btn ghost" href="#features">How it works</a>
+      </div>
+      <div class="micro">No wallet connection. No execution. Information only.</div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="feat">
+        <span class="tag free">Free</span>
+        <h3>3-leg parlay builder</h3>
+        <p>Click "+ Add to slip" on any Polymarket market. PolyParlay reads the live YES/NO price, calculates the combined multiplier, and shows your max payout in real time.</p>
+      </div>
+      <div class="feat">
+        <span class="tag free">Free</span>
+        <h3>Shareable slip card</h3>
+        <p>Generate a 1200×630 slip image with one click. Share to X, Discord, or Telegram with a link that anyone can open in the browser.</p>
+      </div>
+      <div class="feat">
+        <span class="tag">Pro — $29.99/mo</span>
+        <h3>Smart Money Feed + your record</h3>
+        <p>Real-time positions from the top profitable PM wallets. One click adds any of their entries as a leg in your parlay. Plus your own win rate by category, partial-win calculator, and unlimited legs.</p>
+      </div>
+    </section>
+
+    <section class="email">
+      <h2>Get notified when Pro launches</h2>
+      <p>Win-rate-by-bet-type, partial-win calculator, portfolio concentration — coming soon.</p>
+      <form id="emailForm">
+        <input type="email" required placeholder="you@email.com" id="emailInput" />
+        <button type="submit" class="btn primary">Notify me</button>
+      </form>
+      <div class="micro" id="emailStatus" style="margin-top: 12px;"></div>
+    </section>
+
+    <div class="footer">
+      <div>© PolyParlay · Information only — not affiliated with Polymarket.</div>
+      <div>
+        <a href="/privacy.html">Privacy</a>
+        <a href="https://polymarket.com" target="_blank" rel="noopener">Polymarket</a>
+      </div>
+    </div>
+
+    <script>
+      // Placeholder install link until CWS listing is live
+      document.getElementById('installCta').addEventListener('click', (e) => {
+        e.preventDefault();
+        const msg = 'Chrome Web Store listing pending. Watch this space — or load unpacked from GitHub for now.';
+        alert(msg);
+      });
+
+      // Placeholder email capture (no backend yet — log to console; replace with Formspree/Netlify/etc.)
+      document.getElementById('emailForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('emailInput').value.trim();
+        const status = document.getElementById('emailStatus');
+        if (!email) return;
+        // TODO: wire to email service. For now, store locally and confirm.
+        try {
+          const list = JSON.parse(localStorage.getItem('pp_waitlist') || '[]');
+          list.push({ email, ts: Date.now() });
+          localStorage.setItem('pp_waitlist', JSON.stringify(list));
+        } catch {}
+        status.textContent = 'Thanks — you\'re on the list.';
+        document.getElementById('emailInput').value = '';
+      });
+    </script>
+  </body>
+</html>
