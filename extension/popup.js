@@ -1389,24 +1389,44 @@ function renderSimResults(r) {
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Improve Odds — standalone always-visible row when slip has a low-priced leg.
-// Free state: shows feature pitch ("Use our odds algorithm…"). Apply click
-//   activates the trial first, then applies the rebalance.
-// Trial/Paid: shows the specific live recommendation.
+// Improve Odds — always visible at the bottom of the Monte Carlo sim panel.
+// Three states:
+//   - 'ok'        Lowest leg ≥ $0.20 — nothing to rebalance, show green check
+//   - 'free pitch'  Improvable + free user — pitch + Apply (click starts trial)
+//   - 'pro suggest' Improvable + trial/paid — specific recommendation + Apply
 async function renderImproveOdds() {
   const el = document.getElementById('improveOdds');
   if (!el) return;
   const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
-  const suggest = suggestRebalance(eligible);
-  if (!suggest) {
+  const desc = document.getElementById('improveOddsDesc');
+  const apply = document.getElementById('improveOddsApply');
+  const title = el.querySelector('.improve-odds-title');
+  if (!desc || !apply || !title) return;
+
+  // Hide entirely only when there are no legs to evaluate
+  if (!eligible.length) {
     el.classList.add('hidden');
     return;
   }
   el.classList.remove('hidden');
 
-  const desc = document.getElementById('improveOddsDesc');
-  const apply = document.getElementById('improveOddsApply');
-  if (!desc || !apply) return;
+  const suggest = suggestRebalance(eligible);
+
+  // STATE 1: All clear — parlay is balanced, show positive confirmation
+  if (!suggest) {
+    el.classList.add('improve-odds-ok');
+    title.innerHTML = '✓ Parlay looks balanced';
+    desc.classList.remove('improve-odds-pitch');
+    desc.innerHTML = 'No weak leg detected — lowest priced above $0.20. Run the simulation above to see the full distribution.';
+    apply.style.display = 'none';
+    apply.onclick = null;
+    return;
+  }
+
+  // STATE 2/3: There IS a rebalance candidate — show title + Apply
+  el.classList.remove('improve-odds-ok');
+  apply.style.display = '';
+  title.innerHTML = '↗ Improve odds';
 
   const state = await getProState();
   const isPro = state.tier === 'trial' || state.tier === 'paid';

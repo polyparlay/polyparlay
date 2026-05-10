@@ -923,10 +923,10 @@ body.state-expired .run-sim-box .pro-tag {
 .pro-tier-indicator.tier-paid { background: var(--pro); color: #0b0d12; }
 .pro-tier-indicator.tier-expired { background: rgba(239,68,68,0.2); color: var(--red); }
 
-/* Improve Odds — lives at the bottom of the Monte Carlo sim panel so the
-   connection to the simulation is visually unmistakable.
-   Free state: feature pitch (Apply auto-starts trial).
-   Trial/Paid: specific live recommendation. */
+/* Improve Odds — always visible at the bottom of the Monte Carlo sim panel.
+   - improvable: green-tinted suggestion + Apply
+   - ok (balanced): subtler green check + no Apply
+   Connection to the simulation is unmistakable in both states. */
 .improve-odds {
   display: flex;
   align-items: center;
@@ -934,6 +934,16 @@ body.state-expired .run-sim-box .pro-tag {
   padding: 12px;
   background: rgba(34, 197, 94, 0.10);
   border-top: 1px solid rgba(34, 197, 94, 0.28);
+  transition: background 0.18s ease;
+}
+.improve-odds.improve-odds-ok {
+  background: rgba(34, 197, 94, 0.06);
+}
+.improve-odds.improve-odds-ok .improve-odds-title {
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .improve-odds-info { flex: 1; min-width: 0; }
 .improve-odds-title {
