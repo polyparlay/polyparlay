@@ -284,7 +284,7 @@
         url: window.location.href
       });
       if (resp && resp.ok) {
-        const { slip, legs } = await chrome.storage.local.get(['slip']);
+        const { slip } = await chrome.storage.local.get(['slip']);
         const finalSlip = (resp.slip || slip);
         flashButton(resp.message || 'Added', '#16a34a');
         updateBadge(resp.legCount);
@@ -292,7 +292,10 @@
       } else {
         const errMsg = (resp && resp.error) || 'Could not add';
         flashButton(errMsg, '#dc2626');
-        showPreview(null, errMsg);
+        // Show current slip even when THIS add failed (e.g. 'Already in slip',
+        // 'Not found in Gamma'). User has legs from before and wants to see them.
+        const { slip } = await chrome.storage.local.get(['slip']);
+        showPreview(slip || null, errMsg);
       }
     } catch (err) {
       log('addLeg error', err);

@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unlock PolyParlay Pro</title>
+    <meta name="description" content="Pay 149 USDC on Polygon to unlock PolyParlay Pro for 365 days. No subscription. No data given to a payment processor." />
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --surface: #11141a;
+        --surface-2: #161a22;
+        --line: #1e2230;
+        --muted: #6b7280;
+        --text: #e5e7eb;
+        --strong: #f9fafb;
+        --accent: #6366f1;
+        --green: #22c55e;
+        --pro: #f59e0b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; padding: 40px 20px 80px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(900px 500px at 100% -10%, rgba(99,102,241,0.18), transparent 60%),
+          radial-gradient(600px 400px at 0% 100%, rgba(245,158,11,0.12), transparent 60%),
+          #0a0c12;
+        color: var(--text);
+        min-height: 100vh;
+      }
+      .wrap { max-width: 720px; margin: 0 auto; }
+      header {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 36px;
+      }
+      .dot {
+        width: 12px; height: 12px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 16px rgba(99,102,241,0.6);
+      }
+      header .brand { font-weight: 800; font-size: 18px; color: var(--strong); letter-spacing: 0.3px; }
+
+      .lede { margin-bottom: 28px; }
+      h1 {
+        font-size: clamp(28px, 4vw, 40px);
+        margin: 0 0 12px;
+        color: var(--strong);
+        letter-spacing: -0.01em;
+        font-weight: 800;
+      }
+      h1 .accent { color: var(--accent); }
+      .sub { color: var(--muted); font-size: 16px; line-height: 1.5; }
+
+      .card {
+        background: rgba(17, 20, 26, 0.85);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 16px;
+      }
+      .card h2 {
+        margin: 0 0 14px;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .price-block {
+        display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px;
+      }
+      .price-block .price {
+        font-size: 48px; font-weight: 900; color: var(--strong); line-height: 1;
+      }
+      .price-block .unit { color: var(--muted); font-size: 14px; }
+      .price-meta { color: var(--muted); font-size: 13px; }
+
+      .step {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .step:last-child { border-bottom: 0; }
+      .step-num {
+        width: 24px; height: 24px;
+        background: rgba(99,102,241,0.18);
+        color: var(--accent);
+        font-weight: 800; font-size: 12px;
+        border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+      }
+      .step-body strong { color: var(--strong); }
+      .step-body code {
+        display: inline-block;
+        padding: 2px 6px;
+        background: var(--surface-2);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        color: var(--strong);
+      }
+
+      .addr-box {
+        margin-top: 10px;
+        padding: 12px;
+        background: var(--surface-2);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      }
+      .addr-box .addr {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        color: var(--strong);
+        word-break: break-all;
+      }
+      button.copy {
+        background: var(--accent);
+        color: white;
+        border: 0;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 12px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      button.copy:hover { filter: brightness(1.08); }
+
+      .verify-form {
+        display: grid;
+        gap: 10px;
+      }
+      .verify-form input {
+        width: 100%;
+        background: var(--surface-2);
+        border: 1px solid var(--line);
+        color: var(--strong);
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        outline: none;
+      }
+      .verify-form input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+      .verify-form button {
+        background: var(--pro);
+        color: #0a0c12;
+        border: 0;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .verify-form button:hover { filter: brightness(1.05); }
+      .verify-form button:disabled { opacity: 0.55; cursor: not-allowed; }
+      #verifyStatus {
+        margin-top: 8px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        display: none;
+      }
+      #verifyStatus.ok {
+        display: block;
+        background: rgba(34,197,94,0.12);
+        border: 1px solid rgba(34,197,94,0.32);
+        color: var(--green);
+      }
+      #verifyStatus.err {
+        display: block;
+        background: rgba(239,68,68,0.10);
+        border: 1px solid rgba(239,68,68,0.28);
+        color: #fca5a5;
+      }
+
+      footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 32px; }
+      footer a { color: var(--text); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="dot"></div>
+        <div class="brand">PolyParlay</div>
+      </header>
+
+      <section class="lede">
+        <h1>Unlock <span class="accent">Pro</span> · pay once, 365 days</h1>
+        <p class="sub">
+          Send 149 USDC on Polygon to the address below. The extension verifies your payment
+          on-chain — no payment processor, no account, no monthly billing. Your access is
+          good for one year from the transaction timestamp.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Price</h2>
+        <div class="price-block">
+          <span class="price">149</span>
+          <span class="unit">USDC · Polygon · one-time</span>
+        </div>
+        <div class="price-meta">Equivalent of $12.42/mo. Pay once, valid for 365 days.</div>
+      </section>
+
+      <section class="card">
+        <h2>How to pay</h2>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <strong>Open MetaMask</strong> (or any wallet) on the <strong>Polygon network</strong>.
+            Make sure you hold at least 149 USDC.
+            Contract: <code>0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174</code>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <strong>Send 149 USDC</strong> to this address:
+            <div class="addr-box">
+              <span class="addr" id="paymentAddr">0xREPLACE_WITH_YOUR_PAYMENT_ADDRESS</span>
+              <button class="copy" id="copyAddr">Copy</button>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <strong>Verify below.</strong> Enter the wallet address you paid <em>from</em>
+            (not the destination). The verifier checks Polygon for your transfer and unlocks Pro
+            in your extension.
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Verify payment</h2>
+        <form class="verify-form" id="verifyForm">
+          <input
+            type="text"
+            id="walletInput"
+            placeholder="0x… (the wallet you paid from)"
+            spellcheck="false"
+            autocomplete="off"
+          />
+          <button type="submit" id="verifyBtn">Verify payment &amp; unlock Pro</button>
+        </form>
+        <div id="verifyStatus"></div>
+      </section>
+
+      <footer>
+        <p>
+          On-chain verification powered by Polygonscan. No third-party payment processor.<br />
+          Questions? <a href="/privacy">Privacy</a> · <a href="https://polymarket.com" target="_blank" rel="noopener">Polymarket</a>
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // CONFIGURE before deploy:
+      //   - PAYMENT_ADDRESS: your Polygon wallet that receives the 149 USDC
+      //   - VERIFY_URL: your deployed Cloudflare Worker endpoint
+      const PAYMENT_ADDRESS = '0xREPLACE_WITH_YOUR_PAYMENT_ADDRESS';
+      const VERIFY_URL = 'https://polyparlay-verify.YOUR_SUBDOMAIN.workers.dev/verify';
+
+      document.getElementById('paymentAddr').textContent = PAYMENT_ADDRESS;
+
+      document.getElementById('copyAddr').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(PAYMENT_ADDRESS);
+          const btn = document.getElementById('copyAddr');
+          const t = btn.textContent;
+          btn.textContent = 'Copied';
+          setTimeout(() => (btn.textContent = t), 1400);
+        } catch {
+          prompt('Copy this address:', PAYMENT_ADDRESS);
+        }
+      });
+
+      document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const wallet = document.getElementById('walletInput').value.trim();
+        const status = document.getElementById('verifyStatus');
+        const btn = document.getElementById('verifyBtn');
+        status.className = '';
+        status.style.display = 'none';
+
+        if (!/^0x[a-f0-9]{40}$/i.test(wallet)) {
+          status.className = 'err';
+          status.textContent = 'That doesn\'t look like a valid wallet address. It should start with 0x and be 42 characters.';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Checking the blockchain…';
+        try {
+          const r = await fetch(VERIFY_URL + '?wallet=' + encodeURIComponent(wallet));
+          if (!r.ok) throw new Error('Verifier returned ' + r.status);
+          const data = await r.json();
+          if (data.ok && data.pro) {
+            const expires = new Date(data.expires * 1000).toLocaleDateString();
+            status.className = 'ok';
+            status.innerHTML =
+              'Payment verified. Pro is active until <strong>' + expires + '</strong>. ' +
+              'Open the extension — your Pro features are unlocked.';
+            // Tell the extension via chrome.runtime so it can flip proState
+            try {
+              if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                chrome.runtime.sendMessage(
+                  'YOUR_EXTENSION_ID', // replace with your published extension ID
+                  { type: 'proVerified', wallet, expires: data.expires, paidAt: data.paidAt }
+                );
+              }
+            } catch {}
+          } else {
+            status.className = 'err';
+            status.textContent =
+              'No qualifying payment found from this wallet in the last 365 days. ' +
+              'If you just sent the transaction, give it a minute and try again.';
+          }
+        } catch (err) {
+          status.className = 'err';
+          status.textContent = 'Verification failed: ' + (err.message || err) + '. The Polygonscan API may be rate-limited — try again in a few seconds.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Verify payment & unlock Pro';
+        }
+      });
+    </script>
+  </body>
+</html>

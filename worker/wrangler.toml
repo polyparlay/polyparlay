@@ -1,0 +1,14 @@
+name = "polyparlay-verify"
+main = "verify.js"
+compatibility_date = "2026-05-01"
+
+# Secrets to set after `wrangler login`:
+#   wrangler secret put POLYGONSCAN_KEY      (free at polygonscan.com/myapikey)
+#   wrangler secret put PAYMENT_ADDRESS      (your Polygon receiving wallet, 0x...)
+#
+# Deploy:
+#   cd worker/
+#   npx wrangler deploy
+#
+# After deploy, copy the *.workers.dev URL into web/upgrade.html (VERIFY_URL)
+# and extension/popup.js (worker-backed verification call, when wired).

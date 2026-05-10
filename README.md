@@ -88,21 +88,106 @@ Y2 with PM platform growth (~90% QoQ): $60K–250K total.
 
 The Smart Money Feed is what changes the economics. Without it, this is a $10-15K/year side project. With it, it's a real micro-SaaS with a defensible moat (curated wallet list + EdgeClaw-derived signal quality).
 
-## Pre-launch admin checklist (you handle)
+## Launch — end-to-end deploy guide
 
-- [ ] Verify availability: domain `polyparlay.io`, X handle `@polyparlay`
+### 1. Domain + handles
+
 - [ ] Register `polyparlay.io` on Namecheap or Cloudflare Domains (~$12/yr)
-- [ ] Create dedicated `polyparlay@gmail.com` (developer account)
-- [ ] Chrome Web Store developer account ($5 one-time at chrome.google.com/webstore/devconsole)
-- [ ] Coinbase Commerce account (free, 1% fee, requires identity verification)
-- [ ] Generate icons: `extension/icons/icon16.png`, `icon48.png`, `icon128.png`
-- [ ] Replace placeholder email in `web/privacy.html` with real contact
-- [ ] Verify Polymarket and Kalshi referral programs and replace `polyparlay` placeholder ref code in `popup.js` and `slip.html`
-- [ ] Wire `web/index.html` email capture to a real backend (Formspree / ConvertKit / Loops)
-- [ ] Deploy `web/` to Cloudflare Pages (free tier sufficient)
-- [ ] Submit to Chrome Web Store (2–5 business days review)
+- [ ] Verify `@polyparlay` X handle availability and grab it
+- [ ] Create dedicated `polyparlay@gmail.com` (CWS owner email; never personal)
+
+### 2. Icons (Chrome Web Store requires PNGs at 16/48/128)
+
+A source SVG is at `extension/icons/icon.svg`. Export to PNGs:
+
+```bash
+# Pick any of these — they all work
+# Option A: rsvg-convert
+brew install librsvg
+rsvg-convert -w 16  extension/icons/icon.svg -o extension/icons/icon16.png
+rsvg-convert -w 48  extension/icons/icon.svg -o extension/icons/icon48.png
+rsvg-convert -w 128 extension/icons/icon.svg -o extension/icons/icon128.png
+
+# Option B: ImageMagick
+magick -background none -resize 16x16   extension/icons/icon.svg extension/icons/icon16.png
+magick -background none -resize 48x48   extension/icons/icon.svg extension/icons/icon48.png
+magick -background none -resize 128x128 extension/icons/icon.svg extension/icons/icon128.png
+
+# Option C: Browser — open icon.svg in Chrome, screenshot, resize manually
+```
+
+Then add the icons to `manifest.json`:
+```json
+"icons": {
+  "16":  "icons/icon16.png",
+  "48":  "icons/icon48.png",
+  "128": "icons/icon128.png"
+}
+```
+
+### 3. Push to GitHub
+
+```bash
+cd /Users/clawdlawd/polyparlay
+gh repo create polyparlay --public --source . --remote origin
+git push -u origin master
+```
+
+(Or via web UI if you don't have `gh` installed — create empty repo, then `git remote add origin <url>` + `git push -u origin master`.)
+
+### 4. Deploy `web/` to Vercel
+
+```bash
+cd web/
+npx vercel deploy --prod
+# Follow prompts: link to new project named "polyparlay", confirm settings.
+# `vercel.json` (already in this directory) handles the routing.
+```
+
+Then in Vercel dashboard:
+- Add `polyparlay.io` as the custom domain
+- Update your DNS to point at Vercel
+
+### 5. Deploy the Pro-verification worker
+
+The Cloudflare Worker at `worker/verify.js` checks Polygon for the user's 149 USDC payment. See `worker/README.md` for the full deploy walkthrough — short version:
+
+```bash
+cd worker/
+npm install -g wrangler
+wrangler login
+wrangler secret put POLYGONSCAN_KEY      # free at polygonscan.com/myapikey
+wrangler secret put PAYMENT_ADDRESS      # your Polygon receiving wallet
+wrangler deploy
+```
+
+Note the deployed URL (e.g. `polyparlay-verify.YOUR_SUBDOMAIN.workers.dev`). Paste it into:
+- `web/upgrade.html` → `VERIFY_URL` constant
+- `extension/popup.js` → wire when v0.4.0 Pro-state worker call ships
+
+### 6. Replace placeholders
+
+- [ ] `web/upgrade.html` → `PAYMENT_ADDRESS` (your receiving wallet)
+- [ ] `web/upgrade.html` → `VERIFY_URL` (deployed worker)
+- [ ] `web/upgrade.html` → `YOUR_EXTENSION_ID` (after CWS publishes — used to message the extension on successful payment)
+- [ ] `web/privacy.html` → replace `hello@polyparlay.io` with your real contact
+- [ ] `extension/popup.js` → `REF_CODE` (verify with PM/Kalshi affiliate programs)
+
+### 7. Submit to Chrome Web Store
+
+- [ ] `$5` one-time dev fee at <https://chrome.google.com/webstore/devconsole>
+- [ ] Zip the `extension/` directory (must include the PNG icons from step 2)
+- [ ] Upload zip, fill listing (title, description, screenshots), submit for review
+- [ ] Review typically 2-5 business days
+
+### 8. Distribution (post-publish)
+
 - [ ] PR to [Awesome-Prediction-Market-Tools](https://github.com/aarora4/Awesome-Prediction-Market-Tools)
-- [ ] Submit to Polymark.et tools directory
+- [ ] Submit to [Polymark.et](https://polymark.et/) tools directory
+- [ ] Show HN: `Show HN: PolyParlay — Multi-leg parlay builder for Polymarket`
+- [ ] r/Polymarket post (discussion-framed, not pitch)
+- [ ] PM Discord #tools channel
+- [ ] X launch thread tagging @PolyBackTest and similar accounts
 
 ## Distribution plan (launch week)
 
