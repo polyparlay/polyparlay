@@ -88,45 +88,40 @@
         <span class="pro-meta">7-day free trial · $149/year</span>
       </div>
 
-      <button class="pro-row" data-pro="risk" type="button">
-        <span class="pro-row-label">Risk score</span>
-        <span class="pro-row-value" id="proRisk">—</span>
-      </button>
-      <button class="pro-row" data-pro="vol24" type="button">
-        <span class="pro-row-label">Slip 24h volume</span>
-        <span class="pro-row-value" id="proVol24">—</span>
-      </button>
-      <button class="pro-row" data-pro="drift" type="button">
-        <span class="pro-row-label">24h price drift <span class="row-hint">avg across legs</span></span>
-        <span class="pro-row-value" id="proDrift">—</span>
-      </button>
+      <div class="pro-included">
+        <div class="pro-included-label">Included today</div>
+        <div class="pro-included-row" data-pro="monte-carlo">
+          <span class="pro-check">✓</span>
+          <span><strong>Monte Carlo simulation</strong> — 10,000 outcomes per slip</span>
+        </div>
+        <div class="pro-included-row" data-pro="improve-odds">
+          <span class="pro-check">✓</span>
+          <span><strong>Improve Odds rebalancer</strong> — auto-flip or drop weak legs</span>
+        </div>
+        <div class="pro-included-row" data-pro="unlimited-legs">
+          <span class="pro-check">✓</span>
+          <span><strong>Unlimited legs</strong> — free is capped at 3</span>
+        </div>
+        <div class="pro-included-row" data-pro="watermark-free">
+          <span class="pro-check">✓</span>
+          <span><strong>Watermark-free slip cards</strong> — clean shares</span>
+        </div>
+      </div>
 
-      <div class="pro-divider"><span>Unlock 6 more</span></div>
-
-      <button class="pro-row pro-row-locked" data-pro="smart-money" type="button">
-        <span class="pro-row-label">Smart money agreement <span class="row-hint">top 10 wallets</span></span>
-        <span class="pro-row-value pro-blurred" id="proSmart">7 of 10</span>
-      </button>
-      <button class="pro-row pro-row-locked pro-row-anchor" data-pro="archive" type="button">
-        <span class="pro-row-label">Signal archive <span class="row-hint">your data, locks at trial end</span></span>
-        <span class="pro-row-value pro-blurred" id="proArchive">47 signals</span>
-      </button>
-      <button class="pro-row pro-row-locked" data-pro="performance" type="button">
-        <span class="pro-row-label">Signal performance <span class="row-hint">entry vs current</span></span>
-        <span class="pro-row-value pro-blurred" id="proPerformance">9/12 up</span>
-      </button>
-      <button class="pro-row pro-row-locked" data-pro="live-parlays" type="button">
-        <span class="pro-row-label">Live saved parlay prices</span>
-        <span class="pro-row-value pro-blurred" id="proLivePar">3 saved</span>
-      </button>
-      <button class="pro-row pro-row-locked" data-pro="alerts" type="button">
-        <span class="pro-row-label">Real-time alerts <span class="row-hint">push notifications</span></span>
-        <span class="pro-row-value pro-blurred" id="proAlerts">push</span>
-      </button>
-      <button class="pro-row pro-row-locked" data-pro="exit" type="button">
-        <span class="pro-row-label">Mass-exit signal <span class="row-hint">last 6h</span></span>
-        <span class="pro-row-value pro-blurred" id="proExit">3 out</span>
-      </button>
+      <details class="pro-roadmap">
+        <summary class="pro-roadmap-head">
+          <span>Coming v1.0 (6 more)</span>
+          <span class="pro-caret">▾</span>
+        </summary>
+        <div class="pro-roadmap-list">
+          <div class="pro-roadmap-row" data-pro="smart-money">🔒 Smart money agreement <span class="row-hint">top 10 wallets per leg</span></div>
+          <div class="pro-roadmap-row" data-pro="archive">🔒 Signal archive <span class="row-hint">your data — locks at trial end</span></div>
+          <div class="pro-roadmap-row" data-pro="performance">🔒 Signal performance <span class="row-hint">entry vs current price</span></div>
+          <div class="pro-roadmap-row" data-pro="live-parlays">🔒 Live saved parlay prices</div>
+          <div class="pro-roadmap-row" data-pro="alerts">🔒 Real-time push alerts</div>
+          <div class="pro-roadmap-row" data-pro="exit">🔒 Mass-exit signal <span class="row-hint">last 6h</span></div>
+        </div>
+      </details>
 
       <button class="pro-cta-main" id="proMainCta" type="button">
         <span class="pro-cta-line1">Start 7-day free trial</span>
@@ -135,7 +130,19 @@
     </section>
 
     <section class="free-analytics">
-      <div class="section-label">Free · Mechanical &amp; logistics</div>
+      <div class="section-label">Free analytics</div>
+      <div class="row">
+        <span>Risk score</span>
+        <span id="proRisk">—</span>
+      </div>
+      <div class="row">
+        <span>Slip 24h volume</span>
+        <span id="proVol24">—</span>
+      </div>
+      <div class="row">
+        <span>24h price drift <span class="row-hint">avg across legs</span></span>
+        <span id="proDrift">—</span>
+      </div>
       <div class="row">
         <span>Independent payout <span class="row-hint">no parlay, even split</span></span>
         <span id="indSum">—</span>

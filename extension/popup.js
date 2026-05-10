@@ -401,15 +401,16 @@ function truncate(s, n) {
   return s.length <= n ? s : s.slice(0, n - 1).trimEnd() + '…';
 }
 
-// Suggest a rebalance: identify the leg whose removal yields the best
-// risk-adjusted improvement. Heuristic: remove the leg with the lowest price.
-// Lowest-priced leg contributes the smallest factor to the joint probability,
-// so its removal multiplies the win rate by 1/leg.price (the biggest bump).
-//
-// Returns null when there's nothing to optimize (≤ 1 leg, or no candidate
-// improves win rate meaningfully).
+// Suggest a rebalance: identify the weakest leg, then evaluate two amendments:
+//   - FLIP direction (if the opposite outcome is favored — e.g. YES at \$0.05
+//     flipped to NO at \$0.95 is a 19× win-rate improvement on that leg)
+//   - DROP the leg entirely
+// Picks whichever yields the bigger win-rate improvement. Flip is preferred
+// when tied because it preserves the user's intent (they get a position, just
+// on the other side) rather than removing it outright.
 function suggestRebalance(legs) {
   if (!legs.length || legs.length <= 1) return null;
+
   let worstIdx = 0;
   let worstPrice = Number(legs[0].price) || 1;
   for (let i = 1; i < legs.length; i++) {
@@ -419,26 +420,78 @@ function suggestRebalance(legs) {
       worstIdx = i;
     }
   }
-  // Don't suggest removing if the worst price is already > 0.20 (parlay is
-  // not "lottery-shaped" enough to need rebalancing).
-  if (worstPrice >= 0.20) return null;
+  if (worstPrice >= 0.20) return null; // parlay isn't lottery-shaped
 
-  const remaining = legs.filter((_, i) => i !== worstIdx);
   const oldCost = legs.reduce((acc, l) => acc * (Number(l.price) || 0), 1);
-  const newCost = remaining.reduce((acc, l) => acc * (Number(l.price) || 0), 1);
-  if (oldCost <= 0 || newCost <= 0) return null;
+  if (oldCost <= 0) return null;
 
+  const worstLeg = legs[worstIdx];
+
+  // -- Option A: FLIP direction --
+  // Works when the leg has 2+ outcomes and the other outcome is meaningfully
+  // higher priced. Multi-outcome markets (e.g. 'Trump | Harris | Other') skip
+  // this — we only flip true binary YES/NO pairs.
+  let flipOption = null;
+  if (Array.isArray(worstLeg.outcomes) && worstLeg.outcomes.length >= 2 &&
+      Array.isArray(worstLeg.prices) && worstLeg.prices.length >= 2) {
+    const curIdx = typeof worstLeg.selectedIndex === 'number' ? worstLeg.selectedIndex : 0;
+    const otherIdx = curIdx === 0 ? 1 : 0;
+    const otherPrice = Number(worstLeg.prices[otherIdx]) || 0;
+    if (otherPrice > worstPrice + 0.05) {
+      const flipPrices = legs.map((l, i) => (i === worstIdx ? otherPrice : Number(l.price) || 0));
+      const flipCost = flipPrices.reduce((a, b) => a * b, 1);
+      if (flipCost > 0) {
+        flipOption = {
+          type: 'flip',
+          legIdx: worstIdx,
+          flipLegId: worstLeg.id,
+          flipFromLabel: worstLeg.outcomes[curIdx] || worstLeg.direction || 'YES',
+          flipToLabel: worstLeg.outcomes[otherIdx] || 'NO',
+          legQuestion: worstLeg.question,
+          legPrice: worstPrice,
+          newLegPrice: otherPrice,
+          oldWinRate: oldCost,
+          newWinRate: flipCost,
+          oldMultiplier: 1 / oldCost,
+          newMultiplier: 1 / flipCost
+        };
+      }
+    }
+  }
+
+  // -- Option B: DROP leg --
+  const remaining = legs.filter((_, i) => i !== worstIdx);
+  const dropCost = remaining.reduce((acc, l) => acc * (Number(l.price) || 0), 1);
+  const dropOption = dropCost > 0
+    ? {
+        type: 'drop',
+        legIdx: worstIdx,
+        removeLegId: worstLeg.id,
+        removedQuestion: worstLeg.question,
+        removedPrice: worstPrice,
+        oldWinRate: oldCost,
+        newWinRate: dropCost,
+        oldMultiplier: 1 / oldCost,
+        newMultiplier: 1 / dropCost
+      }
+    : null;
+
+  // Pick the better option (higher new win rate). Tie-break to flip since it
+  // preserves the user's exposure to the event instead of removing it.
+  const candidates = [flipOption, dropOption].filter(Boolean);
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => {
+    if (a.newWinRate !== b.newWinRate) return b.newWinRate - a.newWinRate;
+    return a.type === 'flip' ? -1 : 1;
+  });
+
+  // Normalize so renderImproveOdds + Apply handler can read common fields
+  const winner = candidates[0];
   return {
-    removeIdx: worstIdx,
-    removeLegId: legs[worstIdx].id,
-    removedQuestion: legs[worstIdx].question,
-    removedPrice: worstPrice,
-    oldWinRate: oldCost,
-    newWinRate: newCost,
-    oldMultiplier: 1 / oldCost,
-    newMultiplier: 1 / newCost,
-    winRateDelta: newCost - oldCost,
-    multDelta: 1 / oldCost - 1 / newCost
+    ...winner,
+    // legacy compatibility fields used by the rebalance banner on the slip card
+    removedQuestion: winner.legQuestion || winner.removedQuestion,
+    removedPrice: winner.legPrice || winner.removedPrice
   };
 }
 
@@ -883,9 +936,9 @@ function drawCard() {
   ctx.font = '800 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
   ctx.fillText('PolyParlay', 88, 73);
 
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '500 14px -apple-system, sans-serif';
-  ctx.fillText('Monte Carlo + Odds Optimizer · built on Polymarket', 88, 96);
+  ctx.fillStyle = '#a5b4fc';
+  ctx.font = '600 13px -apple-system, sans-serif';
+  ctx.fillText('MONTE CARLO + ODDS OPTIMIZER', 88, 96);
 
   // Timestamp top right
   const now = new Date();
@@ -997,16 +1050,18 @@ function drawCard() {
   ctx.lineTo(W - 60, footerY - 10);
   ctx.stroke();
 
-  // Multiplier — hero number on left
+  // Multiplier — hero number on left. Sized BIG so it survives X feed thumbnail
+  // crops (which scale 1200×630 down to ~600×315 in timeline). Has to read at
+  // that size or the share is wasted.
   const mult = multiplier(eligible);
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.font = '800 12px -apple-system, sans-serif';
   ctx.fillText('IF ALL HIT', 60, footerY + 18);
 
   const multText = fmtMult(mult);
   ctx.fillStyle = '#a5b4fc';
-  ctx.font = '900 90px -apple-system, sans-serif';
-  ctx.fillText(multText, 60, footerY + 100);
+  ctx.font = '900 112px -apple-system, sans-serif';
+  ctx.fillText(multText, 60, footerY + 110);
 
   // Run a quick Monte Carlo to get win rate — uses adaptive iterations
   let winRateText = '—';
@@ -1038,11 +1093,11 @@ function drawCard() {
   ctx.fillText('$' + stake.toFixed(0), W - 220, footerY + 56);
 
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.font = '800 12px -apple-system, sans-serif';
   ctx.fillText('MAX PAYOUT', W - 60, footerY + 18);
   ctx.fillStyle = '#4ade80';
-  ctx.font = '800 36px -apple-system, sans-serif';
-  ctx.fillText(fmt$(payout), W - 60, footerY + 58);
+  ctx.font = '900 46px -apple-system, sans-serif';
+  ctx.fillText(fmt$(payout), W - 60, footerY + 64);
   ctx.textAlign = 'left';
 
   // --- WATERMARK STRIP ---
@@ -1433,16 +1488,25 @@ async function renderImproveOdds() {
 
   if (isPro) {
     desc.classList.remove('improve-odds-pitch');
-    desc.innerHTML =
-      `Drop "<strong>${escapeHtml(truncate(suggest.removedQuestion, 32))}</strong>" ` +
-      `(priced ${fmtPrice(suggest.removedPrice)}). ` +
-      `Win rate <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>. ` +
-      `Multiplier ${suggest.oldMultiplier.toFixed(1)}× → ${suggest.newMultiplier.toFixed(1)}×.`;
+    if (suggest.type === 'flip') {
+      desc.innerHTML =
+        `Flip "<strong>${escapeHtml(truncate(suggest.legQuestion, 28))}</strong>" ` +
+        `from <strong>${escapeHtml(suggest.flipFromLabel)}</strong> → ` +
+        `<strong>${escapeHtml(suggest.flipToLabel)}</strong> ` +
+        `(${fmtPrice(suggest.legPrice)} → ${fmtPrice(suggest.newLegPrice)}). ` +
+        `Win rate <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>.`;
+    } else {
+      desc.innerHTML =
+        `Drop "<strong>${escapeHtml(truncate(suggest.removedQuestion, 32))}</strong>" ` +
+        `(priced ${fmtPrice(suggest.removedPrice)}). ` +
+        `Win rate <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>. ` +
+        `Multiplier ${suggest.oldMultiplier.toFixed(1)}× → ${suggest.newMultiplier.toFixed(1)}×.`;
+    }
   } else {
     desc.classList.add('improve-odds-pitch');
     desc.innerHTML =
-      'Use our odds algorithm to identify the leg dragging down your win rate ' +
-      'and rebalance for higher probability. <strong>Apply</strong> to see the specific recommendation.';
+      'Use our odds algorithm to optimize position direction or drop weak legs ' +
+      'for higher win probability. <strong>Apply</strong> to see the specific recommendation.';
   }
 
   apply.onclick = async () => {
@@ -1451,33 +1515,56 @@ async function renderImproveOdds() {
     apply.textContent = '…';
     try {
       const curState = await getProState();
-      if (curState.tier === 'free' || curState.tier === 'expired') {
-        // Free → starts trial + applies the suggestion (click is rewarded immediately)
+      const wasFree = curState.tier === 'free' || curState.tier === 'expired';
+      if (wasFree) {
         await startTrial();
         await applyProState();
+        showTrialToast(); // celebrate the conversion
       }
-      // Capture the before/after for the slip card banner BEFORE we remove the leg
+      // Capture before/after for the slip-card rebalance banner
       lastRebalance = {
-        removedQuestion: suggest.removedQuestion,
-        removedPrice: suggest.removedPrice,
+        type: suggest.type,
+        removedQuestion: suggest.removedQuestion || suggest.legQuestion,
+        removedPrice: suggest.removedPrice || suggest.legPrice,
         oldMultiplier: suggest.oldMultiplier,
         newMultiplier: suggest.newMultiplier,
         oldWinRate: suggest.oldWinRate,
         newWinRate: suggest.newWinRate,
         at: Date.now()
       };
-      await chrome.runtime.sendMessage({ type: 'removeLeg', legId: suggest.removeLegId });
+      // Branch by amendment type — flip (preserves exposure) or drop
+      if (suggest.type === 'flip') {
+        await chrome.runtime.sendMessage({ type: 'flipLeg', legId: suggest.flipLegId });
+      } else {
+        await chrome.runtime.sendMessage({ type: 'removeLeg', legId: suggest.removeLegId });
+      }
       const resp = await chrome.runtime.sendMessage({ type: 'getSlip' });
       if (resp && resp.ok) currentSlip = resp.slip;
       renderLegs();
       renderSummary();
-      // Re-run sim so user sees the improved outcome
-      runAndShowSim();
+      runAndShowSim(); // re-run so user sees the improved outcome
     } finally {
       apply.disabled = false;
       apply.textContent = prevText;
     }
   };
+}
+
+// Brief celebratory toast when trial activates
+function showTrialToast() {
+  const existing = document.getElementById('trialToast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = 'trialToast';
+  t.className = 'trial-toast';
+  t.innerHTML = '<span>🎉</span><span>Pro trial activated · 7 days unlocked</span>';
+  document.body.appendChild(t);
+  // Trigger CSS transition
+  requestAnimationFrame(() => t.classList.add('trial-toast-show'));
+  setTimeout(() => {
+    t.classList.remove('trial-toast-show');
+    setTimeout(() => t.remove(), 300);
+  }, 2800);
 }
 
 // Execute menu — open all current legs on Polymarket (each in a new tab, with referral).
