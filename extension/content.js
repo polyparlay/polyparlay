@@ -31,6 +31,41 @@
     return /(?:^|\.)polymarket\.com$/.test(window.location.hostname);
   }
 
+  // -------- Theme sync (read PM's computed body background) --------
+  function detectTheme() {
+    const candidates = [document.body, document.documentElement];
+    for (const el of candidates) {
+      if (!el) continue;
+      try {
+        const bg = getComputedStyle(el).backgroundColor;
+        const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
+        if (m) {
+          const r = +m[1], g = +m[2], b = +m[3];
+          const a = m[4] != null ? +m[4] : 1;
+          if (a < 0.1) continue; // transparent — try parent
+          return r + g + b < 384 ? 'dark' : 'light';
+        }
+      } catch {}
+    }
+    return 'dark';
+  }
+
+  let lastTheme = null;
+  function syncTheme() {
+    const t = detectTheme();
+    if (t === lastTheme) return;
+    lastTheme = t;
+    try {
+      chrome.storage.local.set({ pmTheme: t });
+    } catch {}
+    // Apply to floating button + preview drawer
+    document.documentElement.setAttribute('data-pw-theme', t);
+    const btn = document.getElementById(BTN_ID);
+    if (btn) btn.setAttribute('data-pw-theme', t);
+    const preview = document.getElementById(PREVIEW_ID);
+    if (preview) preview.setAttribute('data-pw-theme', t);
+  }
+
   // -------- Slim floating button --------
   function ensureButton() {
     if (!isOnPolymarket() || !document.body) return;
@@ -317,6 +352,7 @@
     ensureButton();
     refreshButton();
     injectInlineButtons();
+    syncTheme();
   }
   window.addEventListener('polyparlay:locationchange', () => {
     if (window.location.href === lastUrl) return;

@@ -527,7 +527,15 @@ async function shareToX() {
 }
 
 // ---------- wiring ----------
+async function applyTheme() {
+  try {
+    const { pmTheme } = await chrome.storage.local.get(['pmTheme']);
+    document.body.setAttribute('data-theme', pmTheme === 'light' ? 'light' : 'dark');
+  } catch {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
   loadSlip();
 
   document.getElementById('refresh').addEventListener('click', refreshPrices);
@@ -658,5 +666,11 @@ chrome.storage.onChanged.addListener((changes) => {
     currentSlip = changes.slip.newValue || { legs: [], stake: 10 };
     renderLegs();
     renderSummary();
+  }
+  if (changes.pmTheme) {
+    document.body.setAttribute(
+      'data-theme',
+      changes.pmTheme.newValue === 'light' ? 'light' : 'dark'
+    );
   }
 });

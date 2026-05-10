@@ -12,6 +12,17 @@
   --red: #ef4444;
   --pro: #f59e0b;
 }
+/* Light theme — synced with PM via content script (see syncTheme in content.js).
+   Accent / green / red kept the same so brand identity stays consistent. */
+body[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f9fafb;
+  --surface-2: #f3f4f6;
+  --line: #e5e7eb;
+  --muted: #6b7280;
+  --text: #1f2937;
+  --text-strong: #111827;
+}
 
 * { box-sizing: border-box; }
 
