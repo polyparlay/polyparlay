@@ -965,25 +965,25 @@ function drawCard() {
     ctx.fillText(String(i + 1), 76, y - 1);
     ctx.textAlign = 'left';
 
-    // Direction pill (YES/NO/etc) — placed first so question wraps next to it
+    // Direction pill (YES/NO/etc) — bumped to 14px font / 25px tall for thumbnail legibility
     const label = (leg.direction || (leg.outcomes && leg.outcomes[leg.selectedIndex || 0]) || 'YES').toUpperCase();
     let dirBg, dirFg;
-    if (/^YES$/i.test(label)) { dirBg = 'rgba(34,197,94,0.18)'; dirFg = '#4ade80'; }
-    else if (/^NO$/i.test(label)) { dirBg = 'rgba(239,68,68,0.18)'; dirFg = '#f87171'; }
-    else { dirBg = 'rgba(99,102,241,0.18)'; dirFg = '#a5b4fc'; }
-    ctx.font = '800 13px -apple-system, sans-serif';
-    const dirW = ctx.measureText(label).width + 18;
+    if (/^YES$/i.test(label)) { dirBg = 'rgba(34,197,94,0.22)'; dirFg = '#4ade80'; }
+    else if (/^NO$/i.test(label)) { dirBg = 'rgba(239,68,68,0.22)'; dirFg = '#f87171'; }
+    else { dirBg = 'rgba(99,102,241,0.22)'; dirFg = '#a5b4fc'; }
+    ctx.font = '800 14px -apple-system, sans-serif';
+    const dirW = ctx.measureText(label).width + 20;
     ctx.fillStyle = dirBg;
-    roundRect(ctx, 105, y - 17, dirW, 22, 6);
+    roundRect(ctx, 105, y - 18, dirW, 25, 6);
     ctx.fill();
     ctx.fillStyle = dirFg;
-    ctx.fillText(label, 114, y - 1);
+    ctx.fillText(label, 115, y - 1);
 
-    // Question (truncate to fit)
+    // Question — bumped 21px → 24px so it stays legible after X feed thumbnail crop
     const questionX = 113 + dirW + 8;
     ctx.fillStyle = '#f9fafb';
-    ctx.font = '600 21px -apple-system, sans-serif';
-    const maxW = W - questionX - 200; // leave room for price on right
+    ctx.font = '600 24px -apple-system, sans-serif';
+    const maxW = W - questionX - 200;
     let q = leg.question || 'Market';
     if (ctx.measureText(q).width > maxW) {
       while (q.length > 4 && ctx.measureText(q + '…').width > maxW) q = q.slice(0, -1);
@@ -991,52 +991,69 @@ function drawCard() {
     }
     ctx.fillText(q, questionX, y);
 
-    // Resolution date small under question
+    // Resolution date subtitle
     if (leg.endDate) {
       const d = new Date(leg.endDate);
       if (!isNaN(d.getTime())) {
         ctx.fillStyle = '#6b7280';
-        ctx.font = '500 12px -apple-system, sans-serif';
-        ctx.fillText('Resolves ' + d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), questionX, y + 22);
+        ctx.font = '500 13px -apple-system, sans-serif';
+        ctx.fillText('Resolves ' + d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), questionX, y + 24);
       }
     }
 
-    // Price (adaptive precision, right-aligned)
+    // Price (adaptive precision, right-aligned). Dropped the redundant "LEG N"
+    // caption — the number badge on the left already conveys position.
     ctx.fillStyle = '#f9fafb';
-    ctx.font = '800 26px -apple-system, sans-serif';
+    ctx.font = '800 28px -apple-system, sans-serif';
     const p = Number(leg.price) || 0;
     const priceText = p > 0 && p < 0.01 ? '$' + p.toFixed(4) : p < 0.10 ? '$' + p.toFixed(3) : '$' + p.toFixed(2);
     ctx.textAlign = 'right';
     ctx.fillText(priceText, W - 60, y);
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '500 12px -apple-system, sans-serif';
-    ctx.fillText('LEG ' + (i + 1), W - 60, y + 22);
     ctx.textAlign = 'left';
   });
 
-  // --- REBALANCE BANNER (when applicable) ---
-  // The story this card actually needs to tell: PolyParlay's algorithm
-  // turned a bad parlay into a viable one.
-  const bannerY = lastRebalance ? H - 260 : null;
+  // --- STORY BANNER ---
+  // Story this card needs to tell: PolyParlay's algorithm made this parlay
+  // viable (rebalance case) OR ran a real simulation behind the multiplier
+  // (default case). Either way fills the dead-space above the footer.
+  const bannerY = H - 270;
   if (lastRebalance) {
-    ctx.fillStyle = 'rgba(34, 197, 94, 0.10)';
-    roundRect(ctx, 60, bannerY, W - 120, 44, 8);
+    // Green rebalance banner — punchier, dramatic copy
+    ctx.fillStyle = 'rgba(34, 197, 94, 0.12)';
+    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(34, 197, 94, 0.32)';
+    ctx.strokeStyle = 'rgba(34, 197, 94, 0.42)';
     ctx.lineWidth = 1;
-    roundRect(ctx, 60, bannerY, W - 120, 44, 8);
+    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
     ctx.stroke();
 
     ctx.fillStyle = '#4ade80';
-    ctx.font = '800 12px -apple-system, sans-serif';
-    ctx.fillText('↗ POLYPARLAY REBALANCED', 78, bannerY + 18);
+    ctx.font = '800 13px -apple-system, sans-serif';
+    ctx.fillText('↗ ODDS REBALANCED BY POLYPARLAY', 80, bannerY + 20);
 
     ctx.fillStyle = '#f9fafb';
-    ctx.font = '600 13px -apple-system, sans-serif';
-    const before = `${fmtPercentSmart(lastRebalance.oldWinRate)} win`;
-    const after = `${fmtPercentSmart(lastRebalance.newWinRate)} win`;
-    const bannerText = `dropped weakest leg · win rate ${before} → ${after}`;
-    ctx.fillText(bannerText, 78, bannerY + 35);
+    ctx.font = '700 16px -apple-system, sans-serif';
+    const before = fmtPercentSmart(lastRebalance.oldWinRate);
+    const after = fmtPercentSmart(lastRebalance.newWinRate);
+    ctx.fillText(`Win rate ${before} → ${after}`, 80, bannerY + 40);
+  } else {
+    // Default state — small Monte Carlo provenance pill so the space tells
+    // a story even without a rebalance. Subtle purple, brand-affirming.
+    ctx.fillStyle = 'rgba(99, 102, 241, 0.10)';
+    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(99, 102, 241, 0.32)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
+    ctx.stroke();
+
+    ctx.fillStyle = '#a5b4fc';
+    ctx.font = '800 13px -apple-system, sans-serif';
+    ctx.fillText('🎲 MONTE CARLO SIMULATED · 10,000 OUTCOMES', 80, bannerY + 20);
+
+    ctx.fillStyle = '#cbd5ff';
+    ctx.font = '500 14px -apple-system, sans-serif';
+    ctx.fillText('Win rate computed live · not just the implied multiplier', 80, bannerY + 40);
   }
 
   // --- FOOTER PAYOUT BLOCK ---
@@ -1063,13 +1080,22 @@ function drawCard() {
   ctx.font = '900 112px -apple-system, sans-serif';
   ctx.fillText(multText, 60, footerY + 110);
 
-  // Run a quick Monte Carlo to get win rate — uses adaptive iterations
+  // Run Monte Carlo for win rate (adaptive iterations)
   let winRateText = '—';
+  let winRateColor = '#fbbf24'; // default amber
   if (eligible.length) {
     const cost = combinedCost(eligible);
     const sims = cost != null && cost < 0.001 ? 100000 : 10000;
     const r = runMonteCarlo(eligible, currentSlip.stake || 10, sims);
-    if (r) winRateText = fmtPercentSmart(r.winRate);
+    if (r) {
+      winRateText = fmtPercentSmart(r.winRate);
+      // Color-code: green if sim win rate is at/above implied (favorable),
+      // red if sim is meaningfully below (unfavorable), amber otherwise.
+      if (cost != null) {
+        if (r.winRate >= cost * 1.02) winRateColor = '#4ade80';
+        else if (r.winRate < cost * 0.98) winRateColor = '#f87171';
+      }
+    }
   }
 
   // Right-side metrics cluster: WIN RATE / STAKE / MAX PAYOUT
@@ -1077,37 +1103,39 @@ function drawCard() {
   const stake = Number(currentSlip.stake) || 0;
   ctx.textAlign = 'right';
 
-  // WIN RATE (highlight the simulation as the unique value-add)
+  // WIN RATE — bumped 28→36px and color-coded (this is our unique value-add)
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '700 12px -apple-system, sans-serif';
-  ctx.fillText('WIN RATE · 10K SIMS', W - 380, footerY + 18);
-  ctx.fillStyle = '#fbbf24';
-  ctx.font = '800 28px -apple-system, sans-serif';
-  ctx.fillText(winRateText, W - 380, footerY + 56);
+  ctx.font = '800 12px -apple-system, sans-serif';
+  ctx.fillText('SIM WIN RATE', W - 380, footerY + 18);
+  ctx.fillStyle = winRateColor;
+  ctx.font = '900 36px -apple-system, sans-serif';
+  ctx.fillText(winRateText, W - 380, footerY + 60);
 
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.font = '800 12px -apple-system, sans-serif';
   ctx.fillText('STAKE', W - 220, footerY + 18);
   ctx.fillStyle = '#f9fafb';
-  ctx.font = '800 28px -apple-system, sans-serif';
-  ctx.fillText('$' + stake.toFixed(0), W - 220, footerY + 56);
+  ctx.font = '800 32px -apple-system, sans-serif';
+  ctx.fillText('$' + stake.toFixed(0), W - 220, footerY + 60);
 
   ctx.fillStyle = '#9ca3af';
   ctx.font = '800 12px -apple-system, sans-serif';
   ctx.fillText('MAX PAYOUT', W - 60, footerY + 18);
   ctx.fillStyle = '#4ade80';
-  ctx.font = '900 46px -apple-system, sans-serif';
-  ctx.fillText(fmt$(payout), W - 60, footerY + 64);
+  ctx.font = '900 48px -apple-system, sans-serif';
+  ctx.fillText(fmt$(payout), W - 60, footerY + 66);
   ctx.textAlign = 'left';
 
-  // --- WATERMARK STRIP ---
-  ctx.fillStyle = '#4b5563';
-  ctx.font = '600 13px -apple-system, sans-serif';
+  // --- WATERMARK ---
+  // Dropped the "Information only" disclaimer that was on the right — pure
+  // visual noise in a shareable image. Just the brand watermark now.
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '700 14px -apple-system, sans-serif';
   ctx.fillText('polyparlay.io', 60, H - 28);
-  ctx.fillStyle = '#374151';
-  ctx.font = '500 11px -apple-system, sans-serif';
+  ctx.fillStyle = '#4b5563';
+  ctx.font = '500 12px -apple-system, sans-serif';
   ctx.textAlign = 'right';
-  ctx.fillText('Information only — verify on Polymarket', W - 60, H - 30);
+  ctx.fillText('Built with Monte Carlo + Odds Optimizer', W - 60, H - 28);
   ctx.textAlign = 'left';
 }
 
