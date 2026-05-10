@@ -845,15 +845,96 @@ summary.execute-summary {
 .dev-toggle:hover { color: var(--text-strong); }
 
 /* Preview Pro mode: removes blur on all locked values + visual hint */
-body.preview-pro .pro-blurred {
+/* Pro state — single source of truth for what's locked.
+   .pro-blurred has blur applied by default. State classes override. */
+body.state-trial .pro-blurred,
+body.state-paid .pro-blurred {
   filter: none !important;
   -webkit-filter: none !important;
   user-select: text !important;
   pointer-events: auto !important;
 }
-body.preview-pro .pro-row-locked {
+body.state-trial .pro-row-locked,
+body.state-paid .pro-row-locked {
   border-left: 2px solid var(--pro);
 }
+
+/* Lock the sim button + show a small lock badge when state=free/expired */
+body.state-free .run-sim-box,
+body.state-expired .run-sim-box {
+  position: relative;
+  filter: saturate(0.6) brightness(0.85);
+}
+body.state-free .run-sim-box::before,
+body.state-expired .run-sim-box::before {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  z-index: 2;
+}
+body.state-free .run-sim-box .pro-tag,
+body.state-expired .run-sim-box .pro-tag {
+  opacity: 0.6;
+}
+
+/* Footer tier indicator */
+.pro-tier-indicator {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.pro-tier-indicator.tier-free { background: var(--line); color: var(--muted); }
+.pro-tier-indicator.tier-trial { background: rgba(99,102,241,0.25); color: var(--accent); }
+.pro-tier-indicator.tier-paid { background: var(--pro); color: #0b0d12; }
+.pro-tier-indicator.tier-expired { background: rgba(239,68,68,0.2); color: var(--red); }
+
+/* Improve Odds — appended to sim panel when a rebalance would help */
+.sim-rebalance {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(34, 197, 94, 0.08);
+  border-top: 1px solid rgba(34, 197, 94, 0.22);
+}
+.sim-rebalance-info { flex: 1; min-width: 0; }
+.sim-rebalance-title {
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sim-rebalance-desc {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.45;
+}
+.sim-rebalance-desc strong { color: var(--text-strong); font-weight: 600; }
+.sim-rebalance-desc .rebal-up { color: var(--green); font-weight: 700; }
+.sim-rebalance-apply {
+  flex-shrink: 0;
+  background: var(--green);
+  color: #0a0c12;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+.sim-rebalance-apply:hover { filter: brightness(1.05); }
+.sim-rebalance-apply:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* Inline analytics rows — free tier, live-updating */
 .analytics-section .row {

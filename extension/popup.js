@@ -289,6 +289,115 @@ let currentSlip = { legs: [], stake: 10 };
 let smartMoneyCache = null;
 let smartMoneyLoadedAt = 0;
 
+// Pro state machine — drives feature locking.
+// State stored in chrome.storage.local under key 'proState':
+//   { trialStartedAt: ms, trialEndsAt: ms, paidUntilAt: ms }
+// Tier derived from current time vs these timestamps:
+//   - 'paid'  = paidUntilAt > now
+//   - 'trial' = trialEndsAt > now (and not paid)
+//   - 'free'  = neither
+//   - 'expired' = had trial that ended without payment (= 'free' but UX differs)
+async function getProState() {
+  const { proState } = await chrome.storage.local.get(['proState']);
+  if (!proState) return { tier: 'free' };
+  const now = Date.now();
+  if (proState.paidUntilAt && proState.paidUntilAt > now) {
+    return { tier: 'paid', expiresAt: proState.paidUntilAt };
+  }
+  if (proState.trialEndsAt && proState.trialEndsAt > now) {
+    const msLeft = proState.trialEndsAt - now;
+    return {
+      tier: 'trial',
+      expiresAt: proState.trialEndsAt,
+      daysLeft: Math.ceil(msLeft / 86400000),
+      hoursLeft: Math.ceil(msLeft / 3600000)
+    };
+  }
+  if (proState.trialStartedAt) return { tier: 'expired' };
+  return { tier: 'free' };
+}
+
+async function startTrial() {
+  const now = Date.now();
+  const existing = (await chrome.storage.local.get(['proState'])).proState || {};
+  // Don't restart a trial that already happened
+  if (existing.trialStartedAt) return;
+  await chrome.storage.local.set({
+    proState: {
+      ...existing,
+      trialStartedAt: now,
+      trialEndsAt: now + 7 * 86400000
+    }
+  });
+}
+
+async function applyProState() {
+  const state = await getProState();
+  document.body.classList.remove('state-free', 'state-trial', 'state-paid', 'state-expired');
+  document.body.classList.add(`state-${state.tier}`);
+
+  const cta = document.getElementById('proMainCta');
+  if (cta) {
+    if (state.tier === 'free') {
+      cta.innerHTML =
+        '<span class="pro-cta-line1">Start 7-day free trial</span>' +
+        '<span class="pro-cta-line2">$149/year after · cancel anytime · no card during trial</span>';
+    } else if (state.tier === 'trial') {
+      const dayLabel = state.daysLeft === 1 ? '1 day' : state.daysLeft + ' days';
+      const hourLabel = state.hoursLeft <= 24 ? state.hoursLeft + 'h' : null;
+      cta.innerHTML =
+        `<span class="pro-cta-line1">Trial · ${hourLabel || dayLabel} left</span>` +
+        '<span class="pro-cta-line2">Pay $149 now to lock in Pro · cancel anytime</span>';
+    } else if (state.tier === 'paid') {
+      const d = new Date(state.expiresAt);
+      const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      cta.innerHTML =
+        '<span class="pro-cta-line1">Pro active</span>' +
+        `<span class="pro-cta-line2">Until ${dateStr}</span>`;
+    } else {
+      cta.innerHTML =
+        '<span class="pro-cta-line1">Trial expired · Pay $149/year</span>' +
+        '<span class="pro-cta-line2">Cancel anytime</span>';
+    }
+  }
+
+  // Update the leg-4 gate upgrade button too
+  const upgradeBtn = document.getElementById('upgrade');
+  if (upgradeBtn) {
+    if (state.tier === 'free') upgradeBtn.textContent = 'Start 7-day free trial';
+    else if (state.tier === 'trial') upgradeBtn.textContent = `Pay $149 — ${state.daysLeft}d trial left`;
+    else if (state.tier === 'paid') upgradeBtn.textContent = 'Pro active';
+    else upgradeBtn.textContent = 'Renew Pro — $149/year';
+  }
+
+  // Footer tier indicator
+  const tierEl = document.getElementById('proTierIndicator');
+  if (tierEl) {
+    if (state.tier === 'paid') {
+      tierEl.textContent = 'Pro';
+      tierEl.className = 'pro-tier-indicator tier-paid';
+    } else if (state.tier === 'trial') {
+      tierEl.textContent = `Trial · ${state.daysLeft}d`;
+      tierEl.className = 'pro-tier-indicator tier-trial';
+    } else if (state.tier === 'expired') {
+      tierEl.textContent = 'Trial expired';
+      tierEl.className = 'pro-tier-indicator tier-expired';
+    } else {
+      tierEl.textContent = 'Free';
+      tierEl.className = 'pro-tier-indicator tier-free';
+    }
+  }
+
+  return state;
+}
+
+// Truncate long question text for the rebalance suggestion display
+function truncate(s, n) {
+  if (!s) return '';
+  s = String(s);
+  return s.length <= n ? s : s.slice(0, n - 1).trimEnd() + '…';
+}
+
 // Suggest a rebalance: identify the leg whose removal yields the best
 // risk-adjusted improvement. Heuristic: remove the leg with the lowest price.
 // Lowest-priced leg contributes the smallest factor to the joint probability,
@@ -707,115 +816,193 @@ async function removeLeg(id) {
 }
 
 // ---------- canvas card ----------
+// Canvas roundRect polyfill (built-in isn't reliable across all Chrome MV3 contexts).
+function roundRect(ctx, x, y, w, h, r) {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
 function drawCard() {
   const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
   const canvas = document.getElementById('card');
   const ctx = canvas.getContext('2d');
-  const W = canvas.width;
-  const H = canvas.height;
+  const W = canvas.width;   // 1200
+  const H = canvas.height;  // 630
 
-  // Background gradient
+  // --- BACKGROUND: deep gradient with subtle vignette accent ---
   const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#0a0c12');
-  bg.addColorStop(1, '#13182a');
+  bg.addColorStop(0, '#0a0c14');
+  bg.addColorStop(0.55, '#0e1322');
+  bg.addColorStop(1, '#161a2e');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // Subtle accent line
-  ctx.strokeStyle = '#6366f1';
-  ctx.lineWidth = 4;
+  // Top-right accent glow
+  const glow = ctx.createRadialGradient(W * 0.82, H * 0.1, 10, W * 0.82, H * 0.1, 380);
+  glow.addColorStop(0, 'rgba(99,102,241,0.32)');
+  glow.addColorStop(1, 'rgba(99,102,241,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Bottom-left amber accent
+  const glow2 = ctx.createRadialGradient(80, H - 60, 10, 80, H - 60, 320);
+  glow2.addColorStop(0, 'rgba(245,158,11,0.18)');
+  glow2.addColorStop(1, 'rgba(245,158,11,0)');
+  ctx.fillStyle = glow2;
+  ctx.fillRect(0, 0, W, H);
+
+  // --- HEADER: brand mark + tagline ---
+  // Purple dot mark
+  ctx.fillStyle = '#6366f1';
   ctx.beginPath();
-  ctx.moveTo(60, 80);
-  ctx.lineTo(180, 80);
-  ctx.stroke();
+  ctx.arc(64, 64, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(99,102,241,0.32)';
+  ctx.beginPath();
+  ctx.arc(64, 64, 18, 0, Math.PI * 2);
+  ctx.fill();
 
-  // Brand
   ctx.fillStyle = '#f9fafb';
-  ctx.font = '600 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-  ctx.fillText('POLYPARLAY', 60, 70);
+  ctx.font = '800 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  ctx.fillText('PolyParlay', 88, 73);
 
-  // Title
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '500 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-  ctx.fillText('Polymarket parlay slip', 60, 110);
+  ctx.font = '500 14px -apple-system, sans-serif';
+  ctx.fillText('Built on Polymarket · all legs must hit', 88, 96);
 
-  // Legs
-  const startY = 170;
-  const lineH = 64;
-  ctx.font = '600 22px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  // Timestamp top right
+  const now = new Date();
+  const dateStr = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '500 13px -apple-system, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(dateStr.toUpperCase(), W - 60, 73);
+  ctx.textAlign = 'left';
+
+  // --- LEGS ---
+  const startY = 160;
+  const lineH = 70;
   eligible.forEach((leg, i) => {
     const y = startY + i * lineH;
-    // Number circle
-    ctx.fillStyle = '#1e2230';
-    ctx.beginPath();
-    ctx.arc(80, y - 8, 18, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#9ca3af';
-    ctx.font = '700 16px -apple-system, sans-serif';
-    ctx.fillText(String(i + 1), 75, y - 3);
 
-    // Question (truncate)
+    // Number badge (small purple square instead of circle — more modern)
+    ctx.fillStyle = 'rgba(99,102,241,0.16)';
+    roundRect(ctx, 60, y - 22, 32, 32, 8);
+    ctx.fill();
+    ctx.fillStyle = '#a5b4fc';
+    ctx.font = '800 14px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(i + 1), 76, y - 1);
+    ctx.textAlign = 'left';
+
+    // Direction pill (YES/NO/etc) — placed first so question wraps next to it
+    const label = (leg.direction || (leg.outcomes && leg.outcomes[leg.selectedIndex || 0]) || 'YES').toUpperCase();
+    let dirBg, dirFg;
+    if (/^YES$/i.test(label)) { dirBg = 'rgba(34,197,94,0.18)'; dirFg = '#4ade80'; }
+    else if (/^NO$/i.test(label)) { dirBg = 'rgba(239,68,68,0.18)'; dirFg = '#f87171'; }
+    else { dirBg = 'rgba(99,102,241,0.18)'; dirFg = '#a5b4fc'; }
+    ctx.font = '800 13px -apple-system, sans-serif';
+    const dirW = ctx.measureText(label).width + 18;
+    ctx.fillStyle = dirBg;
+    roundRect(ctx, 105, y - 17, dirW, 22, 6);
+    ctx.fill();
+    ctx.fillStyle = dirFg;
+    ctx.fillText(label, 114, y - 1);
+
+    // Question (truncate to fit)
+    const questionX = 113 + dirW + 8;
     ctx.fillStyle = '#f9fafb';
-    ctx.font = '600 22px -apple-system, sans-serif';
-    const maxW = 700;
-    let q = leg.question;
+    ctx.font = '600 21px -apple-system, sans-serif';
+    const maxW = W - questionX - 200; // leave room for price on right
+    let q = leg.question || 'Market';
     if (ctx.measureText(q).width > maxW) {
       while (q.length > 4 && ctx.measureText(q + '…').width > maxW) q = q.slice(0, -1);
       q = q + '…';
     }
-    ctx.fillText(q, 120, y);
+    ctx.fillText(q, questionX, y);
 
-    // Direction
-    const label = leg.direction || (leg.outcomes && leg.outcomes[leg.selectedIndex || 0]) || 'YES';
-    let dirColor = '#6366f1';
-    if (/^yes$/i.test(label)) dirColor = '#22c55e';
-    else if (/^no$/i.test(label)) dirColor = '#ef4444';
-    ctx.fillStyle = dirColor;
-    ctx.font = '700 14px -apple-system, sans-serif';
-    ctx.fillText(label, 120, y + 24);
+    // Resolution date small under question
+    if (leg.endDate) {
+      const d = new Date(leg.endDate);
+      if (!isNaN(d.getTime())) {
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '500 12px -apple-system, sans-serif';
+        ctx.fillText('Resolves ' + d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), questionX, y + 22);
+      }
+    }
 
-    // Price (adaptive precision)
+    // Price (adaptive precision, right-aligned)
     ctx.fillStyle = '#f9fafb';
-    ctx.font = '700 24px -apple-system, sans-serif';
+    ctx.font = '800 26px -apple-system, sans-serif';
     const p = Number(leg.price) || 0;
-    const priceText = p < 0.10 ? '$' + p.toFixed(3) : '$' + p.toFixed(2);
-    const priceW = ctx.measureText(priceText).width;
-    ctx.fillText(priceText, W - 60 - priceW, y);
+    const priceText = p > 0 && p < 0.01 ? '$' + p.toFixed(4) : p < 0.10 ? '$' + p.toFixed(3) : '$' + p.toFixed(2);
+    ctx.textAlign = 'right';
+    ctx.fillText(priceText, W - 60, y);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '500 12px -apple-system, sans-serif';
+    ctx.fillText('LEG ' + (i + 1), W - 60, y + 22);
+    ctx.textAlign = 'left';
   });
 
+  // --- FOOTER PAYOUT BLOCK ---
+  const footerY = H - 180;
+
   // Divider
-  ctx.strokeStyle = '#1e2230';
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(60, H - 220);
-  ctx.lineTo(W - 60, H - 220);
+  ctx.moveTo(60, footerY - 10);
+  ctx.lineTo(W - 60, footerY - 10);
   ctx.stroke();
 
-  // Multiplier (huge)
+  // Multiplier — hero number
   const mult = multiplier(eligible);
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '500 16px -apple-system, sans-serif';
-  ctx.fillText('IF ALL HIT', 60, H - 175);
-  ctx.fillStyle = '#f9fafb';
-  ctx.font = '700 96px -apple-system, sans-serif';
-  ctx.fillText(fmtMult(mult), 60, H - 90);
+  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.fillText('IF ALL HIT', 60, footerY + 18);
 
-  // Stake / payout
+  // Big multiplier value with subtle purple cast
+  const multText = fmtMult(mult);
+  ctx.fillStyle = '#a5b4fc';
+  ctx.font = '900 100px -apple-system, sans-serif';
+  ctx.fillText(multText, 60, footerY + 110);
+
+  // STAKE / PAYOUT cluster on the right
   const payout = maxPayout(eligible, currentSlip.stake);
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '500 16px -apple-system, sans-serif';
-  ctx.fillText('STAKE', W - 380, H - 175);
-  ctx.fillText('MAX PAYOUT', W - 220, H - 175);
-  ctx.fillStyle = '#f9fafb';
-  ctx.font = '700 32px -apple-system, sans-serif';
-  ctx.fillText('$' + currentSlip.stake.toFixed(0), W - 380, H - 130);
-  ctx.fillStyle = '#22c55e';
-  ctx.fillText(fmt$(payout).replace('$', '$'), W - 220, H - 130);
+  const stake = Number(currentSlip.stake) || 0;
 
-  // Watermark
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('STAKE', W - 280, footerY + 18);
+  ctx.fillStyle = '#f9fafb';
+  ctx.font = '800 32px -apple-system, sans-serif';
+  ctx.fillText('$' + stake.toFixed(0), W - 280, footerY + 56);
+
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.fillText('MAX PAYOUT', W - 60, footerY + 18);
+  ctx.fillStyle = '#4ade80';
+  ctx.font = '800 44px -apple-system, sans-serif';
+  ctx.fillText(fmt$(payout), W - 60, footerY + 62);
+  ctx.textAlign = 'left';
+
+  // --- WATERMARK STRIP ---
   ctx.fillStyle = '#4b5563';
-  ctx.font = '500 14px -apple-system, sans-serif';
-  ctx.fillText('polyparlay.io', 60, H - 30);
+  ctx.font = '600 13px -apple-system, sans-serif';
+  ctx.fillText('polyparlay.io', 60, H - 28);
+  ctx.fillStyle = '#374151';
+  ctx.font = '500 11px -apple-system, sans-serif';
   ctx.textAlign = 'right';
   ctx.fillText('Information only — verify on Polymarket', W - 60, H - 30);
   ctx.textAlign = 'left';
@@ -972,37 +1159,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Run Sim button — runs Monte Carlo locally and shows results
+  // Run Sim button — locked for free tier (routes to trial), runs locally for trial/paid
   const simBtn = document.getElementById('runSimBtn');
   if (simBtn) {
-    simBtn.addEventListener('click', (e) => {
+    simBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
+      const state = await getProState();
+      if (state.tier === 'free' || state.tier === 'expired') {
+        // Lockout — bounce to trial flow
+        await startTrial();
+        await applyProState();
+        // Now that trial is active, fire the sim so the click feels rewarded
+        runAndShowSim();
+        return;
+      }
       runAndShowSim();
     });
   }
   const simClose = document.getElementById('simClose');
   if (simClose) {
-    simClose.addEventListener('click', () => {
-      toggleHidden('simResults', true);
+    simClose.addEventListener('click', () => toggleHidden('simResults', true));
+  }
+
+  // Main Pro CTA — starts trial when free, opens payment when trial/expired
+  const proMainCta = document.getElementById('proMainCta');
+  if (proMainCta) {
+    proMainCta.addEventListener('click', async () => {
+      const state = await getProState();
+      if (state.tier === 'free') {
+        await startTrial();
+        await applyProState();
+        renderLegs();
+        renderSummary();
+      } else {
+        // Trial / Expired / Paid → all go to payment page (worker-backed)
+        chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=main-cta' });
+      }
     });
   }
 
-  // Pro Preview toggle — defaults ON so the user can see every feature unlocked
-  const previewToggle = document.getElementById('proPreview');
-  if (previewToggle) {
-    chrome.storage.local.get(['proPreview']).then(({ proPreview }) => {
-      const enabled = proPreview === undefined ? true : !!proPreview;
-      previewToggle.checked = enabled;
-      document.body.classList.toggle('preview-pro', enabled);
-      if (proPreview === undefined) chrome.storage.local.set({ proPreview: true });
-    });
-    previewToggle.addEventListener('change', () => {
-      const on = previewToggle.checked;
-      document.body.classList.toggle('preview-pro', on);
-      chrome.storage.local.set({ proPreview: on });
-    });
-  }
+  // Pro Preview toggle removed — state machine is the single source of truth.
+  // For local dev: open DevTools console and run
+  //   chrome.storage.local.set({proState:{trialStartedAt:Date.now(),trialEndsAt:Date.now()+7*86400000}})
+  // to simulate an active trial.
+
+  applyProState();
 });
 
 async function loadAndRenderLeaderboard() {
@@ -1131,6 +1333,44 @@ function renderSimResults(r) {
     </div>`
   ).join('');
   setText('simHeadLabel', `Monte Carlo · ${itLabel} sims`);
+
+  // Improve Odds suggestion — append below the grid when there's a leg
+  // priced low enough that its removal would meaningfully improve win rate.
+  // Remove any previous suggestion before re-rendering.
+  const old = panel.querySelector('.sim-rebalance');
+  if (old) old.remove();
+  const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
+  const suggest = suggestRebalance(eligible);
+  if (suggest) {
+    const rebalEl = document.createElement('div');
+    rebalEl.className = 'sim-rebalance';
+    rebalEl.innerHTML =
+      '<div class="sim-rebalance-info">' +
+      '  <div class="sim-rebalance-title">↗ Improve odds</div>' +
+      '  <div class="sim-rebalance-desc">' +
+      `    Drop "<strong>${escapeHtml(truncate(suggest.removedQuestion, 38))}</strong>" ` +
+      `    (priced ${fmtPrice(suggest.removedPrice)}). ` +
+      `    Win rate jumps <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>. ` +
+      `    Multiplier drops ${suggest.oldMultiplier.toFixed(1)}× → ${suggest.newMultiplier.toFixed(1)}×.` +
+      '  </div>' +
+      '</div>' +
+      '<button class="sim-rebalance-apply" id="simRebalanceApply" type="button">Apply</button>';
+    panel.appendChild(rebalEl);
+    const applyBtn = document.getElementById('simRebalanceApply');
+    if (applyBtn) {
+      applyBtn.addEventListener('click', async () => {
+        applyBtn.disabled = true;
+        applyBtn.textContent = 'Rebalancing…';
+        await chrome.runtime.sendMessage({ type: 'removeLeg', legId: suggest.removeLegId });
+        const resp = await chrome.runtime.sendMessage({ type: 'getSlip' });
+        if (resp && resp.ok) currentSlip = resp.slip;
+        renderLegs();
+        renderSummary();
+        runAndShowSim(); // re-run sim with new slip composition
+      });
+    }
+  }
+
   toggleHidden('simResults', false);
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
