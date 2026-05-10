@@ -251,6 +251,78 @@ function fmtRelativeDate(d) {
 
 // ---------- state ----------
 let currentSlip = { legs: [], stake: 10 };
+let userInputs = { edge: 0, bankroll: 1000, wallet: '' };
+let walletPositionsCache = null; // populated when wallet pasted
+
+// True per-leg probability after applying user edge (clamped to keep math sane)
+function trueProb(legPrice, edgePp) {
+  const p = (Number(legPrice) || 0) + (Number(edgePp) || 0) / 100;
+  if (p <= 0.001) return 0.001;
+  if (p >= 0.999) return 0.999;
+  return p;
+}
+
+// Joint true probability across legs assuming independence
+function jointTrueProb(legs, edgePp) {
+  if (!legs.length) return null;
+  return legs.reduce((acc, l) => acc * trueProb(l.price, edgePp), 1);
+}
+
+// Expected ROI per dollar staked given user's edge claim
+function expectedRoi(legs, edgePp) {
+  const m = multiplier(legs);
+  const p = jointTrueProb(legs, edgePp);
+  if (!m || p == null) return null;
+  return p * m - 1;
+}
+
+// Kelly fraction = (b·p - q) / b where b = decimal_odds - 1 = multiplier - 1
+function kellyFraction(legs, edgePp) {
+  const m = multiplier(legs);
+  const p = jointTrueProb(legs, edgePp);
+  if (!m || p == null || m <= 1) return null;
+  const b = m - 1;
+  const q = 1 - p;
+  return (b * p - q) / b;
+}
+
+// Fetch resolved positions from a wallet via Polymarket data-api.
+// Used to compute "Your record on this category" — wins/losses for a category.
+async function fetchWalletPositions(addr) {
+  if (!addr || !/^0x[a-f0-9]{40}$/i.test(addr.trim())) return null;
+  try {
+    const r = await fetch(`https://data-api.polymarket.com/positions?user=${addr.trim()}&sizeThreshold=0.5`);
+    if (!r.ok) return null;
+    const data = await r.json();
+    return Array.isArray(data) ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+// Given fetched positions and the current slip's primary category,
+// estimate the user's hit/miss record in that category from RESOLVED positions only.
+function recordForCategory(positions, category) {
+  if (!positions || !positions.length || !category) return null;
+  const cat = category.toLowerCase();
+  let wins = 0;
+  let losses = 0;
+  for (const pos of positions) {
+    // Heuristic: data-api position objects typically expose `redeemable`,
+    // `outcome`, `outcomeIndex`, `eventCategory` or similar; check a couple of
+    // possibilities since the schema varies.
+    const posCat = String(pos.eventCategory || pos.category || pos.eventTitle || '').toLowerCase();
+    if (!posCat.includes(cat)) continue;
+    // Position is resolved if `redeemable` exists or `cashedOut` is true
+    const resolved = pos.redeemable != null || pos.cashedOut === true || pos.curPrice === 0 || pos.curPrice === 1;
+    if (!resolved) continue;
+    // Won = current price hit 1, lost = hit 0 (atomic resolution)
+    if (Number(pos.curPrice) === 1 || pos.outcome === 'Yes' && Number(pos.realizedPnl) > 0) wins++;
+    else losses++;
+  }
+  if (wins + losses === 0) return null;
+  return { wins, losses, total: wins + losses, rate: wins / (wins + losses) };
+}
 
 // ---------- render ----------
 function renderLegs() {
@@ -407,6 +479,46 @@ function renderSummary() {
     }
   } else {
     setText('proDrift', '—');
+  }
+
+  // Real Pro analytics — locked rows that depend on user inputs (edge / bankroll / wallet)
+  const edgePp = Number(userInputs.edge) || 0;
+  const winP = jointTrueProb(eligible, edgePp);
+  setText('proWinProb', winP != null ? (winP * 100).toFixed(2) + '%' : '—');
+
+  const evRoi = expectedRoi(eligible, edgePp);
+  if (evRoi != null) {
+    const sign = evRoi >= 0 ? '+' : '';
+    setText('proExpectedRoi', sign + (evRoi * 100).toFixed(2) + '%');
+  } else {
+    setText('proExpectedRoi', '—');
+  }
+
+  const kf = kellyFraction(eligible, edgePp);
+  const bankroll = Number(userInputs.bankroll) || 0;
+  if (kf != null && bankroll > 0) {
+    const kellyDollars = Math.max(0, kf * bankroll);
+    const halfKelly = kellyDollars / 2;
+    setText('proKelly', kf > 0 ? `$${halfKelly.toFixed(0)} (½) · $${kellyDollars.toFixed(0)} (full)` : '$0 (no edge)');
+  } else {
+    setText('proKelly', '—');
+  }
+
+  // Your record — derived from cached wallet positions
+  if (walletPositionsCache && eligible.length) {
+    const cat = eligible[0].category;
+    const rec = recordForCategory(walletPositionsCache, cat);
+    if (rec) {
+      setText('proRecord', `${rec.wins}-${rec.losses} (${(rec.rate * 100).toFixed(0)}%) in ${cat}`);
+    } else if (cat) {
+      setText('proRecord', `0 resolved in ${cat}`);
+    } else {
+      setText('proRecord', 'no category match');
+    }
+  } else if (userInputs.wallet) {
+    setText('proRecord', 'fetching…');
+  } else {
+    setText('proRecord', 'paste wallet ↑');
   }
 
   const hasLegs = eligible.length > 0;
@@ -738,13 +850,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Pro Preview toggle — local-only flag for testing the paid UX without paying.
-  // Unblurs locked values + ensures real-data rows compute. Persists in chrome.storage.
+  // Pro Preview toggle — defaults ON so the user can try every feature unlocked.
   const previewToggle = document.getElementById('proPreview');
   if (previewToggle) {
     chrome.storage.local.get(['proPreview']).then(({ proPreview }) => {
-      previewToggle.checked = !!proPreview;
-      document.body.classList.toggle('preview-pro', !!proPreview);
+      // Default to true if the key has never been set
+      const enabled = proPreview === undefined ? true : !!proPreview;
+      previewToggle.checked = enabled;
+      document.body.classList.toggle('preview-pro', enabled);
+      if (proPreview === undefined) {
+        chrome.storage.local.set({ proPreview: true });
+      }
     });
     previewToggle.addEventListener('change', () => {
       const on = previewToggle.checked;
@@ -752,7 +868,59 @@ document.addEventListener('DOMContentLoaded', () => {
       chrome.storage.local.set({ proPreview: on });
     });
   }
+
+  // Edge / bankroll / wallet inputs — drive the real Pro analytics computations
+  const edgeInput = document.getElementById('edgeInput');
+  const bankrollInput = document.getElementById('bankrollInput');
+  const walletInput = document.getElementById('walletInput');
+
+  // Restore persisted inputs so the user doesn't re-type each time
+  chrome.storage.local.get(['userInputs']).then(({ userInputs: stored }) => {
+    if (stored) {
+      userInputs = { ...userInputs, ...stored };
+      if (edgeInput) edgeInput.value = userInputs.edge;
+      if (bankrollInput) bankrollInput.value = userInputs.bankroll;
+      if (walletInput) walletInput.value = userInputs.wallet;
+      if (userInputs.wallet) refreshWalletPositions();
+    }
+    renderSummary();
+  });
+
+  function persistInputs() {
+    chrome.storage.local.set({ userInputs });
+  }
+
+  if (edgeInput) {
+    edgeInput.addEventListener('input', () => {
+      userInputs.edge = Number(edgeInput.value) || 0;
+      persistInputs();
+      renderSummary();
+    });
+  }
+  if (bankrollInput) {
+    bankrollInput.addEventListener('input', () => {
+      userInputs.bankroll = Number(bankrollInput.value) || 0;
+      persistInputs();
+      renderSummary();
+    });
+  }
+  if (walletInput) {
+    walletInput.addEventListener('change', () => {
+      userInputs.wallet = walletInput.value.trim();
+      persistInputs();
+      walletPositionsCache = null;
+      renderSummary();
+      if (userInputs.wallet) refreshWalletPositions();
+    });
+  }
 });
+
+async function refreshWalletPositions() {
+  if (!userInputs.wallet) return;
+  const positions = await fetchWalletPositions(userInputs.wallet);
+  walletPositionsCache = positions || [];
+  renderSummary();
+}
 
 function runAndShowSim() {
   const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
