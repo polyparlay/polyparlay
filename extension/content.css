@@ -1,12 +1,14 @@
+/* PolyParlay v0.1.3 — slim floating button + slide-out preview */
+
 #polyparlay-floating-btn {
   position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
+  bottom: 80px !important;        /* lifted above PM's bottom UI */
+  right: 16px !important;
   z-index: 2147483647 !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  padding: 10px 14px 10px 12px !important;
+  gap: 0 !important;
+  padding: 8px !important;
   background: #1f2937 !important;
   color: #f9fafb !important;
   border: 1px solid #374151 !important;
@@ -16,14 +18,17 @@
   font-weight: 600 !important;
   cursor: pointer !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
-  transition: transform 0.12s ease, background 0.18s ease, box-shadow 0.18s ease !important;
+  transition: padding 0.15s ease, gap 0.15s ease, background 0.15s ease, transform 0.12s ease !important;
   line-height: 1 !important;
   user-select: none !important;
+  overflow: hidden !important;
+  max-width: 240px !important;
 }
 #polyparlay-floating-btn:hover {
-  transform: translateY(-1px) !important;
   background: #2b3848 !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45) !important;
+  padding: 8px 14px 8px 8px !important;
+  gap: 8px !important;
+  transform: translateY(-1px) !important;
 }
 #polyparlay-floating-btn:active {
   transform: translateY(0) !important;
@@ -32,20 +37,40 @@
   opacity: 0.7 !important;
   pointer-events: none !important;
 }
-#polyparlay-floating-btn .pw-plus {
+#polyparlay-floating-btn.pw-flash {
+  padding: 8px 14px 8px 8px !important;
+  gap: 8px !important;
+}
+#polyparlay-floating-btn.pw-disabled {
+  opacity: 0.55 !important;
+  background: #1a2030 !important;
+}
+#polyparlay-floating-btn .pw-icon {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 18px !important;
-  height: 18px !important;
+  width: 22px !important;
+  height: 22px !important;
   background: #6366f1 !important;
   color: #fff !important;
   border-radius: 50% !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
   font-weight: 700 !important;
+  flex: 0 0 22px !important;
 }
-#polyparlay-floating-btn .pw-label {
+#polyparlay-floating-btn.pw-disabled .pw-icon {
+  background: #374151 !important;
+}
+#polyparlay-floating-btn .pw-text {
   white-space: nowrap !important;
+  max-width: 0 !important;
+  opacity: 0 !important;
+  transition: max-width 0.15s ease, opacity 0.15s ease !important;
+}
+#polyparlay-floating-btn:hover .pw-text,
+#polyparlay-floating-btn.pw-flash .pw-text {
+  max-width: 200px !important;
+  opacity: 1 !important;
 }
 #polyparlay-floating-btn .pw-badge {
   display: none;
@@ -55,22 +80,16 @@
   background: #f59e0b !important;
   color: #1f2937 !important;
   border-radius: 9px !important;
-  font-size: 11px !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
   line-height: 18px !important;
   text-align: center !important;
-}
-#polyparlay-floating-btn.pw-disabled {
-  opacity: 0.6 !important;
-  background: #1a2030 !important;
-}
-#polyparlay-floating-btn.pw-disabled .pw-plus {
-  background: #374151 !important;
-}
-#polyparlay-floating-btn.pw-disabled:hover {
-  opacity: 0.85 !important;
+  position: absolute !important;
+  top: -4px !important;
+  right: -4px !important;
 }
 
+/* Inline injection button (best-effort, near YES/NO pairs) */
 .polyparlay-inline-btn {
   display: inline-flex !important;
   align-items: center !important;
@@ -93,9 +112,130 @@
   text-transform: none !important;
   box-shadow: 0 2px 6px rgba(99, 102, 241, 0.35) !important;
 }
-.polyparlay-inline-btn:hover {
-  filter: brightness(1.1) !important;
+.polyparlay-inline-btn:hover { filter: brightness(1.1) !important; }
+
+/* Slide-out preview that appears after every successful add */
+#polyparlay-preview {
+  position: fixed !important;
+  bottom: 130px !important;
+  right: 16px !important;
+  z-index: 2147483646 !important;
+  width: 320px !important;
+  background: #11141a !important;
+  color: #e5e7eb !important;
+  border: 1px solid #1e2230 !important;
+  border-radius: 12px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 13px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
+  overflow: hidden !important;
 }
-.polyparlay-inline-btn:active {
-  transform: translateY(1px) !important;
+#polyparlay-preview.pw-hidden {
+  transform: translateY(20px) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
+.pw-preview-head {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid #1e2230 !important;
+}
+.pw-preview-title {
+  font-weight: 700 !important;
+  color: #f9fafb !important;
+}
+.pw-preview-close {
+  background: transparent !important;
+  border: 0 !important;
+  color: #6b7280 !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  padding: 0 4px !important;
+}
+.pw-preview-close:hover { color: #f9fafb !important; }
+.pw-preview-legs {
+  max-height: 220px !important;
+  overflow-y: auto !important;
+}
+.pw-preview-empty {
+  padding: 24px 12px !important;
+  text-align: center !important;
+  color: #6b7280 !important;
+  font-size: 12px !important;
+}
+.pw-pleg {
+  display: grid !important;
+  grid-template-columns: 22px 1fr !important;
+  gap: 8px !important;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid #1e2230 !important;
+  align-items: start !important;
+}
+.pw-pleg:last-child { border-bottom: 0 !important; }
+.pw-pleg-num {
+  width: 20px !important; height: 20px !important;
+  border-radius: 50% !important;
+  background: #1e2230 !important;
+  color: #6b7280 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.pw-pleg-q {
+  color: #f9fafb !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+}
+.pw-pleg-meta {
+  display: block !important;
+  font-size: 11px !important;
+  color: #6b7280 !important;
+  margin-top: 2px !important;
+}
+.pw-yes { color: #22c55e !important; font-weight: 700 !important; }
+.pw-no { color: #ef4444 !important; font-weight: 700 !important; }
+.pw-other { color: #6366f1 !important; font-weight: 700 !important; }
+
+.pw-preview-summary {
+  padding: 10px 12px !important;
+  border-top: 1px solid #1e2230 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+}
+.pw-preview-summary span { color: #6b7280 !important; }
+.pw-preview-summary strong {
+  color: #f9fafb !important;
+  font-size: 18px !important;
+}
+.pw-preview-footer {
+  padding: 8px 12px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  background: #0f1218 !important;
+  border-top: 1px solid #1e2230 !important;
+}
+.pw-preview-status {
+  font-size: 11px !important;
+  color: #6b7280 !important;
+}
+.pw-preview-popup {
+  background: #6366f1 !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  padding: 5px 10px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+.pw-preview-popup:hover { filter: brightness(1.08) !important; }

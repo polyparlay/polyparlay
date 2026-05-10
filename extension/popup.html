@@ -34,7 +34,7 @@
         <span id="combinedCost">—</span>
       </div>
       <div class="row big">
-        <span>Multiplier</span>
+        <span>Multiplier <span class="row-hint">if all legs hit</span></span>
         <span id="multiplier">—</span>
       </div>
       <div class="row stake-row">
@@ -51,10 +51,14 @@
     </section>
 
     <section class="actions">
-      <button id="generate" class="primary">Generate slip card</button>
-      <button id="share" class="secondary" disabled>Share</button>
-      <button id="open" class="secondary" disabled>Open viewer</button>
+      <button id="shareX" class="primary" disabled>Share to X</button>
+      <button id="downloadTop" class="secondary" disabled>Download PNG</button>
     </section>
+    <div id="shareStatus" class="share-status"></div>
+
+    <div class="parlay-note">
+      Polymarket doesn't natively execute parlays — to realize this multiplier, place each leg separately or use an on-chain parlay service like <a href="https://parlays.predictshark.io" target="_blank" rel="noopener">PredictShark ↗</a>.
+    </div>
 
     <section class="pro-panel" id="proPanel">
       <div class="pro-panel-head">
@@ -101,10 +105,6 @@
 
     <section id="cardWrap" class="card-wrap hidden">
       <canvas id="card" width="1200" height="630"></canvas>
-      <div class="card-actions">
-        <button id="download" class="secondary">Download PNG</button>
-        <button id="copyLink" class="secondary">Copy link</button>
-      </div>
     </section>
 
     <footer>

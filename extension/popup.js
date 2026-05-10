@@ -24,6 +24,15 @@ function fmt$(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   return '$' + Number(n).toFixed(2);
 }
+// Adaptive precision for prices: low-priced legs (under $0.10) need 3 decimals
+// so the user can mentally verify the multiplier. $0.02 vs $0.025 changes the math
+// by ~20% on a single leg, more on a multi-leg parlay.
+function fmtPrice(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const v = Number(n);
+  if (v < 0.10) return '$' + v.toFixed(3);
+  return '$' + v.toFixed(2);
+}
 function fmtMult(n) {
   if (!isFinite(n) || n <= 0) return '—';
   return n.toFixed(2) + '×';
@@ -96,23 +105,37 @@ function renderLegs() {
 function renderLeg(leg, idx) {
   const div = document.createElement('div');
   div.className = 'leg';
-  const dirClass = leg.direction === 'YES' ? 'dir-yes' : 'dir-no';
-  const dirLabel = leg.direction || 'YES';
+
+  // Determine current outcome label and the next one (for the flip button)
+  const outcomes = Array.isArray(leg.outcomes) && leg.outcomes.length
+    ? leg.outcomes
+    : [leg.direction || 'YES', leg.direction === 'YES' ? 'NO' : 'YES'];
+  const cur = typeof leg.selectedIndex === 'number'
+    ? leg.selectedIndex
+    : Math.max(0, outcomes.findIndex((o) => o === leg.direction));
+  const dirLabel = outcomes[cur] || leg.direction || 'YES';
+  const nextLabel = outcomes[(cur + 1) % outcomes.length];
+
+  // Color: YES=green, NO=red, anything else = accent purple
+  let dirClass = 'dir-other';
+  if (/^yes$/i.test(dirLabel)) dirClass = 'dir-yes';
+  else if (/^no$/i.test(dirLabel)) dirClass = 'dir-no';
+
   div.innerHTML = `
     <div class="leg-body">
       <div class="q">${escapeHtml(leg.question)}</div>
       <div class="meta">
-        <span class="${dirClass}">${dirLabel}</span>
+        <span class="${dirClass}">${escapeHtml(dirLabel)}</span>
         ${leg.category ? ' · ' + escapeHtml(leg.category) : ''}
         ${leg.endDate ? ' · resolves ' + new Date(leg.endDate).toLocaleDateString() : ''}
       </div>
       <div class="leg-secondary">
-        <button data-flip="${leg.id}" title="Switch this leg between YES and NO">Flip to ${leg.direction === 'YES' ? 'NO' : 'YES'}</button>
+        <button data-flip="${leg.id}" title="Switch outcome">Flip to ${escapeHtml(nextLabel)}</button>
         <button data-open="${leg.id}" title="Open on Polymarket">Open ↗</button>
       </div>
     </div>
     <div class="price">
-      ${fmt$(leg.price)}
+      ${fmtPrice(leg.price)}
       <small>leg ${idx + 1}</small>
     </div>
     <button class="leg-remove" data-remove="${leg.id}" title="Remove leg" aria-label="Remove leg ${idx + 1}">×</button>
@@ -137,15 +160,22 @@ function renderSummary() {
   const payout = maxPayout(eligible, safeStake);
 
   document.getElementById('combinedCost').textContent =
-    cost == null ? '—' : (cost * 100).toFixed(1) + '¢ / $1';
+    cost == null ? '—' : (cost * 100).toFixed(2) + '¢ / $1 payout';
   document.getElementById('multiplier').textContent = fmtMult(mult);
   document.getElementById('maxPayout').textContent = fmt$(payout);
   document.getElementById('stake').value = safeStake;
 
   const hasLegs = eligible.length > 0;
-  document.getElementById('generate').disabled = !hasLegs;
-  document.getElementById('share').disabled = true;
-  document.getElementById('open').disabled = true;
+  document.getElementById('shareX').disabled = !hasLegs;
+  document.getElementById('downloadTop').disabled = !hasLegs;
+
+  // Auto-render the slip card when there are legs so the user always sees what they're about to share
+  if (hasLegs) {
+    drawCard();
+    document.getElementById('cardWrap').classList.remove('hidden');
+  } else {
+    document.getElementById('cardWrap').classList.add('hidden');
+  }
 }
 
 // ---------- actions ----------
@@ -260,14 +290,19 @@ function drawCard() {
     ctx.fillText(q, 120, y);
 
     // Direction
-    ctx.fillStyle = leg.direction === 'NO' ? '#ef4444' : '#22c55e';
+    const label = leg.direction || (leg.outcomes && leg.outcomes[leg.selectedIndex || 0]) || 'YES';
+    let dirColor = '#6366f1';
+    if (/^yes$/i.test(label)) dirColor = '#22c55e';
+    else if (/^no$/i.test(label)) dirColor = '#ef4444';
+    ctx.fillStyle = dirColor;
     ctx.font = '700 14px -apple-system, sans-serif';
-    ctx.fillText(leg.direction || 'YES', 120, y + 24);
+    ctx.fillText(label, 120, y + 24);
 
-    // Price
+    // Price (adaptive precision)
     ctx.fillStyle = '#f9fafb';
     ctx.font = '700 24px -apple-system, sans-serif';
-    const priceText = '$' + (leg.price || 0).toFixed(2);
+    const p = Number(leg.price) || 0;
+    const priceText = p < 0.10 ? '$' + p.toFixed(3) : '$' + p.toFixed(2);
     const priceW = ctx.measureText(priceText).width;
     ctx.fillText(priceText, W - 60 - priceW, y);
   });
@@ -327,11 +362,11 @@ function buildShareUrl() {
   return `${VIEWER_BASE}#${hash}`;
 }
 
-function generate() {
-  drawCard();
-  document.getElementById('cardWrap').classList.remove('hidden');
-  document.getElementById('share').disabled = false;
-  document.getElementById('open').disabled = false;
+function setShareStatus(msg, color) {
+  const el = document.getElementById('shareStatus');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = color || '';
 }
 
 function downloadCard() {
@@ -346,33 +381,45 @@ function downloadCard() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+    setShareStatus('PNG downloaded — attach it to a post manually.', '');
   }, 'image/png');
 }
 
-async function copyLink() {
-  const url = buildShareUrl();
+async function copyImageToClipboard() {
+  const canvas = document.getElementById('card');
+  if (!canvas) return false;
   try {
-    await navigator.clipboard.writeText(url);
-    const btn = document.getElementById('copyLink');
-    const t = btn.textContent;
-    btn.textContent = 'Copied';
-    setTimeout(() => (btn.textContent = t), 1200);
-  } catch {
-    prompt('Copy this link:', url);
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
+    if (!blob) return false;
+    if (typeof ClipboardItem === 'undefined' || !navigator.clipboard || !navigator.clipboard.write) {
+      return false;
+    }
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 
-function shareToX() {
+async function shareToX() {
   const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
-  const mult = multiplier(eligible);
-  const url = buildShareUrl();
-  const text = `Built a ${eligible.length}-leg Polymarket parlay. ${fmtMult(mult)} if all hit.`;
-  const intent = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-  window.open(intent, '_blank');
-}
+  if (!eligible.length) return;
+  // Make sure the canvas is current
+  drawCard();
 
-function openViewer() {
-  window.open(buildShareUrl(), '_blank');
+  const mult = multiplier(eligible);
+  const text = `${eligible.length}-leg Polymarket parlay. ${fmtMult(mult)} if all hit. Built with @polyparlay`;
+  const intent = `https://x.com/intent/post?text=${encodeURIComponent(text)}`;
+
+  setShareStatus('Copying slip image to clipboard…', '');
+  const copied = await copyImageToClipboard();
+
+  if (copied) {
+    setShareStatus('Slip image copied — paste (⌘/Ctrl+V) in the X composer that just opened.', '#22c55e');
+  } else {
+    setShareStatus('Couldn\'t copy image — use Download PNG and attach manually.', '#f59e0b');
+  }
+  chrome.tabs.create({ url: intent });
 }
 
 // ---------- wiring ----------
@@ -393,11 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (leg && leg.url) chrome.tabs.create({ url: withRef(leg.url) });
     }
   });
-  document.getElementById('generate').addEventListener('click', generate);
-  document.getElementById('download').addEventListener('click', downloadCard);
-  document.getElementById('copyLink').addEventListener('click', copyLink);
-  document.getElementById('share').addEventListener('click', shareToX);
-  document.getElementById('open').addEventListener('click', openViewer);
+  document.getElementById('shareX').addEventListener('click', shareToX);
+  document.getElementById('downloadTop').addEventListener('click', downloadCard);
   document.getElementById('upgrade').addEventListener('click', () => {
     chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=leg-gate' });
   });

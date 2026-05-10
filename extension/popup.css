@@ -176,6 +176,7 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
 }
 .leg .dir-yes { color: var(--green); font-weight: 600; }
 .leg .dir-no { color: var(--red); font-weight: 600; }
+.leg .dir-other { color: var(--accent); font-weight: 600; }
 
 .locked {
   padding: 12px;
@@ -295,11 +296,34 @@ button[disabled] { opacity: 0.45; cursor: not-allowed; }
   background: #0a0c12;
   display: block;
 }
-.card-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
+.row-hint {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: 4px;
+  letter-spacing: 0.2px;
 }
+.share-status {
+  padding: 0 12px 8px;
+  font-size: 11px;
+  color: var(--muted);
+  min-height: 14px;
+  text-align: center;
+}
+.parlay-note {
+  padding: 8px 12px 10px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  background: rgba(99, 102, 241, 0.04);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.parlay-note a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.parlay-note a:hover { text-decoration: underline; }
 
 footer {
   display: flex;

@@ -37,17 +37,15 @@ function normalizeMarket(m, parentEvent) {
     prices = typeof m.outcomePrices === 'string' ? JSON.parse(m.outcomePrices) : (m.outcomePrices || []);
   } catch {}
 
-  const yi = outcomes.findIndex((o) => String(o).toLowerCase() === 'yes');
-  const ni = outcomes.findIndex((o) => String(o).toLowerCase() === 'no');
-  const yesPrice = yi >= 0 && prices[yi] != null ? parseFloat(prices[yi]) : null;
-  const noPrice = ni >= 0 && prices[ni] != null ? parseFloat(prices[ni]) : null;
+  const labels = outcomes.map((o) => String(o));
+  const numericPrices = prices.map((p) => parseFloat(p)).filter((p) => !isNaN(p));
 
   return {
     id: m.id || m.conditionId || m.slug,
     slug: m.slug,
     question: m.question || (parentEvent && parentEvent.title) || m.title || 'Unknown market',
-    yesPrice,
-    noPrice,
+    outcomes: labels,
+    prices: numericPrices,
     endDate: m.endDate || (parentEvent && parentEvent.endDate) || null,
     category: m.category || (parentEvent && parentEvent.category) || null,
     eventSlug: parentEvent ? parentEvent.slug : null
@@ -70,13 +68,18 @@ async function setSlip(slip) {
 }
 
 async function addLeg({ detected, pageTitle, url }) {
-  if (!detected) return { ok: false, error: 'No market on page' };
+  if (!detected) return { ok: false, error: 'No market detected in URL' };
 
   const market = await fetchMarketBySlug(detected.slug);
-  if (!market) return { ok: false, error: 'Market not found in Gamma' };
+  if (!market) {
+    return { ok: false, error: `Not found in Gamma: ${detected.slug}` };
+  }
 
-  if (market.yesPrice == null) {
-    return { ok: false, error: 'Market has no YES price (not a binary market?)' };
+  if (!market.outcomes || market.outcomes.length < 2) {
+    return { ok: false, error: 'Market has fewer than 2 outcomes' };
+  }
+  if (!market.prices || market.prices.length < market.outcomes.length) {
+    return { ok: false, error: 'Market has incomplete pricing' };
   }
 
   const slip = await getSlip();
@@ -86,15 +89,18 @@ async function addLeg({ detected, pageTitle, url }) {
     return { ok: false, error: 'Already in slip', legCount: slip.legs.length };
   }
 
-  // Default direction: YES
+  // Default to first outcome (typically YES, Up, Team A, etc.)
+  const selectedIndex = 0;
   slip.legs.push({
     id: market.id,
     slug: market.slug,
     question: market.question,
-    direction: 'YES',
-    price: market.yesPrice,
-    yesPrice: market.yesPrice,
-    noPrice: market.noPrice,
+    outcomes: market.outcomes,
+    prices: market.prices,
+    selectedIndex,
+    // Convenience fields kept for backward compatibility with old popup code
+    direction: market.outcomes[selectedIndex],
+    price: market.prices[selectedIndex],
     endDate: market.endDate,
     category: market.category,
     url
@@ -105,7 +111,7 @@ async function addLeg({ detected, pageTitle, url }) {
     ? `Added — leg ${slip.legs.length} (Pro)`
     : `Added — leg ${slip.legs.length} of ${FREE_LEG_LIMIT}`;
 
-  return { ok: true, message, legCount: slip.legs.length };
+  return { ok: true, message, legCount: slip.legs.length, slip };
 }
 
 async function removeLeg(legId) {
@@ -118,11 +124,19 @@ async function removeLeg(legId) {
 async function flipLeg(legId) {
   const slip = await getSlip();
   const leg = slip.legs.find((l) => l.id === legId);
-  if (leg) {
-    if (leg.direction === 'YES' && leg.noPrice != null) {
+  if (leg && leg.outcomes && leg.outcomes.length > 1) {
+    // Cycle through outcomes (binary = simple flip; 3+ = round-robin)
+    const cur = typeof leg.selectedIndex === 'number' ? leg.selectedIndex : 0;
+    const next = (cur + 1) % leg.outcomes.length;
+    leg.selectedIndex = next;
+    leg.direction = leg.outcomes[next];
+    leg.price = leg.prices[next];
+  } else if (leg && leg.yesPrice != null && leg.noPrice != null) {
+    // Legacy leg (pre-v0.1.3) — keep old flip behavior so existing slips don't break
+    if (leg.direction === 'YES') {
       leg.direction = 'NO';
       leg.price = leg.noPrice;
-    } else if (leg.direction === 'NO' && leg.yesPrice != null) {
+    } else {
       leg.direction = 'YES';
       leg.price = leg.yesPrice;
     }
@@ -142,16 +156,29 @@ async function setStake(stake) {
   return slip;
 }
 
-// Refresh prices for all legs in current slip (for live multiplier)
+// Refresh prices for all legs in current slip (for live multiplier).
+// Also migrates legacy legs (pre-v0.1.3) to the outcomes/prices array shape.
 async function refreshSlipPrices() {
   const slip = await getSlip();
   for (const leg of slip.legs) {
     try {
       const fresh = await fetchMarketBySlug(leg.slug);
-      if (fresh) {
-        leg.yesPrice = fresh.yesPrice;
-        leg.noPrice = fresh.noPrice;
-        leg.price = leg.direction === 'YES' ? fresh.yesPrice : fresh.noPrice;
+      if (fresh && fresh.outcomes && fresh.prices) {
+        leg.outcomes = fresh.outcomes;
+        leg.prices = fresh.prices;
+        // Preserve selection if possible — match by label first, fall back to index
+        let idx = 0;
+        if (typeof leg.selectedIndex === 'number') {
+          idx = Math.min(leg.selectedIndex, fresh.outcomes.length - 1);
+        } else if (leg.direction) {
+          const matchIdx = fresh.outcomes.findIndex(
+            (o) => String(o).toLowerCase() === String(leg.direction).toLowerCase()
+          );
+          if (matchIdx >= 0) idx = matchIdx;
+        }
+        leg.selectedIndex = idx;
+        leg.direction = fresh.outcomes[idx];
+        leg.price = fresh.prices[idx];
       }
     } catch {}
   }
