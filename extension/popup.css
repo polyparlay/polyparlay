@@ -895,7 +895,59 @@ body.state-expired .run-sim-box .pro-tag {
 .pro-tier-indicator.tier-paid { background: var(--pro); color: #0b0d12; }
 .pro-tier-indicator.tier-expired { background: rgba(239,68,68,0.2); color: var(--red); }
 
-/* Improve Odds — appended to sim panel when a rebalance would help */
+/* Improve Odds — standalone always-visible row above the Run Sim button.
+   Free state: feature pitch (Apply auto-starts trial).
+   Trial/Paid: specific live recommendation.
+   Huge upgrade lever — title + Apply always clear, description swaps. */
+.improve-odds {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 12px 8px;
+  padding: 10px 12px;
+  background: rgba(34, 197, 94, 0.07);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  border-radius: 8px;
+}
+.improve-odds-info { flex: 1; min-width: 0; }
+.improve-odds-title {
+  font-weight: 800;
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.improve-odds-desc {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.45;
+}
+.improve-odds-desc strong { color: var(--text-strong); font-weight: 600; }
+.improve-odds-desc .rebal-up { color: var(--green); font-weight: 700; }
+/* Free state: pitch text — slightly muted so the green title + Apply button stand out */
+.improve-odds-desc.improve-odds-pitch {
+  color: var(--muted);
+  font-style: italic;
+}
+.improve-odds-apply {
+  flex-shrink: 0;
+  background: var(--green);
+  color: #0a0c12;
+  border: 0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: filter 0.12s ease, transform 0.1s ease;
+}
+.improve-odds-apply:hover { filter: brightness(1.06); }
+.improve-odds-apply:active { transform: scale(0.97); }
+.improve-odds-apply:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Improve Odds (legacy) — appended to sim panel when a rebalance would help */
 .sim-rebalance {
   display: flex;
   align-items: center;

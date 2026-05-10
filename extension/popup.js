@@ -764,6 +764,9 @@ function renderSummary() {
   } else {
     toggleHidden('cardWrap', true);
   }
+
+  // Refresh the standalone Improve Odds row (async — state-dependent text)
+  renderImproveOdds();
 }
 
 // ---------- actions ----------
