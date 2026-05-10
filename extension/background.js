@@ -40,6 +40,13 @@ function normalizeMarket(m, parentEvent) {
   const labels = outcomes.map((o) => String(o));
   const numericPrices = prices.map((p) => parseFloat(p)).filter((p) => !isNaN(p));
 
+  // Volume / liquidity fields vary between Gamma payloads — try the common ones
+  const vol24 = pickNumber([
+    m.volume24hr, m.volume24Hr, m.volume24h, m.volume_24h,
+    m.volume24hrClob, m.oneDayVolumeNum
+  ]);
+  const liquidity = pickNumber([m.liquidity, m.liquidityNum, m.liquidityClob]);
+
   return {
     id: m.id || m.conditionId || m.slug,
     slug: m.slug,
@@ -48,8 +55,19 @@ function normalizeMarket(m, parentEvent) {
     prices: numericPrices,
     endDate: m.endDate || (parentEvent && parentEvent.endDate) || null,
     category: m.category || (parentEvent && parentEvent.category) || null,
-    eventSlug: parentEvent ? parentEvent.slug : null
+    eventSlug: parentEvent ? parentEvent.slug : null,
+    volume24h: vol24,
+    liquidity
   };
+}
+
+function pickNumber(values) {
+  for (const v of values) {
+    if (v == null) continue;
+    const n = parseFloat(v);
+    if (!isNaN(n) && isFinite(n)) return n;
+  }
+  return null;
 }
 
 async function getSlip() {
@@ -103,6 +121,8 @@ async function addLeg({ detected, pageTitle, url }) {
     price: market.prices[selectedIndex],
     endDate: market.endDate,
     category: market.category,
+    volume24h: market.volume24h,
+    liquidity: market.liquidity,
     url
   });
 
@@ -166,6 +186,10 @@ async function refreshSlipPrices() {
       if (fresh && fresh.outcomes && fresh.prices) {
         leg.outcomes = fresh.outcomes;
         leg.prices = fresh.prices;
+        leg.volume24h = fresh.volume24h;
+        leg.liquidity = fresh.liquidity;
+        leg.endDate = fresh.endDate || leg.endDate;
+        leg.category = fresh.category || leg.category;
         // Preserve selection if possible — match by label first, fall back to index
         let idx = 0;
         if (typeof leg.selectedIndex === 'number') {

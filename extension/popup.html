@@ -29,24 +29,112 @@
     </section>
 
     <section class="summary">
-      <div class="row">
-        <span>Combined cost</span>
-        <span id="combinedCost">—</span>
-      </div>
-      <div class="row big">
-        <span>Multiplier <span class="row-hint">if all legs hit</span></span>
-        <span id="multiplier">—</span>
-      </div>
-      <div class="row stake-row">
-        <label for="stake">Stake</label>
-        <div class="stake-input">
-          <span class="dollar">$</span>
-          <input id="stake" type="number" min="0" step="1" value="10" />
+      <div class="summary-section">
+        <div class="row big">
+          <span>Multiplier <span class="row-hint">if all legs hit</span></span>
+          <span id="multiplier">—</span>
+        </div>
+        <div class="row stake-row">
+          <label for="stake">Stake</label>
+          <div class="stake-input">
+            <span class="dollar">$</span>
+            <input id="stake" type="number" min="0" step="1" value="10" />
+          </div>
+        </div>
+        <div class="row big payout">
+          <span>Max payout</span>
+          <span id="maxPayout">—</span>
         </div>
       </div>
-      <div class="row big payout">
-        <span>Max payout</span>
-        <span id="maxPayout">—</span>
+
+      <button class="pro-blur" data-pro="roi" type="button" aria-label="Unlock expected ROI">
+        <div class="pro-blur-content">
+          <div class="pro-blur-label">Expected ROI</div>
+          <div class="pro-blur-value">+14.2%</div>
+          <div class="pro-blur-sub">on $10 stake · 12.4× kelly</div>
+        </div>
+        <div class="pro-blur-overlay">
+          <span class="pro-tag">PRO</span>
+          <div class="pro-blur-msg">EV from your wallet history + smart money + spread cost</div>
+        </div>
+      </button>
+
+      <div class="summary-section analytics-section">
+        <div class="section-label">Live analytics · Free</div>
+        <div class="row">
+          <span>Loss probability <span class="row-hint">any leg misses</span></span>
+          <span id="lossProb">—</span>
+        </div>
+        <div class="row">
+          <span>Independent payout <span class="row-hint">no parlay</span></span>
+          <span id="indSum">—</span>
+        </div>
+        <div class="row">
+          <span>Implied joint prob</span>
+          <span id="combinedCost">—</span>
+        </div>
+        <div class="row">
+          <span>Resolves by</span>
+          <span id="lastReso">—</span>
+        </div>
+        <div class="row">
+          <span>Liquidity <span class="row-hint">24h vol</span></span>
+          <span id="volSum">—</span>
+        </div>
+        <div class="warning hidden" id="concentrationWarn">
+          <span class="warn-icon">⚠</span>
+          <span id="concentrationText"></span>
+        </div>
+      </div>
+
+      <button class="run-sim" data-pro="simulation" type="button">
+        <span class="run-sim-icon" aria-hidden="true">🎲</span>
+        <span class="run-sim-content">
+          <span class="run-sim-title">Run 10,000-outcome simulation</span>
+          <span class="run-sim-desc">Distribution of payouts, percentile bands, sensitivity to per-leg edge</span>
+        </span>
+        <span class="pro-tag">PRO</span>
+      </button>
+
+      <div class="summary-section pro-mini-section">
+        <div class="section-label pro-section-label">
+          <span class="pro-tag">PRO</span> Decision data — hidden from other tools
+        </div>
+        <button class="pro-mini-row" data-pro="smart">
+          <span class="pro-mini-lock">🔒</span>
+          <span class="pro-mini-label">
+            <span class="pro-mini-title">Smart money agreement</span>
+            <span class="pro-mini-desc">"7 of top 10 profitable wallets are YES here. 1 is NO. 2 sat out." Public on-chain data, surfaced at the moment you decide.</span>
+          </span>
+        </button>
+        <button class="pro-mini-row" data-pro="slippage">
+          <span class="pro-mini-lock">🔒</span>
+          <span class="pro-mini-label">
+            <span class="pro-mini-title">True fill price at your stake</span>
+            <span class="pro-mini-desc">"$50 fills at $0.024, not the $0.021 displayed — orderbook depth costs you 14%." Numbers PM doesn't surface.</span>
+          </span>
+        </button>
+        <button class="pro-mini-row" data-pro="drift">
+          <span class="pro-mini-lock">🔒</span>
+          <span class="pro-mini-label">
+            <span class="pro-mini-title">Recent price drift</span>
+            <span class="pro-mini-desc">"Up 30pp in 24h, up 45pp in 7d — you're chasing momentum." Or: "Flat for 5 days — fresh entry."</span>
+          </span>
+        </button>
+        <button class="pro-mini-row" data-pro="exit">
+          <span class="pro-mini-lock">🔒</span>
+          <span class="pro-mini-label">
+            <span class="pro-mini-title">Mass-exit alert</span>
+            <span class="pro-mini-desc">"3 of top 10 wallets exited this position in the last 6 hours." Strong negative signal nobody else surfaces.</span>
+          </span>
+        </button>
+        <button class="pro-mini-row" data-pro="basrate">
+          <span class="pro-mini-lock">🔒</span>
+          <span class="pro-mini-label">
+            <span class="pro-mini-title">Your record on this bet type</span>
+            <span class="pro-mini-desc">"You're 4-9 on weather YES at $0.60+ entries. You don't win this structure." Calibrated from your own wallet.</span>
+          </span>
+        </button>
       </div>
     </section>
 
@@ -56,8 +144,26 @@
     </section>
     <div id="shareStatus" class="share-status"></div>
 
+    <details class="execute-menu" id="executeMenu">
+      <summary class="execute-summary">
+        <span class="execute-icon">↗</span>
+        <span>Execute this parlay</span>
+        <span class="execute-caret">▾</span>
+      </summary>
+      <div class="execute-options">
+        <a class="execute-opt" href="https://parlays.predictshark.io" target="_blank" rel="noopener" data-exec="predictshark">
+          <div class="execute-opt-title">PredictShark <span class="exec-badge">on-chain</span></div>
+          <div class="execute-opt-desc">Combines all legs into a single Polygon contract. Real parlay execution — all legs must hit for payout.</div>
+        </a>
+        <button type="button" class="execute-opt" id="openAllLegs" data-exec="pm-manual">
+          <div class="execute-opt-title">Open each leg on Polymarket</div>
+          <div class="execute-opt-desc">Place positions independently. You get per-leg payouts that sum — not the parlay multiplier.</div>
+        </button>
+      </div>
+    </details>
+
     <div class="parlay-note">
-      Polymarket doesn't natively execute parlays — to realize this multiplier, place each leg separately or use an on-chain parlay service like <a href="https://parlays.predictshark.io" target="_blank" rel="noopener">PredictShark ↗</a>.
+      PolyParlay is informational. The multiplier shown assumes a true parlay (all-or-nothing). Polymarket itself pays each leg independently — use an on-chain service to execute as a parlay.
     </div>
 
     <section class="pro-panel" id="proPanel">

@@ -59,6 +59,88 @@ function maxPayout(legs, stake) {
   if (!m) return null;
   return m * stake;
 }
+function lossProbability(legs) {
+  const c = combinedCost(legs);
+  if (c == null) return null;
+  return 1 - c;
+}
+// If user placed each leg independently (no parlay), max payout if every leg hits
+// is the SUM of per-leg payouts. Worth showing alongside parlay multiplier so the
+// user sees what they'd actually win on PM without a parlay execution layer.
+function independentMaxPayout(legs, stake) {
+  if (!legs.length || stake <= 0) return null;
+  const perLeg = stake / legs.length; // assume even split
+  return legs.reduce((acc, l) => acc + (l.price > 0 ? perLeg / l.price : 0), 0);
+}
+function lastResolutionDate(legs) {
+  let latest = null;
+  for (const l of legs) {
+    if (!l.endDate) continue;
+    const d = new Date(l.endDate);
+    if (isNaN(d.getTime())) continue;
+    if (!latest || d > latest) latest = d;
+  }
+  return latest;
+}
+function categoryConcentration(legs) {
+  if (legs.length < 2) return null;
+  const counts = {};
+  let known = 0;
+  for (const l of legs) {
+    const c = (l.category || '').toLowerCase();
+    if (!c) continue;
+    counts[c] = (counts[c] || 0) + 1;
+    known++;
+  }
+  if (known < 2) return null;
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const [topCat, topCount] = sorted[0];
+  // Concentrated if 2+ legs share a category and that category is at least half the slip
+  if (topCount >= 2 && topCount / legs.length >= 0.5) {
+    return {
+      category: topCat,
+      count: topCount,
+      total: legs.length,
+      message: `${topCount} of ${legs.length} legs in ${topCat} — these may move together`
+    };
+  }
+  return null;
+}
+function totalVolume24h(legs) {
+  let any = false;
+  let total = 0;
+  for (const l of legs) {
+    if (l.volume24h != null && !isNaN(l.volume24h)) {
+      total += Number(l.volume24h);
+      any = true;
+    }
+  }
+  return any ? total : null;
+}
+function fmtCompactDollar(n) {
+  if (n == null || isNaN(n)) return '—';
+  const v = Number(n);
+  if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '$' + (v / 1e3).toFixed(1) + 'K';
+  return '$' + v.toFixed(0);
+}
+function fmtPercent(n, decimals) {
+  if (n == null || isNaN(n)) return '—';
+  return (Number(n) * 100).toFixed(decimals != null ? decimals : 2) + '%';
+}
+function fmtRelativeDate(d) {
+  if (!d) return '—';
+  const now = new Date();
+  const ms = d.getTime() - now.getTime();
+  const days = Math.round(ms / (1000 * 60 * 60 * 24));
+  const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  if (days < 0) return dateStr + ' (resolved)';
+  if (days === 0) return dateStr + ' (today)';
+  if (days === 1) return dateStr + ' (tomorrow)';
+  if (days < 30) return dateStr + ` (${days}d)`;
+  if (days < 365) return dateStr + ` (${Math.round(days / 30)}mo)`;
+  return dateStr + ` (${Math.round(days / 365)}y)`;
+}
 
 // ---------- state ----------
 let currentSlip = { legs: [], stake: 10 };
@@ -160,10 +242,32 @@ function renderSummary() {
   const payout = maxPayout(eligible, safeStake);
 
   document.getElementById('combinedCost').textContent =
-    cost == null ? '—' : (cost * 100).toFixed(2) + '¢ / $1 payout';
+    cost == null ? '—' : fmtPercent(cost, cost < 0.01 ? 3 : 2);
   document.getElementById('multiplier').textContent = fmtMult(mult);
   document.getElementById('maxPayout').textContent = fmt$(payout);
   document.getElementById('stake').value = safeStake;
+
+  // Live analytics — free tier
+  const lossP = lossProbability(eligible);
+  document.getElementById('lossProb').textContent = fmtPercent(lossP, 2);
+
+  const indPay = independentMaxPayout(eligible, safeStake);
+  document.getElementById('indSum').textContent = indPay != null ? fmt$(indPay) + ' max' : '—';
+
+  const lastReso = lastResolutionDate(eligible);
+  document.getElementById('lastReso').textContent = lastReso ? fmtRelativeDate(lastReso) : '—';
+
+  const vol = totalVolume24h(eligible);
+  document.getElementById('volSum').textContent = vol != null ? fmtCompactDollar(vol) : 'data unavailable';
+
+  const conc = categoryConcentration(eligible);
+  const warn = document.getElementById('concentrationWarn');
+  if (conc) {
+    warn.classList.remove('hidden');
+    document.getElementById('concentrationText').textContent = conc.message;
+  } else {
+    warn.classList.add('hidden');
+  }
 
   const hasLegs = eligible.length > 0;
   document.getElementById('shareX').disabled = !hasLegs;
@@ -458,6 +562,41 @@ document.addEventListener('DOMContentLoaded', () => {
       chrome.tabs.create({ url: `https://polyparlay.io/upgrade?from=feat-${encodeURIComponent(feature)}` });
     });
   });
+
+  // Slip-level Pro hooks (blurred ROI, run-sim, decision-data mini-rows)
+  document.querySelectorAll('[data-pro]').forEach((el) => {
+    if (el.classList.contains('pro-feat')) return; // already wired above
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const feature = el.getAttribute('data-pro') || 'unknown';
+      chrome.tabs.create({ url: `https://polyparlay.io/upgrade?from=slip-${encodeURIComponent(feature)}` });
+    });
+  });
+
+  // Execute menu — open all current legs on Polymarket (each in a new tab, with referral)
+  const openAllBtn = document.getElementById('openAllLegs');
+  if (openAllBtn) {
+    openAllBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
+      const refUrls = eligible
+        .map((l) => l.url)
+        .filter(Boolean)
+        .map((u) => withRef(u));
+      if (!refUrls.length) {
+        setShareStatus('No leg URLs to open. Add at least one leg first.', '#f59e0b');
+        return;
+      }
+      // Open each in a new tab. Chrome may prompt about multiple tabs but the
+      // user-gesture context here typically allows it.
+      refUrls.forEach((u, i) => {
+        // Stagger slightly to avoid Chrome blocking the burst
+        setTimeout(() => chrome.tabs.create({ url: u, active: i === 0 }), i * 80);
+      });
+      const menu = document.getElementById('executeMenu');
+      if (menu) menu.removeAttribute('open');
+    });
+  }
 });
 
 async function addCurrentTab() {

@@ -325,6 +325,317 @@ button[disabled] { opacity: 0.45; cursor: not-allowed; }
 }
 .parlay-note a:hover { text-decoration: underline; }
 
+/* Reset button defaults for elements styled as panels/cards.
+   Without this, Chrome paints them with system grey (ButtonFace) and
+   filter:blur / position:absolute children behave inconsistently. */
+button.pro-blur,
+button.run-sim,
+button.pro-mini-row,
+button.execute-opt,
+button.pro-feat,
+button.pro-cta,
+button.upgrade,
+summary.execute-summary {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+}
+
+/* Summary sub-sections */
+.summary-section {
+  padding: 10px 12px;
+}
+.summary-section + .summary-section {
+  border-top: 1px solid var(--line);
+}
+.section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pro-section-label .pro-tag {
+  margin-right: 0;
+}
+
+/* Blurred Expected ROI panel — the curiosity hook */
+.pro-blur {
+  position: relative;
+  display: block;
+  width: calc(100% - 24px);
+  margin: 12px;
+  padding: 18px 14px;
+  background-color: var(--surface-2);
+  background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(99, 102, 241, 0.06));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: inherit;
+  text-align: center;
+  color: var(--text);
+  transition: border-color 0.18s ease, transform 0.12s ease;
+}
+.pro-blur:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+.pro-blur:active {
+  transform: scale(0.99);
+}
+.pro-blur-content {
+  filter: blur(7px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.85;
+}
+.pro-blur-label {
+  font-size: 10px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.pro-blur-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.pro-blur-sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+.pro-blur-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(11, 13, 18, 0.55);
+  padding: 12px;
+  text-align: center;
+}
+.pro-blur-overlay .pro-tag {
+  font-size: 10px;
+}
+.pro-blur-msg {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Inline analytics rows — free tier, live-updating */
+.analytics-section .row {
+  padding: 3px 0;
+  font-size: 12px;
+}
+.warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text);
+}
+.warn-icon {
+  color: var(--red);
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+/* Pro mini-rows — visible-but-locked decision data */
+.pro-mini-section {
+  background: rgba(245, 158, 11, 0.03);
+}
+.pro-mini-row {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 6px;
+  background-color: transparent;
+  background-image: none;
+  border: 0;
+  border-radius: 6px;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.12s ease, background-color 0.12s ease;
+}
+.pro-mini-row:hover {
+  opacity: 1;
+  background: rgba(245, 158, 11, 0.08);
+}
+.pro-mini-lock {
+  font-size: 13px;
+  align-self: start;
+  margin-top: 1px;
+}
+.pro-mini-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.pro-mini-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+.pro-mini-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Run Simulation — prominent secondary CTA, locked */
+.run-sim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 24px);
+  margin: 0 12px 12px;
+  padding: 12px 14px;
+  background-color: var(--surface-2);
+  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(245, 158, 11, 0.08));
+  border: 1px solid rgba(99, 102, 241, 0.32);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: filter 0.12s ease, transform 0.12s ease;
+}
+.run-sim:hover {
+  filter: brightness(1.08);
+}
+.run-sim:active { transform: scale(0.99); }
+.run-sim-icon { font-size: 22px; }
+.run-sim-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex: 1;
+  text-align: left;
+}
+.run-sim-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-strong);
+}
+.run-sim-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Execute parlay dropdown */
+.execute-menu {
+  margin: 0 12px 10px;
+}
+.execute-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+}
+.execute-summary::-webkit-details-marker { display: none; }
+.execute-summary:hover { color: var(--text-strong); border-color: #2c3142; }
+.execute-icon {
+  display: inline-flex;
+  width: 20px; height: 20px;
+  align-items: center; justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+.execute-caret {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 10px;
+  transition: transform 0.18s ease;
+}
+.execute-menu[open] .execute-caret { transform: rotate(180deg); }
+.execute-options {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.execute-opt {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--surface);
+  background-image: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-align: left;
+  text-decoration: none;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+.execute-opt:hover {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+.execute-opt-title {
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 3px;
+  font-size: 12px;
+}
+.execute-opt-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.exec-badge {
+  display: inline-block;
+  background: rgba(99, 102, 241, 0.18);
+  color: var(--accent);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
 footer {
   display: flex;
   justify-content: space-between;
