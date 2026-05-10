@@ -74,25 +74,15 @@
           <span class="pro-meta">$29.99/mo · launches v1.0</span>
         </div>
 
-        <div class="pro-inputs">
-          <label class="pro-input-row" title="Your edge over the market on each leg, in percentage points">
-            <span>Your edge per leg</span>
-            <span class="pro-input-wrap">
-              <input id="edgeInput" type="number" min="-50" max="50" step="0.5" value="0" />
-              <span class="pro-input-unit">pp</span>
-            </span>
-          </label>
-          <label class="pro-input-row" title="Used for Kelly-optimal stake calculation">
-            <span>Your bankroll</span>
-            <span class="pro-input-wrap">
-              <span class="pro-input-unit">$</span>
-              <input id="bankrollInput" type="number" min="0" step="50" value="1000" />
-            </span>
-          </label>
-          <label class="pro-input-row pro-input-row-wide" title="Polymarket wallet address (read-only — never asks for keys)">
-            <span>Wallet for Your record</span>
-            <input id="walletInput" class="pro-input-wallet" type="text" placeholder="0x… (paste to fetch)" spellcheck="false" />
-          </label>
+        <div class="pro-leaderboard">
+          <div class="pro-lb-head">
+            <span class="pro-lb-title">Smart Money · top 3 (last 30d)</span>
+            <span class="pro-lb-status" id="lbStatus">…</span>
+          </div>
+          <div class="pro-lb-list" id="lbList">
+            <div class="pro-lb-row pro-lb-loading">Loading leaderboard…</div>
+          </div>
+          <div class="pro-lb-foot" id="lbAgreement"></div>
         </div>
 
         <button class="pro-row" data-pro="risk" type="button">
@@ -110,29 +100,29 @@
 
         <div class="pro-divider"><span>Unlock 6 more</span></div>
 
-        <button class="pro-row pro-row-locked" data-pro="winprob" type="button">
-          <span class="pro-row-label">Win probability <span class="row-hint">w/ your edge</span></span>
-          <span class="pro-row-value pro-blurred" id="proWinProb">—</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="expected-roi" type="button">
-          <span class="pro-row-label">Expected ROI <span class="row-hint">w/ your edge</span></span>
-          <span class="pro-row-value pro-blurred" id="proExpectedRoi">—</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="kelly" type="button">
-          <span class="pro-row-label">Kelly-optimal stake</span>
-          <span class="pro-row-value pro-blurred" id="proKelly">—</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="record" type="button">
-          <span class="pro-row-label">Your record on this category</span>
-          <span class="pro-row-value pro-blurred" id="proRecord">paste wallet ↑</span>
-        </button>
-        <button class="pro-row pro-row-locked" data-pro="smart-money" type="button">
-          <span class="pro-row-label">Smart money agreement</span>
-          <span class="pro-row-value pro-blurred" id="proSmart">v1.0</span>
+        <button class="pro-row pro-row-locked" data-pro="smart-agree" type="button">
+          <span class="pro-row-label">Smart money agreement <span class="row-hint">top 10 wallets</span></span>
+          <span class="pro-row-value pro-blurred" id="proSmart">—</span>
         </button>
         <button class="pro-row pro-row-locked" data-pro="exit" type="button">
-          <span class="pro-row-label">Mass-exit signal</span>
-          <span class="pro-row-value pro-blurred" id="proExit">v1.0</span>
+          <span class="pro-row-label">Mass-exit signal <span class="row-hint">last 6h</span></span>
+          <span class="pro-row-value pro-blurred" id="proExit">—</span>
+        </button>
+        <button class="pro-row pro-row-locked" data-pro="whale-entries" type="button">
+          <span class="pro-row-label">Whale entries <span class="row-hint">last 24h</span></span>
+          <span class="pro-row-value pro-blurred" id="proWhaleEntries">—</span>
+        </button>
+        <button class="pro-row pro-row-locked" data-pro="record" type="button">
+          <span class="pro-row-label">Your record <span class="row-hint">paste wallet to enable</span></span>
+          <span class="pro-row-value pro-blurred" id="proRecord">v1.0</span>
+        </button>
+        <button class="pro-row pro-row-locked" data-pro="trend" type="button">
+          <span class="pro-row-label">7d trend strength</span>
+          <span class="pro-row-value pro-blurred" id="proTrend">—</span>
+        </button>
+        <button class="pro-row pro-row-locked" data-pro="resolution-confidence" type="button">
+          <span class="pro-row-label">Resolution confidence</span>
+          <span class="pro-row-value pro-blurred" id="proConfidence">—</span>
         </button>
 
         <button class="pro-cta-main" id="proMainCta" type="button">Unlock Pro — $29.99/mo</button>

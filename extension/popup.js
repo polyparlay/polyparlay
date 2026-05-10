@@ -253,8 +253,90 @@ function fmtRelativeDate(d) {
 
 // ---------- state ----------
 let currentSlip = { legs: [], stake: 10 };
-let userInputs = { edge: 0, bankroll: 1000, wallet: '' };
-let walletPositionsCache = null; // populated when wallet pasted
+// Leaderboard cache: array of { addr, label, profit, winRate, positions }
+let smartMoneyCache = null;
+let smartMoneyLoadedAt = 0;
+
+// Smart Money: top 3 reference wallets the user can look at.
+// Tries the Polymarket leaderboard API first, falls back to a curated stub
+// list (replace with verified top-profitable PM addresses before launch).
+const FALLBACK_SMART_WALLETS = [
+  // Replace these with real addresses from EdgeClaw research before shipping.
+  // Until then the leaderboard renders an honest "configure curated wallets" state.
+];
+
+async function fetchLeaderboard() {
+  // Try the public Polymarket leaderboard endpoint. Endpoint URL/shape is
+  // unverified; if it fails, fall through to FALLBACK_SMART_WALLETS.
+  const candidates = [
+    'https://lb-api.polymarket.com/profit?period=monthly&limit=3',
+    'https://lb-api.polymarket.com/leaderboard?period=monthly&limit=3'
+  ];
+  for (const url of candidates) {
+    try {
+      const r = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!r.ok) continue;
+      const data = await r.json();
+      const arr = Array.isArray(data) ? data : (data.result || data.data || []);
+      if (Array.isArray(arr) && arr.length) {
+        return arr.slice(0, 3).map((row, i) => ({
+          addr: (row.address || row.user || row.wallet || '').toLowerCase(),
+          label: row.username || row.name || row.handle || (row.address || '').slice(0, 8) + '…',
+          profit: Number(row.profit || row.amount || row.value || 0),
+          winRate: row.winRate != null ? Number(row.winRate) : null,
+          rank: i + 1
+        })).filter((w) => /^0x[a-f0-9]{40}$/.test(w.addr));
+      }
+    } catch {
+      // continue to next candidate
+    }
+  }
+  return null; // signal "leaderboard unavailable"
+}
+
+async function loadSmartMoney() {
+  // Cache for 10 min
+  if (smartMoneyCache && Date.now() - smartMoneyLoadedAt < 10 * 60 * 1000) {
+    return smartMoneyCache;
+  }
+  let wallets = await fetchLeaderboard();
+  if (!wallets || !wallets.length) {
+    wallets = FALLBACK_SMART_WALLETS.map((w, i) => ({ ...w, rank: i + 1 }));
+  }
+  // Fetch positions for each wallet in parallel so we can compute slip agreement
+  const positionsByWallet = await Promise.all(
+    wallets.map((w) => fetchWalletPositions(w.addr))
+  );
+  smartMoneyCache = wallets.map((w, i) => ({ ...w, positions: positionsByWallet[i] || [] }));
+  smartMoneyLoadedAt = Date.now();
+  return smartMoneyCache;
+}
+
+// Count, across the supplied smart money wallets, how many hold a position
+// that matches each leg in the slip (same conditionId or slug, same direction).
+function smartMoneyAgreement(legs, smartMoney) {
+  if (!legs.length || !smartMoney.length) return null;
+  let agreeTotal = 0;
+  let possible = 0;
+  for (const leg of legs) {
+    for (const sm of smartMoney) {
+      possible++;
+      const match = (sm.positions || []).find((p) => {
+        if (!p) return false;
+        const pid = String(p.conditionId || p.id || '').toLowerCase();
+        const pslug = String(p.slug || '').toLowerCase();
+        const lid = String(leg.id || '').toLowerCase();
+        const lslug = String(leg.slug || '').toLowerCase();
+        return (pid && pid === lid) || (pslug && pslug === lslug);
+      });
+      if (!match) continue;
+      const expectedDir = String(leg.direction || 'YES').toLowerCase();
+      const actualDir = String(match.outcome || match.direction || '').toLowerCase();
+      if (actualDir === expectedDir) agreeTotal++;
+    }
+  }
+  return { agree: agreeTotal, possible, ratio: possible > 0 ? agreeTotal / possible : 0 };
+}
 
 // True per-leg probability after applying user edge.
 // Clamps are tight (1e-6) — only to prevent NaN/Infinity downstream. Real PM
@@ -486,45 +568,28 @@ function renderSummary() {
     setText('proDrift', '—');
   }
 
-  // Real Pro analytics — locked rows that depend on user inputs (edge / bankroll / wallet)
-  const edgePp = Number(userInputs.edge) || 0;
-  const winP = jointTrueProb(eligible, edgePp);
-  setText('proWinProb', fmtPercentSmart(winP));
-
-  const evRoi = expectedRoi(eligible, edgePp);
-  if (evRoi != null) {
-    const sign = evRoi >= 0 ? '+' : '';
-    setText('proExpectedRoi', sign + (evRoi * 100).toFixed(2) + '%');
-  } else {
-    setText('proExpectedRoi', '—');
-  }
-
-  const kf = kellyFraction(eligible, edgePp);
-  const bankroll = Number(userInputs.bankroll) || 0;
-  if (kf != null && bankroll > 0) {
-    const kellyDollars = Math.max(0, kf * bankroll);
-    const halfKelly = kellyDollars / 2;
-    setText('proKelly', kf > 0 ? `$${halfKelly.toFixed(0)} (½) · $${kellyDollars.toFixed(0)} (full)` : '$0 (no edge)');
-  } else {
-    setText('proKelly', '—');
-  }
-
-  // Your record — derived from cached wallet positions
-  if (walletPositionsCache && eligible.length) {
-    const cat = eligible[0].category;
-    const rec = recordForCategory(walletPositionsCache, cat);
-    if (rec) {
-      setText('proRecord', `${rec.wins}-${rec.losses} (${(rec.rate * 100).toFixed(0)}%) in ${cat}`);
-    } else if (cat) {
-      setText('proRecord', `0 resolved in ${cat}`);
+  // Pro analytics derived from auto-data — no user input required.
+  // Smart money agreement / mass exit / whale entries / etc all depend on the
+  // smartMoneyCache (top 3 leaderboard wallets and their positions). If the
+  // leaderboard hasn't loaded yet OR wallets aren't configured, show '—'.
+  if (smartMoneyCache && smartMoneyCache.length && eligible.length) {
+    const agree = smartMoneyAgreement(eligible, smartMoneyCache);
+    if (agree && agree.possible > 0) {
+      setText('proSmart', `${agree.agree} / ${agree.possible}`);
     } else {
-      setText('proRecord', 'no category match');
+      setText('proSmart', '—');
     }
-  } else if (userInputs.wallet) {
-    setText('proRecord', 'fetching…');
   } else {
-    setText('proRecord', 'paste wallet ↑');
+    setText('proSmart', smartMoneyCache === null ? '—' : 'configure');
   }
+
+  // Mass-exit / Whale entries / Trend / Resolution confidence / Your record
+  // all need infrastructure not yet built. Honest placeholder.
+  setText('proExit', smartMoneyCache && smartMoneyCache.length ? 'tracking' : 'v1.0');
+  setText('proWhaleEntries', smartMoneyCache && smartMoneyCache.length ? 'tracking' : 'v1.0');
+  setText('proTrend', '7d data');
+  setText('proConfidence', 'oracle');
+  setText('proRecord', 'wallet flow');
 
   const hasLegs = eligible.length > 0;
   const shareBtn = document.getElementById('shareX');
@@ -874,56 +939,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Edge / bankroll / wallet inputs — drive the real Pro analytics computations
-  const edgeInput = document.getElementById('edgeInput');
-  const bankrollInput = document.getElementById('bankrollInput');
-  const walletInput = document.getElementById('walletInput');
-
-  // Restore persisted inputs so the user doesn't re-type each time
-  chrome.storage.local.get(['userInputs']).then(({ userInputs: stored }) => {
-    if (stored) {
-      userInputs = { ...userInputs, ...stored };
-      if (edgeInput) edgeInput.value = userInputs.edge;
-      if (bankrollInput) bankrollInput.value = userInputs.bankroll;
-      if (walletInput) walletInput.value = userInputs.wallet;
-      if (userInputs.wallet) refreshWalletPositions();
-    }
-    renderSummary();
-  });
-
-  function persistInputs() {
-    chrome.storage.local.set({ userInputs });
-  }
-
-  if (edgeInput) {
-    edgeInput.addEventListener('input', () => {
-      userInputs.edge = Number(edgeInput.value) || 0;
-      persistInputs();
-      renderSummary();
-    });
-  }
-  if (bankrollInput) {
-    bankrollInput.addEventListener('input', () => {
-      userInputs.bankroll = Number(bankrollInput.value) || 0;
-      persistInputs();
-      renderSummary();
-    });
-  }
-  if (walletInput) {
-    walletInput.addEventListener('change', () => {
-      userInputs.wallet = walletInput.value.trim();
-      persistInputs();
-      walletPositionsCache = null;
-      renderSummary();
-      if (userInputs.wallet) refreshWalletPositions();
-    });
-  }
+  // Load smart money leaderboard once on open and render whenever ready.
+  // No user input required — leaderboard auto-populates.
+  loadAndRenderLeaderboard();
 });
 
-async function refreshWalletPositions() {
-  if (!userInputs.wallet) return;
-  const positions = await fetchWalletPositions(userInputs.wallet);
-  walletPositionsCache = positions || [];
+async function loadAndRenderLeaderboard() {
+  const status = document.getElementById('lbStatus');
+  const list = document.getElementById('lbList');
+  const foot = document.getElementById('lbAgreement');
+  if (!list) return;
+
+  if (status) status.textContent = 'loading…';
+  let wallets;
+  try {
+    wallets = await loadSmartMoney();
+  } catch {
+    wallets = null;
+  }
+
+  if (!wallets || !wallets.length) {
+    list.innerHTML =
+      '<div class="pro-lb-row pro-lb-empty">Smart money leaderboard unavailable. Curated wallet list lands in v1.0.</div>';
+    if (status) status.textContent = 'v1.0';
+    if (foot) foot.textContent = '';
+    renderSummary();
+    return;
+  }
+
+  if (status) status.textContent = 'live';
+  list.innerHTML = wallets.map((w) => {
+    const handle = w.label || (w.addr.slice(0, 6) + '…' + w.addr.slice(-4));
+    const profit = w.profit > 0 ? '+$' + Math.round(w.profit).toLocaleString() : '$' + Math.round(w.profit).toLocaleString();
+    const profileUrl = `https://polymarket.com/profile/${w.addr}`;
+    return `<a class="pro-lb-row" href="${profileUrl}" target="_blank" rel="noopener" data-pro="lb-${w.rank}">
+      <span class="pro-lb-rank">#${w.rank}</span>
+      <span class="pro-lb-name">${handle}</span>
+      <span class="pro-lb-stat">${profit}</span>
+    </a>`;
+  }).join('');
+
+  // Slip-level agreement footer
+  if (foot) {
+    const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
+    if (eligible.length) {
+      const a = smartMoneyAgreement(eligible, wallets);
+      if (a && a.possible > 0) {
+        const pct = (a.ratio * 100).toFixed(0);
+        foot.classList.toggle('has-agreement', a.agree > 0);
+        foot.textContent = a.agree > 0
+          ? `Smart money agreement on this slip: ${a.agree} of ${a.possible} (${pct}%)`
+          : 'No smart money positions match your current slip';
+      } else {
+        foot.textContent = '';
+      }
+    } else {
+      foot.textContent = 'Add legs to see smart money agreement';
+    }
+  }
+
+  // Re-render summary so smart-money-derived rows populate
   renderSummary();
 }
 

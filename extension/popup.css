@@ -469,70 +469,97 @@ summary.execute-summary {
   opacity: 0.85;
 }
 
-/* Edge / bankroll / wallet inputs — drive the real Pro analytics computations */
-.pro-inputs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  padding: 8px 4px;
-  margin-bottom: 4px;
+/* Smart Money Reference — top 3 PM wallets, auto-populated.
+   No user input required. The Pro analytics derive from these wallets'
+   on-chain positions instead of asking the user to type their edge. */
+.pro-leaderboard {
+  padding: 8px 4px 10px;
+  margin-bottom: 6px;
   border-bottom: 1px solid rgba(245, 158, 11, 0.12);
 }
-.pro-input-row {
+.pro-lb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+.pro-lb-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+}
+.pro-lb-status {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.pro-lb-list {
   display: flex;
   flex-direction: column;
   gap: 3px;
+}
+.pro-lb-row {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 6px;
+  background-color: rgba(99, 102, 241, 0.04);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 5px;
+  font-size: 11px;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.12s ease;
+}
+.pro-lb-row:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+}
+.pro-lb-row.pro-lb-loading,
+.pro-lb-row.pro-lb-empty {
+  cursor: default;
+  background: transparent;
+  border-style: dashed;
+  color: var(--muted);
+  font-size: 10px;
+  text-align: center;
+  display: block;
+  padding: 8px;
+}
+.pro-lb-rank {
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+  font-size: 10px;
+}
+.pro-lb-name {
+  font-weight: 600;
+  color: var(--text-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pro-lb-stat {
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--green);
+}
+.pro-lb-foot {
+  margin-top: 6px;
+  padding: 0 4px;
   font-size: 10px;
   color: var(--muted);
-  letter-spacing: 0.2px;
+  text-align: center;
+  min-height: 13px;
 }
-.pro-input-row-wide {
-  grid-column: 1 / -1;
-}
-.pro-input-wrap {
-  display: flex;
-  align-items: center;
-  background-color: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  overflow: hidden;
-}
-.pro-input-wrap input {
-  background: transparent;
-  border: 0;
+.pro-lb-foot.has-agreement {
   color: var(--text-strong);
-  font-size: 13px;
   font-weight: 600;
-  padding: 5px 6px;
-  width: 100%;
-  text-align: right;
-  outline: none;
-  font-family: inherit;
-}
-.pro-input-wrap input:focus {
-  outline: 1px solid var(--accent);
-  outline-offset: -1px;
-}
-.pro-input-unit {
-  padding: 0 8px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-}
-.pro-input-wallet {
-  background-color: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  color: var(--text-strong);
-  font-size: 11px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  padding: 5px 8px;
-  outline: none;
-  width: 100%;
-}
-.pro-input-wallet:focus {
-  outline: 1px solid var(--accent);
-  outline-offset: -1px;
 }
 
 /* Visual divider — the "below this is locked" line. Subtle but clear. */
