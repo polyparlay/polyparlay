@@ -47,24 +47,39 @@
     // 2. /market/<slug> or /markets/<slug>
     const marketMatch = path.match(/^\/markets?\/([^/?#]+)/);
     if (marketMatch) return { kind: 'market', slug: marketMatch[1] };
-    // 3. Category-prefixed URLs
-    const categoryMatch = path.match(/^\/([a-z-]+)\/([^/?#]+)(?:\/([^/?#]+))?/);
-    if (categoryMatch) {
-      const [, category, first, second] = categoryMatch;
+
+    // 3. Category-prefixed URLs — handles ARBITRARY DEPTH for sports/live paths
+    //    like /sports/nfl/2024-season-mvp/josh-allen-mvp or
+    //    /live/nba/lal-vs-bos/q3/total-points.
+    //    Walks backwards through the path, picks the deepest slug-shaped segment.
+    const parts = path.split('/').filter(Boolean);
+    if (parts.length >= 2) {
+      const category = parts[0].toLowerCase();
       if (!RESERVED_PM_PATHS.has(category)) {
-        return { kind: category, slug: second || first };
+        for (let i = parts.length - 1; i >= 1; i--) {
+          const candidate = parts[i];
+          if (
+            candidate.length > 5 &&
+            candidate.includes('-') &&
+            !RESERVED_PM_PATHS.has(candidate.toLowerCase())
+          ) {
+            return { kind: category, slug: candidate };
+          }
+        }
       }
     }
-    // 4. Generic last-segment fallback
-    const parts = path.split('/').filter(Boolean);
+
+    // 4. Last-resort: any slug-shaped segment in the path
     if (parts.length >= 1) {
-      const candidate = parts[parts.length - 1];
-      if (
-        candidate.length > 5 &&
-        candidate.includes('-') &&
-        !RESERVED_PM_PATHS.has(candidate.toLowerCase())
-      ) {
-        return { kind: 'guess', slug: candidate };
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const candidate = parts[i];
+        if (
+          candidate.length > 5 &&
+          candidate.includes('-') &&
+          !RESERVED_PM_PATHS.has(candidate.toLowerCase())
+        ) {
+          return { kind: 'guess', slug: candidate };
+        }
       }
     }
     return null;

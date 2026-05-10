@@ -246,6 +246,34 @@ async function openExtensionUI() {
   }
 }
 
+// External messages from the polyparlay.io upgrade page (defined in
+// manifest.externally_connectable). When user pays + verifies on the upgrade
+// page, the page calls chrome.runtime.sendMessage(EXTENSION_ID, {...}) to
+// flip the extension's proState to 'paid'.
+chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
+  if (!sender.url || !/^https:\/\/(?:[a-z0-9-]+\.)?polyparlay\.io\//.test(sender.url)) {
+    sendResponse({ ok: false, error: 'Origin not allowed' });
+    return false;
+  }
+  if (msg && msg.type === 'proVerified' && msg.wallet && msg.expires) {
+    (async () => {
+      const { proState } = await chrome.storage.local.get(['proState']);
+      const updated = {
+        ...(proState || {}),
+        wallet: String(msg.wallet).toLowerCase(),
+        paidAt: Number(msg.paidAt) || Math.floor(Date.now() / 1000),
+        paidUntilAt: Number(msg.expires) * 1000,
+        lastVerifiedAt: Date.now()
+      };
+      await chrome.storage.local.set({ proState: updated });
+      sendResponse({ ok: true });
+    })();
+    return true;
+  }
+  sendResponse({ ok: false, error: 'Unknown message type' });
+  return false;
+});
+
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     try {

@@ -320,6 +320,33 @@ async function getProState() {
   return { tier: 'free' };
 }
 
+// Cloudflare Worker URL for Pro verification.
+// REPLACE with your deployed worker URL after `wrangler deploy`.
+const VERIFY_URL = 'https://polyparlay-verify.YOUR_SUBDOMAIN.workers.dev/verify';
+const VERIFY_CACHE_MS = 60 * 60 * 1000; // re-check the worker at most once per hour
+
+async function syncProFromWorker() {
+  try {
+    const { proState } = await chrome.storage.local.get(['proState']);
+    if (!proState || !proState.wallet) return null;
+    if (Date.now() - (proState.lastVerifiedAt || 0) < VERIFY_CACHE_MS) return proState;
+    const r = await fetch(`${VERIFY_URL}?wallet=${encodeURIComponent(proState.wallet)}`);
+    if (!r.ok) return proState;
+    const data = await r.json();
+    if (!data.ok) return proState;
+    const next = {
+      ...proState,
+      paidAt: data.pro && data.paidAt ? data.paidAt : proState.paidAt || null,
+      paidUntilAt: data.pro && data.expires ? data.expires * 1000 : null,
+      lastVerifiedAt: Date.now()
+    };
+    await chrome.storage.local.set({ proState: next });
+    return next;
+  } catch (err) {
+    return null;
+  }
+}
+
 async function startTrial() {
   const now = Date.now();
   const existing = (await chrome.storage.local.get(['proState'])).proState || {};
@@ -1354,6 +1381,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // to simulate an active trial.
 
   applyProState();
+  // After initial render, sync from worker in the background so an external
+  // payment (made on polyparlay.io/upgrade) gets reflected without a manual reload.
+  syncProFromWorker().then((next) => {
+    if (next) applyProState();
+  });
 });
 
 async function loadAndRenderLeaderboard() {

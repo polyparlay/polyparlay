@@ -88,6 +88,15 @@ Y2 with PM platform growth (~90% QoQ): $60K–250K total.
 
 The Smart Money Feed is what changes the economics. Without it, this is a $10-15K/year side project. With it, it's a real micro-SaaS with a defensible moat (curated wallet list + EdgeClaw-derived signal quality).
 
+## GitHub vs Vercel — they do different things
+
+You need **both**, not either-or:
+
+- **GitHub** hosts the source code (the git repo you've been committing into). Makes the project public, gets you a star count, satisfies HN/r/Polymarket "show me the code" requests, lands you in the Awesome-PM-Tools directory.
+- **Vercel** hosts the static website (`polyparlay.io`, `polyparlay.io/upgrade`, `polyparlay.io/slip`). Serves the actual pages users visit.
+
+The clean flow is **GitHub → Vercel auto-deploy**: push to GitHub, Vercel watches the `web/` subdirectory and rebuilds on every push. One source of truth, automatic deploys. You set this up once in 5 minutes.
+
 ## Launch — end-to-end deploy guide
 
 ### 1. Domain + handles
@@ -133,20 +142,29 @@ gh repo create polyparlay --public --source . --remote origin
 git push -u origin master
 ```
 
-(Or via web UI if you don't have `gh` installed — create empty repo, then `git remote add origin <url>` + `git push -u origin master`.)
+(Or via web UI: create empty repo at github.com/new, then `git remote add origin <url>` + `git push -u origin master`.)
 
-### 4. Deploy `web/` to Vercel
+### 4. Deploy `web/` to Vercel — connect to GitHub for auto-deploy
+
+**Recommended flow (5 minutes, one-time setup):**
+
+1. Sign in at <https://vercel.com> with your GitHub account
+2. Click "Add New Project"
+3. Import your `polyparlay` GitHub repo
+4. Vercel auto-detects no framework — manually set:
+   - **Root Directory:** `web`
+   - **Framework Preset:** Other (static)
+   - **Build Command:** (leave empty)
+   - **Output Directory:** (leave empty — Vercel serves the `web/` directory as-is)
+5. Deploy. Every subsequent `git push` auto-deploys.
+6. In Vercel project settings → Domains, add `polyparlay.io`. Vercel gives you the DNS records to add at your registrar (an A record + a CNAME).
+
+**Alternative one-off deploy (no auto-deploy):**
 
 ```bash
 cd web/
 npx vercel deploy --prod
-# Follow prompts: link to new project named "polyparlay", confirm settings.
-# `vercel.json` (already in this directory) handles the routing.
 ```
-
-Then in Vercel dashboard:
-- Add `polyparlay.io` as the custom domain
-- Update your DNS to point at Vercel
 
 ### 5. Deploy the Pro-verification worker
 
@@ -167,11 +185,12 @@ Note the deployed URL (e.g. `polyparlay-verify.YOUR_SUBDOMAIN.workers.dev`). Pas
 
 ### 6. Replace placeholders
 
-- [ ] `web/upgrade.html` → `PAYMENT_ADDRESS` (your receiving wallet)
-- [ ] `web/upgrade.html` → `VERIFY_URL` (deployed worker)
+- [ ] `web/upgrade.html` → `PAYMENT_ADDRESS` (your Polygon receiving wallet)
+- [ ] `web/upgrade.html` → `VERIFY_URL` (your deployed worker URL from step 5)
 - [ ] `web/upgrade.html` → `YOUR_EXTENSION_ID` (after CWS publishes — used to message the extension on successful payment)
-- [ ] `web/privacy.html` → replace `hello@polyparlay.io` with your real contact
-- [ ] `extension/popup.js` → `REF_CODE` (verify with PM/Kalshi affiliate programs)
+- [ ] `extension/popup.js` → `VERIFY_URL` constant (same deployed worker URL)
+- [ ] `extension/popup.js` → `REF_CODE` (your PM/Kalshi affiliate code, if you sign up for those programs)
+- [ ] `web/privacy.html` → replace `hello@polyparlay.io` with your real contact email
 
 ### 7. Submit to Chrome Web Store
 
