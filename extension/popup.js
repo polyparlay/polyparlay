@@ -288,6 +288,9 @@ let currentSlip = { legs: [], stake: 10 };
 // Leaderboard cache: array of { addr, label, profit, winRate, positions }
 let smartMoneyCache = null;
 let smartMoneyLoadedAt = 0;
+// Captured when user clicks Improve Odds Apply — drives the rebalance banner
+// on the shareable slip card. Cleared when slip is cleared or all legs are removed.
+let lastRebalance = null;
 
 // Pro state machine — drives feature locking.
 // State stored in chrome.storage.local under key 'proState':
@@ -790,6 +793,7 @@ async function clearSlip() {
   if (!confirm('Clear all legs?')) return;
   const resp = await chrome.runtime.sendMessage({ type: 'clearSlip' });
   if (resp && resp.ok) currentSlip = resp.slip;
+  lastRebalance = null; // banner is per-active-slip, drop when cleared
   document.getElementById('cardWrap').classList.add('hidden');
   renderLegs();
   renderSummary();
@@ -878,7 +882,7 @@ function drawCard() {
 
   ctx.fillStyle = '#9ca3af';
   ctx.font = '500 14px -apple-system, sans-serif';
-  ctx.fillText('Built on Polymarket · all legs must hit', 88, 96);
+  ctx.fillText('Monte Carlo + Odds Optimizer · built on Polymarket', 88, 96);
 
   // Timestamp top right
   const now = new Date();
@@ -954,8 +958,33 @@ function drawCard() {
     ctx.textAlign = 'left';
   });
 
+  // --- REBALANCE BANNER (when applicable) ---
+  // The story this card actually needs to tell: PolyParlay's algorithm
+  // turned a bad parlay into a viable one.
+  const bannerY = lastRebalance ? H - 260 : null;
+  if (lastRebalance) {
+    ctx.fillStyle = 'rgba(34, 197, 94, 0.10)';
+    roundRect(ctx, 60, bannerY, W - 120, 44, 8);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(34, 197, 94, 0.32)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, 60, bannerY, W - 120, 44, 8);
+    ctx.stroke();
+
+    ctx.fillStyle = '#4ade80';
+    ctx.font = '800 12px -apple-system, sans-serif';
+    ctx.fillText('↗ POLYPARLAY REBALANCED', 78, bannerY + 18);
+
+    ctx.fillStyle = '#f9fafb';
+    ctx.font = '600 13px -apple-system, sans-serif';
+    const before = `${fmtPercentSmart(lastRebalance.oldWinRate)} win`;
+    const after = `${fmtPercentSmart(lastRebalance.newWinRate)} win`;
+    const bannerText = `dropped weakest leg · win rate ${before} → ${after}`;
+    ctx.fillText(bannerText, 78, bannerY + 35);
+  }
+
   // --- FOOTER PAYOUT BLOCK ---
-  const footerY = H - 180;
+  const footerY = H - 200;
 
   // Divider
   ctx.strokeStyle = 'rgba(255,255,255,0.06)';
@@ -965,36 +994,52 @@ function drawCard() {
   ctx.lineTo(W - 60, footerY - 10);
   ctx.stroke();
 
-  // Multiplier — hero number
+  // Multiplier — hero number on left
   const mult = multiplier(eligible);
   ctx.fillStyle = '#9ca3af';
   ctx.font = '700 12px -apple-system, sans-serif';
   ctx.fillText('IF ALL HIT', 60, footerY + 18);
 
-  // Big multiplier value with subtle purple cast
   const multText = fmtMult(mult);
   ctx.fillStyle = '#a5b4fc';
-  ctx.font = '900 100px -apple-system, sans-serif';
-  ctx.fillText(multText, 60, footerY + 110);
+  ctx.font = '900 90px -apple-system, sans-serif';
+  ctx.fillText(multText, 60, footerY + 100);
 
-  // STAKE / PAYOUT cluster on the right
+  // Run a quick Monte Carlo to get win rate — uses adaptive iterations
+  let winRateText = '—';
+  if (eligible.length) {
+    const cost = combinedCost(eligible);
+    const sims = cost != null && cost < 0.001 ? 100000 : 10000;
+    const r = runMonteCarlo(eligible, currentSlip.stake || 10, sims);
+    if (r) winRateText = fmtPercentSmart(r.winRate);
+  }
+
+  // Right-side metrics cluster: WIN RATE / STAKE / MAX PAYOUT
   const payout = maxPayout(eligible, currentSlip.stake);
   const stake = Number(currentSlip.stake) || 0;
+  ctx.textAlign = 'right';
+
+  // WIN RATE (highlight the simulation as the unique value-add)
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.fillText('WIN RATE · 10K SIMS', W - 380, footerY + 18);
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = '800 28px -apple-system, sans-serif';
+  ctx.fillText(winRateText, W - 380, footerY + 56);
 
   ctx.fillStyle = '#9ca3af';
   ctx.font = '700 12px -apple-system, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText('STAKE', W - 280, footerY + 18);
+  ctx.fillText('STAKE', W - 220, footerY + 18);
   ctx.fillStyle = '#f9fafb';
-  ctx.font = '800 32px -apple-system, sans-serif';
-  ctx.fillText('$' + stake.toFixed(0), W - 280, footerY + 56);
+  ctx.font = '800 28px -apple-system, sans-serif';
+  ctx.fillText('$' + stake.toFixed(0), W - 220, footerY + 56);
 
   ctx.fillStyle = '#9ca3af';
   ctx.font = '700 12px -apple-system, sans-serif';
   ctx.fillText('MAX PAYOUT', W - 60, footerY + 18);
   ctx.fillStyle = '#4ade80';
-  ctx.font = '800 44px -apple-system, sans-serif';
-  ctx.fillText(fmt$(payout), W - 60, footerY + 62);
+  ctx.font = '800 36px -apple-system, sans-serif';
+  ctx.fillText(fmt$(payout), W - 60, footerY + 58);
   ctx.textAlign = 'left';
 
   // --- WATERMARK STRIP ---
@@ -1333,46 +1378,77 @@ function renderSimResults(r) {
     </div>`
   ).join('');
   setText('simHeadLabel', `Monte Carlo · ${itLabel} sims`);
-
-  // Improve Odds suggestion — append below the grid when there's a leg
-  // priced low enough that its removal would meaningfully improve win rate.
-  // Remove any previous suggestion before re-rendering.
-  const old = panel.querySelector('.sim-rebalance');
-  if (old) old.remove();
-  const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
-  const suggest = suggestRebalance(eligible);
-  if (suggest) {
-    const rebalEl = document.createElement('div');
-    rebalEl.className = 'sim-rebalance';
-    rebalEl.innerHTML =
-      '<div class="sim-rebalance-info">' +
-      '  <div class="sim-rebalance-title">↗ Improve odds</div>' +
-      '  <div class="sim-rebalance-desc">' +
-      `    Drop "<strong>${escapeHtml(truncate(suggest.removedQuestion, 38))}</strong>" ` +
-      `    (priced ${fmtPrice(suggest.removedPrice)}). ` +
-      `    Win rate jumps <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>. ` +
-      `    Multiplier drops ${suggest.oldMultiplier.toFixed(1)}× → ${suggest.newMultiplier.toFixed(1)}×.` +
-      '  </div>' +
-      '</div>' +
-      '<button class="sim-rebalance-apply" id="simRebalanceApply" type="button">Apply</button>';
-    panel.appendChild(rebalEl);
-    const applyBtn = document.getElementById('simRebalanceApply');
-    if (applyBtn) {
-      applyBtn.addEventListener('click', async () => {
-        applyBtn.disabled = true;
-        applyBtn.textContent = 'Rebalancing…';
-        await chrome.runtime.sendMessage({ type: 'removeLeg', legId: suggest.removeLegId });
-        const resp = await chrome.runtime.sendMessage({ type: 'getSlip' });
-        if (resp && resp.ok) currentSlip = resp.slip;
-        renderLegs();
-        renderSummary();
-        runAndShowSim(); // re-run sim with new slip composition
-      });
-    }
-  }
-
   toggleHidden('simResults', false);
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Improve Odds — standalone always-visible row when slip has a low-priced leg.
+// Free state: shows feature pitch ("Use our odds algorithm…"). Apply click
+//   activates the trial first, then applies the rebalance.
+// Trial/Paid: shows the specific live recommendation.
+async function renderImproveOdds() {
+  const el = document.getElementById('improveOdds');
+  if (!el) return;
+  const eligible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
+  const suggest = suggestRebalance(eligible);
+  if (!suggest) {
+    el.classList.add('hidden');
+    return;
+  }
+  el.classList.remove('hidden');
+
+  const desc = document.getElementById('improveOddsDesc');
+  const apply = document.getElementById('improveOddsApply');
+  if (!desc || !apply) return;
+
+  const state = await getProState();
+  const isPro = state.tier === 'trial' || state.tier === 'paid';
+
+  if (isPro) {
+    desc.classList.remove('improve-odds-pitch');
+    desc.innerHTML =
+      `Drop "<strong>${escapeHtml(truncate(suggest.removedQuestion, 32))}</strong>" ` +
+      `(priced ${fmtPrice(suggest.removedPrice)}). ` +
+      `Win rate <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>. ` +
+      `Multiplier ${suggest.oldMultiplier.toFixed(1)}× → ${suggest.newMultiplier.toFixed(1)}×.`;
+  } else {
+    desc.classList.add('improve-odds-pitch');
+    desc.innerHTML =
+      'Use our odds algorithm to identify the leg dragging down your win rate ' +
+      'and rebalance for higher probability. <strong>Apply</strong> to see the specific recommendation.';
+  }
+
+  apply.onclick = async () => {
+    apply.disabled = true;
+    const prevText = apply.textContent;
+    apply.textContent = '…';
+    try {
+      const curState = await getProState();
+      if (curState.tier === 'free' || curState.tier === 'expired') {
+        // Free → starts trial + applies the suggestion (click is rewarded immediately)
+        await startTrial();
+        await applyProState();
+      }
+      // Capture the before/after for the slip card banner BEFORE we remove the leg
+      lastRebalance = {
+        removedQuestion: suggest.removedQuestion,
+        removedPrice: suggest.removedPrice,
+        oldMultiplier: suggest.oldMultiplier,
+        newMultiplier: suggest.newMultiplier,
+        oldWinRate: suggest.oldWinRate,
+        newWinRate: suggest.newWinRate,
+        at: Date.now()
+      };
+      await chrome.runtime.sendMessage({ type: 'removeLeg', legId: suggest.removeLegId });
+      const resp = await chrome.runtime.sendMessage({ type: 'getSlip' });
+      if (resp && resp.ok) currentSlip = resp.slip;
+      renderLegs();
+      renderSummary();
+    } finally {
+      apply.disabled = false;
+      apply.textContent = prevText;
+    }
+  };
 }
 
 // Execute menu — open all current legs on Polymarket (each in a new tab, with referral).
