@@ -14,16 +14,54 @@
   const log = (...a) => DEBUG && console.log('[PolyParlay]', ...a);
 
   // -------- URL/slug detection --------
+  // Known top-level segments on polymarket.com that are NOT market slugs.
+  // Used to filter out non-market routes during the generic fallback below.
+  const RESERVED_PM_PATHS = new Set([
+    '', 'home', 'profile', 'profiles', 'portfolio', 'leaderboard',
+    'markets', 'market', 'event', 'events', 'search', 'login', 'signup',
+    'about', 'terms', 'privacy', 'docs', 'help', 'support', 'settings',
+    'feed', 'activity', 'rewards', 'referral', 'earn', 'wallet'
+  ]);
+
   function extractSlug() {
     const path = window.location.pathname;
+
+    // 1. /event/<slug> or /event/<event-slug>/<sub-market-slug>
     const eventMatch = path.match(/^\/event\/([^/?#]+)(?:\/([^/?#]+))?/);
-    const marketMatch = path.match(/^\/markets?\/([^/?#]+)/);
     if (eventMatch) {
       return { kind: eventMatch[2] ? 'submarket' : 'event', slug: eventMatch[2] || eventMatch[1] };
     }
-    if (marketMatch) {
-      return { kind: 'market', slug: marketMatch[1] };
+
+    // 2. /market/<slug> or /markets/<slug>
+    const marketMatch = path.match(/^\/markets?\/([^/?#]+)/);
+    if (marketMatch) return { kind: 'market', slug: marketMatch[1] };
+
+    // 3. Category-prefixed URLs: /sports/<slug>, /crypto/<slug>, /elections/<slug>,
+    //    /politics/<slug>, /odds/<slug>, /games/<slug>, etc.
+    //    These all follow the same pattern: a category bucket then a market slug.
+    const categoryMatch = path.match(/^\/([a-z-]+)\/([^/?#]+)(?:\/([^/?#]+))?/);
+    if (categoryMatch) {
+      const [, category, first, second] = categoryMatch;
+      // Don't double-count standard paths handled above
+      if (!RESERVED_PM_PATHS.has(category)) {
+        return { kind: category, slug: second || first };
+      }
     }
+
+    // 4. Generic fallback: try the deepest segment if it looks like a slug.
+    //    Catches edge cases like /<slug-with-dashes> at root or unusual routes.
+    const parts = path.split('/').filter(Boolean);
+    if (parts.length >= 1) {
+      const candidate = parts[parts.length - 1];
+      if (
+        candidate.length > 5 &&
+        candidate.includes('-') &&
+        !RESERVED_PM_PATHS.has(candidate.toLowerCase())
+      ) {
+        return { kind: 'guess', slug: candidate };
+      }
+    }
+
     return null;
   }
 
@@ -180,6 +218,11 @@
     return String(s || '').replace(/[&<>"']/g, (c) =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
     );
+  }
+  function truncateText(s, n) {
+    if (!s) return 'Market';
+    s = String(s);
+    return s.length <= n ? s : s.slice(0, n - 1).trimEnd() + '…';
   }
 
   function renderPreview(p, slip, status) {

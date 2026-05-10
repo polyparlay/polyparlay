@@ -1,4 +1,5 @@
 :root {
+  /* Dark theme variables (default for users with OS=dark or no preference) */
   --bg: #0b0d12;
   --surface: #11141a;
   --surface-2: #161a22;
@@ -12,14 +13,34 @@
   --red: #ef4444;
   --pro: #f59e0b;
 }
-/* Light theme — synced with PM via content script (see syncTheme in content.js).
-   Accent / green / red kept the same so brand identity stays consistent. */
+
+/* PRE-JS theme via OS preference — prevents the dark→light flash.
+   This is what the page renders with BEFORE chrome.storage / content script syncs. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ffffff;
+    --surface: #f9fafb;
+    --surface-2: #f3f4f6;
+    --line: #e5e7eb;
+    --text: #1f2937;
+    --text-strong: #111827;
+  }
+}
+
+/* JS-driven overrides — applied once we know PM's theme (via content script) */
+body[data-theme="dark"] {
+  --bg: #0b0d12;
+  --surface: #11141a;
+  --surface-2: #161a22;
+  --line: #1e2230;
+  --text: #e5e7eb;
+  --text-strong: #f9fafb;
+}
 body[data-theme="light"] {
   --bg: #ffffff;
   --surface: #f9fafb;
   --surface-2: #f3f4f6;
   --line: #e5e7eb;
-  --muted: #6b7280;
   --text: #1f2937;
   --text-strong: #111827;
 }
@@ -396,28 +417,35 @@ summary.execute-summary {
 
 /* Standalone Run-Simulation box — kept separate from the Pro analytics list
    per user feedback (it's the action hook, deserves its own visual weight). */
+/* Run Sim — primary conversion lever immediately after the slip summary.
+   Visually amplified so it never gets missed and reads as a clear CTA. */
 .run-sim-box {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: calc(100% - 24px);
-  margin: 0 12px 8px;
-  padding: 12px 14px;
+  margin: 4px 12px 10px;
+  padding: 14px 16px;
   background-color: var(--surface-2);
-  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(245, 158, 11, 0.08));
-  border: 1px solid rgba(99, 102, 241, 0.32);
+  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(245, 158, 11, 0.10));
+  border: 1px solid rgba(99, 102, 241, 0.45);
   border-radius: 10px;
   color: var(--text);
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-  transition: filter 0.12s ease, transform 0.12s ease;
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.12);
+  transition: filter 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
 }
-.run-sim-box:hover { filter: brightness(1.08); }
-.run-sim-box:active { transform: scale(0.99); }
-.run-sim-icon { font-size: 22px; line-height: 1; }
-.run-sim-content { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-.run-sim-title { font-weight: 700; font-size: 13px; color: var(--text-strong); }
+.run-sim-box:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.22);
+  transform: translateY(-1px);
+}
+.run-sim-box:active { transform: scale(0.99) translateY(0); }
+.run-sim-icon { font-size: 26px; line-height: 1; }
+.run-sim-content { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.run-sim-title { font-weight: 800; font-size: 14px; color: var(--text-strong); letter-spacing: 0.1px; }
 .run-sim-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
 
 /* Single Pro section — Smart Money signals only.
