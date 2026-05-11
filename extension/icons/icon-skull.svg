@@ -1,0 +1,47 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="bone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f9fafb"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <radialGradient id="aura" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+  <circle cx="64" cy="56" r="48" fill="url(#aura)"/>
+
+  <!-- Stylized skull — abstract dome + jaw, not literal/scary -->
+  <path d="M40 26 Q64 18 88 26 Q104 38 102 60 Q102 76 92 82 L92 96 L80 96 L78 102 L72 96 L56 96 L50 102 L48 96 L36 96 L36 82 Q26 76 26 60 Q24 38 40 26 Z"
+        fill="url(#bone)"
+        stroke="#94a3b8"
+        stroke-width="1.5"/>
+
+  <!-- Eye sockets = × symbols (multipliers, not skulls' empty eyes) -->
+  <g transform="translate(48 58)">
+    <line x1="-7" y1="-7" x2="7" y2="7" stroke="#6366f1" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-7" y1="7" x2="7" y2="-7" stroke="#6366f1" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(80 58)">
+    <line x1="-7" y1="-7" x2="7" y2="7" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-7" y1="7" x2="7" y2="-7" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Tiny nose triangle -->
+  <path d="M64 70 L60 80 L68 80 Z" fill="#475569"/>
+
+  <!-- Teeth row -->
+  <g fill="#94a3b8">
+    <rect x="50" y="86" width="3" height="8" rx="1"/>
+    <rect x="56" y="86" width="3" height="8" rx="1"/>
+    <rect x="62" y="86" width="3" height="8" rx="1"/>
+    <rect x="68" y="86" width="3" height="8" rx="1"/>
+    <rect x="74" y="86" width="3" height="8" rx="1"/>
+  </g>
+</svg>

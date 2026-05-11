@@ -1,31 +1,51 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.55"/>
-      <stop offset="65%" stop-color="#6366f1" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
-    </radialGradient>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0a0c14"/>
-      <stop offset="100%" stop-color="#13182a"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
     </linearGradient>
-    <linearGradient id="mark" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#7c84ff"/>
-      <stop offset="100%" stop-color="#5050cf"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
     </linearGradient>
+    <linearGradient id="iris" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a5b4fc"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="62%" r="40%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
-  <!-- Rounded dark background, matches the extension's surface -->
+  <!-- Dark rounded base -->
   <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
 
-  <!-- Soft halo behind the mark for depth -->
-  <circle cx="64" cy="64" r="58" fill="url(#glow)"/>
+  <!-- Golden pyramid (all-seeing finance) -->
+  <path d="M64 16 L112 104 L16 104 Z"
+        fill="none"
+        stroke="url(#gold)"
+        stroke-width="3.5"
+        stroke-linejoin="round"/>
 
-  <!-- Brand dot — same purple mark used in the popup header -->
-  <circle cx="64" cy="64" r="32" fill="url(#mark)"/>
+  <!-- Soft glow behind the eye -->
+  <ellipse cx="64" cy="74" rx="38" ry="22" fill="url(#glow)"/>
 
-  <!-- Stylized 'P' inset (Polyparlay) -->
-  <path d="M52 46 L52 88 L60 88 L60 76 L70 76 C77.7 76 84 69.7 84 62 C84 54.3 77.7 48 70 48 L52 48 Z M60 56 L70 56 C73.3 56 76 58.7 76 62 C76 65.3 73.3 68 70 68 L60 68 Z"
-        fill="#ffffff"
-        opacity="0.96"/>
+  <!-- Eye almond — light cream -->
+  <path d="M30 74 Q64 50 98 74 Q64 98 30 74 Z"
+        fill="#f3e8b8"
+        stroke="url(#gold)"
+        stroke-width="2"/>
+
+  <!-- Iris (purple) -->
+  <circle cx="64" cy="74" r="14" fill="url(#iris)"/>
+
+  <!-- Pupil = × multiplier symbol -->
+  <g transform="translate(64 74)">
+    <line x1="-6" y1="-6" x2="6" y2="6" stroke="#0a0c14" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="-6" y1="6" x2="6" y2="-6" stroke="#0a0c14" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Tiny light reflection on iris top-right -->
+  <circle cx="70" cy="68" r="2.5" fill="#ffffff" opacity="0.85"/>
 </svg>

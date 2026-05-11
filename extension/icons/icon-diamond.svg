@@ -1,0 +1,50 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="topFacet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a5b4fc"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="leftFacet" x1="0" y1="0" x2="1" y2="0.5">
+      <stop offset="0%" stop-color="#7c84ff"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="rightFacet" x1="1" y1="0" x2="0" y2="0.5">
+      <stop offset="0%" stop-color="#a5b4fc"/>
+      <stop offset="100%" stop-color="#5050cf"/>
+    </linearGradient>
+    <radialGradient id="sparkle" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+  <ellipse cx="64" cy="60" rx="50" ry="20" fill="url(#sparkle)"/>
+
+  <!-- Diamond geometry — three top facets + V bottom -->
+  <!-- Left top facet -->
+  <path d="M24 50 L48 30 L64 50 Z" fill="url(#leftFacet)"/>
+  <!-- Center top facet -->
+  <path d="M48 30 L80 30 L64 50 Z" fill="url(#topFacet)"/>
+  <!-- Right top facet -->
+  <path d="M80 30 L104 50 L64 50 Z" fill="url(#rightFacet)"/>
+  <!-- Bottom point -->
+  <path d="M24 50 L104 50 L64 108 Z" fill="url(#topFacet)" opacity="0.92"/>
+
+  <!-- Inner facet lines -->
+  <line x1="48" y1="30" x2="64" y2="108" stroke="#0a0c14" stroke-width="1.5" opacity="0.35"/>
+  <line x1="80" y1="30" x2="64" y2="108" stroke="#0a0c14" stroke-width="1.5" opacity="0.35"/>
+
+  <!-- × multiplier carved in the gem -->
+  <g transform="translate(64 70)">
+    <line x1="-9" y1="-9" x2="9" y2="9" stroke="#fbbf24" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="-9" y1="9" x2="9" y2="-9" stroke="#fbbf24" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Sparkle highlight top -->
+  <circle cx="56" cy="40" r="2.5" fill="#ffffff" opacity="0.85"/>
+</svg>
