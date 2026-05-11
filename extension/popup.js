@@ -1383,7 +1383,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('upgrade').addEventListener('click', () => {
     chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=leg-gate' });
   });
-  document.getElementById('addCurrent').addEventListener('click', addCurrentTab);
+  // addCurrent button was removed in v1.0.6 (the floating pill on PM pages
+  // handles adding legs). Guard the listener so a missing element doesn't
+  // throw and abort the rest of init (which would silently break other
+  // handlers like the Run Sim button below).
+  const addCurrentBtn = document.getElementById('addCurrent');
+  if (addCurrentBtn) addCurrentBtn.addEventListener('click', addCurrentTab);
 
   // Single Pro upgrade CTA at the bottom of the consolidated Pro section
   const mainCta = document.getElementById('proMainCta');
@@ -1406,6 +1411,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Analytics inline unlock CTA + clicking any blurred Pro row -> start trial
+  const analyticsUnlock = document.getElementById('analyticsUnlock');
+  const startTrialFromContext = async (sourceLabel) => {
+    await startTrial();
+    await applyProState();
+    showTrialToast();
+    renderLegs();
+    renderSummary();
+  };
+  if (analyticsUnlock) {
+    analyticsUnlock.addEventListener('click', () => startTrialFromContext('analytics-unlock'));
+  }
+  document.querySelectorAll('.analytics-blur-row').forEach((row) => {
+    row.addEventListener('click', async () => {
+      const state = await getProState();
+      if (state.tier === 'free' || state.tier === 'expired') {
+        await startTrialFromContext('analytics-row-' + (row.dataset.proRow || 'unknown'));
+      }
+    });
+  });
+
   // Run Sim button — locked for free tier (routes to trial), runs locally for trial/paid
   const simBtn = document.getElementById('runSimBtn');
   if (simBtn) {
@@ -1414,9 +1440,11 @@ document.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
       const state = await getProState();
       if (state.tier === 'free' || state.tier === 'expired') {
-        // Lockout — bounce to trial flow
+        // Lockout — start trial with celebratory toast, then run sim so the
+        // click feels rewarded (user sees something obviously happen)
         await startTrial();
         await applyProState();
+        showTrialToast();
         // Now that trial is active, fire the sim so the click feels rewarded
         runAndShowSim();
         return;

@@ -1029,8 +1029,8 @@ summary.execute-summary {
   opacity: 0.75;
 }
 
-/* Free analytics — THE value prop. Purple-tinted bg + accent left border
-   so the user's eye reads "this is what PolyParlay gives you." */
+/* Analytics — baked panel: free rows on top, blurred Pro rows below, inline
+   unlock CTA at the bottom. The blur+CTA is the conversion hook. */
 .free-analytics {
   margin: 0 12px 12px;
   padding: 12px 14px;
@@ -1045,31 +1045,123 @@ summary.execute-summary {
   padding: 5px 0;
   font-size: 12px;
 }
-.free-analytics .row span:last-child {
+.free-analytics .row > span:last-child {
   font-weight: 700;
   color: var(--text-strong);
 }
 
-/* Trial-activated celebratory toast — slides down from top */
-.trial-toast {
-  position: fixed;
-  top: 8px;
-  left: 50%;
-  transform: translate(-50%, -20px);
+.analytics-pro {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(99, 102, 241, 0.32);
+  position: relative;
+}
+.analytics-pro-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  background: var(--green);
-  color: #061410;
-  border-radius: 999px;
+  margin-bottom: 6px;
+}
+.analytics-pro-text {
+  font-size: 10px;
   font-weight: 800;
-  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.lock-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--pro);
+  color: #0a0c12;
+}
+
+/* Free state: blur the Pro rows so they read as "there's data behind this." */
+body.state-free .analytics-blur-row .blur-target,
+body.state-expired .analytics-blur-row .blur-target {
+  filter: blur(5px);
+  color: var(--accent);
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: 1px;
+}
+body.state-free .analytics-blur-row,
+body.state-expired .analytics-blur-row {
+  cursor: pointer;
+  position: relative;
+}
+body.state-free .analytics-blur-row:hover,
+body.state-expired .analytics-blur-row:hover {
+  background: rgba(99, 102, 241, 0.06);
+  border-radius: 4px;
+}
+
+/* When trial/paid, blur clears + CTA hides — same rows now show real data. */
+body.state-trial .analytics-pro .analytics-unlock,
+body.state-paid .analytics-pro .analytics-unlock { display: none; }
+body.state-trial .analytics-pro .analytics-pro-label .lock-chip,
+body.state-paid .analytics-pro .analytics-pro-label .lock-chip { display: none; }
+body.state-trial .analytics-pro .analytics-pro-text::before { content: "✓ "; }
+body.state-paid .analytics-pro .analytics-pro-text::before { content: "✓ "; }
+
+/* Inline unlock CTA — sits directly under blurred rows, contextual upsell */
+.analytics-unlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  color: white;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.12s ease, transform 0.1s ease;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.32);
+}
+.analytics-unlock:hover { filter: brightness(1.06); }
+.analytics-unlock:active { transform: scale(0.99); }
+.analytics-unlock-headline {
+  font-size: 13px;
+  font-weight: 800;
   letter-spacing: 0.2px;
-  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35);
+}
+.analytics-unlock-sub {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* Trial-activated celebratory toast — slides down from top.
+   Big and unmistakable so the user sees their click rewarded. */
+.trial-toast {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translate(-50%, -32px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #ffffff;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 12px 36px rgba(34, 197, 94, 0.5),
+              0 0 0 2px rgba(34, 197, 94, 0.25);
   z-index: 2147483647;
   opacity: 0;
-  transition: transform 0.25s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.18s ease;
+  transition: transform 0.32s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.2s ease;
   pointer-events: none;
 }
 .trial-toast.trial-toast-show {

@@ -43,26 +43,52 @@
 
     <div class="section-header section-header-analytics">
       <span class="section-header-dot"></span>
-      <span class="section-header-title">Free analytics</span>
+      <span class="section-header-title">Analytics</span>
       <span class="section-header-count">live</span>
     </div>
     <section class="free-analytics">
-      <div class="row">
-        <span>Risk score</span>
-        <span id="proRisk">—</span>
+      <!-- FREE rows — low-value passthrough data anyone can get from PM directly -->
+      <div class="analytics-free">
+        <div class="row">
+          <span>Resolves by</span>
+          <span id="lastReso">—</span>
+        </div>
+        <div class="row">
+          <span>Slip 24h volume <span class="row-hint">sum across legs</span></span>
+          <span id="proVol24">—</span>
+        </div>
       </div>
-      <div class="row">
-        <span>Slip 24h volume</span>
-        <span id="proVol24">—</span>
+
+      <!-- PRO rows — decision-making metrics. Visually blurred for free tier. -->
+      <div class="analytics-pro" id="analyticsPro">
+        <div class="analytics-pro-label">
+          <span class="lock-chip">🔒 PRO</span>
+          <span class="analytics-pro-text">Decision-making signals</span>
+        </div>
+        <div class="row analytics-blur-row" data-pro-row="risk">
+          <span>Risk score <span class="row-hint">stake concentration + variance</span></span>
+          <span id="proRisk" class="blur-target">HIGH</span>
+        </div>
+        <div class="row analytics-blur-row" data-pro-row="drift">
+          <span>24h price drift <span class="row-hint">momentum signal</span></span>
+          <span id="proDrift" class="blur-target">+37.0pp</span>
+        </div>
+        <div class="row analytics-blur-row" data-pro-row="ev">
+          <span>Expected ROI <span class="row-hint">Monte Carlo EV</span></span>
+          <span id="proExpectedRoi" class="blur-target">+12.4%</span>
+        </div>
+        <div class="row analytics-blur-row" data-pro-row="improve">
+          <span>Improve Odds <span class="row-hint">auto-rebalance suggestion</span></span>
+          <span id="proImprovePreview" class="blur-target">Flip leg 2 → NO</span>
+        </div>
+
+        <!-- Inline unlock CTA — contextual, right under the blurred data -->
+        <button type="button" class="analytics-unlock" id="analyticsUnlock">
+          <span class="analytics-unlock-headline">Unlock decision-making data</span>
+          <span class="analytics-unlock-sub">Start 7-day free trial · no card · cancel anytime</span>
+        </button>
       </div>
-      <div class="row">
-        <span>24h price drift <span class="row-hint">avg across legs</span></span>
-        <span id="proDrift">—</span>
-      </div>
-      <div class="row">
-        <span>Resolves by</span>
-        <span id="lastReso">—</span>
-      </div>
+
       <div class="warning hidden" id="concentrationWarn">
         <span class="warn-icon">⚠</span>
         <span id="concentrationText"></span>
