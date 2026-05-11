@@ -103,15 +103,49 @@
     return /(?:^|\.)polymarket\.com$/.test(window.location.hostname);
   }
 
-  // -------- Theme sync — multiple signals because PM's body bg is often
-  // transparent so we can't rely on backgroundColor alone. Priority:
-  //   1. Explicit html/body data-theme or .dark/.light class
-  //   2. <meta name="color-scheme"> content
-  //   3. Computed bg of body OR html OR <main>, first non-transparent wins
-  //   4. Body text COLOR (light text => dark theme, dark text => light theme)
-  //   5. Fallback to OS prefers-color-scheme
+  // -------- Theme sync — trust the actual VISUAL rendering first because
+  // PM (and many SPAs) keep stale class="dark" / data-theme="dark" on the
+  // root even when the visible page is rendered in light. Order:
+  //   1. Computed bg color of body/html/main/#__next (first opaque wins)
+  //   2. Computed text color of body (inverted — light text => dark page)
+  //   3. Explicit data-theme/data-mode attribute
+  //   4. Explicit .dark/.light class
+  //   5. <meta name="color-scheme">
+  //   6. OS prefers-color-scheme
   function detectTheme() {
-    // 1. explicit attribute / class
+    const parse = (s) => {
+      const m = (s || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
+      if (!m) return null;
+      return { r: +m[1], g: +m[2], b: +m[3], a: m[4] != null ? +m[4] : 1 };
+    };
+
+    // 1. computed bg — try several roots, first one with real opacity wins.
+    //    This is the authoritative "what does the user actually see" signal.
+    const bgTargets = [
+      document.body,
+      document.documentElement,
+      document.querySelector('main'),
+      document.querySelector('#__next'),
+      document.querySelector('[class*="layout"]'),
+    ].filter(Boolean);
+    for (const el of bgTargets) {
+      try {
+        const p = parse(getComputedStyle(el).backgroundColor);
+        if (p && p.a >= 0.5) {
+          return p.r + p.g + p.b < 384 ? 'dark' : 'light';
+        }
+      } catch {}
+    }
+
+    // 2. body text color — light text on transparent bg implies a dark page
+    if (document.body) {
+      try {
+        const p = parse(getComputedStyle(document.body).color);
+        if (p) return p.r + p.g + p.b > 384 ? 'dark' : 'light';
+      } catch {}
+    }
+
+    // 3 & 4. fall back to declarative signals (these can lie when SPA caches them)
     for (const el of [document.documentElement, document.body]) {
       if (!el) continue;
       const dt = el.getAttribute('data-theme') || el.getAttribute('data-mode');
@@ -120,7 +154,7 @@
       if (el.classList.contains('light')) return 'light';
     }
 
-    // 2. <meta name="color-scheme">
+    // 5. <meta color-scheme>
     const metaScheme = document.querySelector('meta[name="color-scheme"]');
     if (metaScheme) {
       const v = (metaScheme.getAttribute('content') || '').toLowerCase();
@@ -128,38 +162,7 @@
       if (v.includes('only light') || v === 'light') return 'light';
     }
 
-    // helper to parse rgb/rgba and return {r,g,b,a} or null
-    const parse = (s) => {
-      const m = (s || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
-      if (!m) return null;
-      return { r: +m[1], g: +m[2], b: +m[3], a: m[4] != null ? +m[4] : 1 };
-    };
-
-    // 3. computed bg of body, html, or <main> — first opaque non-transparent wins
-    const bgTargets = [
-      document.body,
-      document.documentElement,
-      document.querySelector('main'),
-      document.querySelector('#__next'),
-    ].filter(Boolean);
-    for (const el of bgTargets) {
-      try {
-        const p = parse(getComputedStyle(el).backgroundColor);
-        if (p && p.a >= 0.1) {
-          return p.r + p.g + p.b < 384 ? 'dark' : 'light';
-        }
-      } catch {}
-    }
-
-    // 4. fall back to body text color — light text means dark theme
-    if (document.body) {
-      try {
-        const p = parse(getComputedStyle(document.body).color);
-        if (p) return p.r + p.g + p.b > 384 ? 'dark' : 'light';
-      } catch {}
-    }
-
-    // 5. OS preference
+    // 6. OS
     if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
     return 'light';
   }
