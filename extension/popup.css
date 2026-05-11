@@ -1044,10 +1044,30 @@ summary.execute-summary {
 .free-analytics .row {
   padding: 5px 0;
   font-size: 12px;
+  align-items: flex-start;
+}
+.free-analytics .row > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
 }
 .free-analytics .row > span:last-child {
   font-weight: 700;
   color: var(--text-strong);
+  white-space: nowrap;
+  text-align: right;
+  flex-shrink: 0;
+}
+.free-analytics .row .row-hint {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin: 0;
+  font-weight: 600;
 }
 
 .analytics-pro {
@@ -1285,17 +1305,22 @@ body.state-expired .run-sim-box {
 }
 body.state-free .run-sim-box::after,
 body.state-expired .run-sim-box::after {
-  content: '🔒 PRO · Click to start free trial';
+  content: '🔒 PRO';
   position: absolute;
   top: 0; right: 0;
   background: var(--pro);
   color: #0a0c12;
   font-size: 9px;
   font-weight: 900;
-  letter-spacing: 0.4px;
-  padding: 3px 8px;
+  letter-spacing: 0.6px;
+  padding: 3px 7px;
   border-bottom-left-radius: 8px;
   z-index: 2;
+}
+/* Pad the content so it can't slide under the corner chip. */
+body.state-free .run-sim-box .run-sim-content,
+body.state-expired .run-sim-box .run-sim-content {
+  padding-right: 48px;
 }
 body.state-free .run-sim-box .pro-tag,
 body.state-expired .run-sim-box .pro-tag {

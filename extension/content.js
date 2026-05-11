@@ -103,23 +103,65 @@
     return /(?:^|\.)polymarket\.com$/.test(window.location.hostname);
   }
 
-  // -------- Theme sync (read PM's computed body background) --------
+  // -------- Theme sync — multiple signals because PM's body bg is often
+  // transparent so we can't rely on backgroundColor alone. Priority:
+  //   1. Explicit html/body data-theme or .dark/.light class
+  //   2. <meta name="color-scheme"> content
+  //   3. Computed bg of body OR html OR <main>, first non-transparent wins
+  //   4. Body text COLOR (light text => dark theme, dark text => light theme)
+  //   5. Fallback to OS prefers-color-scheme
   function detectTheme() {
-    const candidates = [document.body, document.documentElement];
-    for (const el of candidates) {
+    // 1. explicit attribute / class
+    for (const el of [document.documentElement, document.body]) {
       if (!el) continue;
+      const dt = el.getAttribute('data-theme') || el.getAttribute('data-mode');
+      if (dt === 'dark' || dt === 'light') return dt;
+      if (el.classList.contains('dark')) return 'dark';
+      if (el.classList.contains('light')) return 'light';
+    }
+
+    // 2. <meta name="color-scheme">
+    const metaScheme = document.querySelector('meta[name="color-scheme"]');
+    if (metaScheme) {
+      const v = (metaScheme.getAttribute('content') || '').toLowerCase();
+      if (v.includes('only dark') || v === 'dark') return 'dark';
+      if (v.includes('only light') || v === 'light') return 'light';
+    }
+
+    // helper to parse rgb/rgba and return {r,g,b,a} or null
+    const parse = (s) => {
+      const m = (s || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
+      if (!m) return null;
+      return { r: +m[1], g: +m[2], b: +m[3], a: m[4] != null ? +m[4] : 1 };
+    };
+
+    // 3. computed bg of body, html, or <main> — first opaque non-transparent wins
+    const bgTargets = [
+      document.body,
+      document.documentElement,
+      document.querySelector('main'),
+      document.querySelector('#__next'),
+    ].filter(Boolean);
+    for (const el of bgTargets) {
       try {
-        const bg = getComputedStyle(el).backgroundColor;
-        const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
-        if (m) {
-          const r = +m[1], g = +m[2], b = +m[3];
-          const a = m[4] != null ? +m[4] : 1;
-          if (a < 0.1) continue; // transparent — try parent
-          return r + g + b < 384 ? 'dark' : 'light';
+        const p = parse(getComputedStyle(el).backgroundColor);
+        if (p && p.a >= 0.1) {
+          return p.r + p.g + p.b < 384 ? 'dark' : 'light';
         }
       } catch {}
     }
-    return 'dark';
+
+    // 4. fall back to body text color — light text means dark theme
+    if (document.body) {
+      try {
+        const p = parse(getComputedStyle(document.body).color);
+        if (p) return p.r + p.g + p.b > 384 ? 'dark' : 'light';
+      } catch {}
+    }
+
+    // 5. OS preference
+    if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
   }
 
   let lastTheme = null;
