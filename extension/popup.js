@@ -1401,6 +1401,44 @@ document.addEventListener('DOMContentLoaded', () => {
   syncProFromWorker().then((next) => {
     if (next) applyProState();
   });
+
+  // Dev affordance: Shift+click the footer tier pill to cycle through
+  //   free → trial → paid → expired → free
+  // Useful for previewing each lockout state without resetting storage manually.
+  const tierEl = document.getElementById('proTierIndicator');
+  if (tierEl) {
+    tierEl.addEventListener('click', async (e) => {
+      if (!e.shiftKey) return;
+      e.preventDefault();
+      const { proState } = await chrome.storage.local.get(['proState']);
+      const now = Date.now();
+      let cur = 'free';
+      if (proState) {
+        if (proState.paidUntilAt && proState.paidUntilAt > now) cur = 'paid';
+        else if (proState.trialEndsAt && proState.trialEndsAt > now) cur = 'trial';
+        else if (proState.trialStartedAt) cur = 'expired';
+      }
+      const next = { free: 'trial', trial: 'paid', paid: 'expired', expired: 'free' }[cur];
+      if (next === 'free') {
+        await chrome.storage.local.remove(['proState']);
+      } else if (next === 'trial') {
+        await chrome.storage.local.set({
+          proState: { trialStartedAt: now, trialEndsAt: now + 7 * 86400000 }
+        });
+      } else if (next === 'paid') {
+        await chrome.storage.local.set({
+          proState: { paidUntilAt: now + 365 * 86400000, paidAt: Math.floor(now / 1000) }
+        });
+      } else if (next === 'expired') {
+        await chrome.storage.local.set({
+          proState: { trialStartedAt: now - 8 * 86400000, trialEndsAt: now - 86400000 }
+        });
+      }
+      await applyProState();
+      renderLegs();
+      renderSummary();
+    });
+  }
 });
 
 async function loadAndRenderLeaderboard() {
