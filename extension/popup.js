@@ -300,6 +300,19 @@ let lastRebalance = null;
 //   - 'trial' = trialEndsAt > now (and not paid)
 //   - 'free'  = neither
 //   - 'expired' = had trial that ended without payment (= 'free' but UX differs)
+
+// One-time hard reset to free tier on this version. Runs on the first popup
+// load after install/update to 1.0.15, then sets the flag so it's a no-op
+// thereafter. Lets operator walk the end-to-end upgrade journey as a real
+// free user. Cycle states via the footer tier pill if you need to revisit.
+const FORCE_FREE_RESET_VERSION = '1.0.15';
+async function maybeForceFreeReset() {
+  const { lastFreeResetVersion } = await chrome.storage.local.get(['lastFreeResetVersion']);
+  if (lastFreeResetVersion === FORCE_FREE_RESET_VERSION) return;
+  await chrome.storage.local.remove(['proState']);
+  await chrome.storage.local.set({ lastFreeResetVersion: FORCE_FREE_RESET_VERSION });
+}
+
 async function getProState() {
   const { proState } = await chrome.storage.local.get(['proState']);
   if (!proState) return { tier: 'free' };
@@ -1445,7 +1458,9 @@ document.addEventListener('DOMContentLoaded', () => {
   //   chrome.storage.local.set({proState:{trialStartedAt:Date.now(),trialEndsAt:Date.now()+7*86400000}})
   // to simulate an active trial.
 
-  applyProState();
+  // One-time free-tier reset for v1.0.15 — fires once per install, then a no-op.
+  maybeForceFreeReset().then(() => applyProState());
+
   // After initial render, sync from worker in the background so an external
   // payment (made on polyparlay.io/upgrade) gets reflected without a manual reload.
   syncProFromWorker().then((next) => {
