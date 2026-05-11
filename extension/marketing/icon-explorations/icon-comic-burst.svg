@@ -1,0 +1,72 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Bangers', 'Impact', 'Anton', 'Arial Black', sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="burstFill" x1="0" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="38%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <radialGradient id="burstHi" cx="32%" cy="28%" r="55%">
+      <stop offset="0%" stop-color="#fffbeb" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#fffbeb" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+
+  <!-- ==========================================================
+       BOOM bubble — 9 irregular spikes (variable lengths!), deep
+       notches, sharp angular tips. Tilted -10° for comic energy.
+       Spike vertex coords laid out clockwise from top.
+       ========================================================== -->
+  <g transform="rotate(-10 64 64)">
+
+    <!-- Drop shadow -->
+    <path d="M 64 3
+             L 80 30 L 116 12 L 96 40 L 124 56
+             L 100 70 L 118 102 L 88 86 L 80 124
+             L 60 92 L 30 118 L 44 84 L 8 88
+             L 32 64 L 6 36 L 40 42 L 30 8 L 56 32 Z"
+          fill="#000" opacity="0.5" transform="translate(2.5 3.5)"/>
+
+    <!-- Outer outline + fill -->
+    <path d="M 64 3
+             L 80 30 L 116 12 L 96 40 L 124 56
+             L 100 70 L 118 102 L 88 86 L 80 124
+             L 60 92 L 30 118 L 44 84 L 8 88
+             L 32 64 L 6 36 L 40 42 L 30 8 L 56 32 Z"
+          fill="url(#burstFill)"
+          stroke="#0a0c14" stroke-width="4" stroke-linejoin="miter" stroke-miterlimit="2"/>
+
+    <!-- Inner highlight halo (printed-comic feel) -->
+    <path d="M 64 3
+             L 80 30 L 116 12 L 96 40 L 124 56
+             L 100 70 L 118 102 L 88 86 L 80 124
+             L 60 92 L 30 118 L 44 84 L 8 88
+             L 32 64 L 6 36 L 40 42 L 30 8 L 56 32 Z"
+          fill="url(#burstHi)"/>
+
+    <!-- TEXT: "POLY" / "PARLAY" stacked, white-stroked black fill for
+         comic-lettering emboss. Anchored to fit inside the inner area. -->
+    <g text-anchor="middle" font-weight="900">
+      <!-- POLY (top) -->
+      <text x="64" y="58" font-size="22" fill="#ffffff" stroke="#ffffff"
+            stroke-width="4" stroke-linejoin="round" letter-spacing="-0.5">POLY</text>
+      <text x="64" y="58" font-size="22" fill="#0a0c14" letter-spacing="-0.5">POLY</text>
+      <!-- PARLAY (bottom) -->
+      <text x="64" y="80" font-size="19" fill="#ffffff" stroke="#ffffff"
+            stroke-width="4" stroke-linejoin="round" letter-spacing="-1">PARLAY</text>
+      <text x="64" y="80" font-size="19" fill="#0a0c14" letter-spacing="-1">PARLAY</text>
+    </g>
+  </g>
+
+  <!-- Tiny accent specks (manga/comic stippling vibe) outside the burst -->
+  <circle cx="18" cy="18" r="2" fill="#fbbf24" opacity="0.7"/>
+  <circle cx="112" cy="20" r="1.5" fill="#fbbf24" opacity="0.65"/>
+  <circle cx="108" cy="112" r="1.8" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="16" cy="108" r="1.4" fill="#fbbf24" opacity="0.7"/>
+</svg>
