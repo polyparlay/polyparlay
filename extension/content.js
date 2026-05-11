@@ -103,58 +103,17 @@
     return /(?:^|\.)polymarket\.com$/.test(window.location.hostname);
   }
 
-  // -------- Theme sync — body TEXT color is the most reliable signal
-  // because (unlike bg, which can be transparent or stale-cached on SPAs)
-  // text is always set to an explicit non-transparent value matching the
-  // actual rendered page. Light text => dark page; dark text => light page.
+  // -------- Theme sync — OS prefers-color-scheme is the single source
+  // of truth. We tried multi-tier SPA detection (body text color, computed
+  // bg, declarative attribute/class, meta color-scheme). Every approach
+  // had false positives on PM because their SPA leaves stale class="dark"
+  // on root + transparent body bg + various edge cases. The user wants the
+  // drawer to match the OS theme, so we honor that directly.
   function detectTheme() {
-    const parse = (s) => {
-      const m = (s || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
-      if (!m) return null;
-      return { r: +m[1], g: +m[2], b: +m[3], a: m[4] != null ? +m[4] : 1 };
-    };
-    const isLight = (rgb) => rgb.r + rgb.g + rgb.b >= 384;
-
-    // 1. PRIMARY: body text color (inverted -> theme). This is what users see.
-    if (document.body) {
-      try {
-        const p = parse(getComputedStyle(document.body).color);
-        if (p && p.a >= 0.5) {
-          // text is LIGHT (sum >= 384) means the page bg is DARK
-          return isLight(p) ? 'dark' : 'light';
-        }
-      } catch {}
+    if (window.matchMedia) {
+      if (matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+      if (matchMedia('(prefers-color-scheme: light)').matches) return 'light';
     }
-
-    // 2. SECONDARY: try common content roots' computed bg (text might be
-    // unset on body for some SPAs). First opaque bg wins.
-    const bgTargets = [
-      document.querySelector('main'),
-      document.querySelector('#__next'),
-      document.querySelector('[class*="layout"]'),
-      document.body,
-      document.documentElement,
-    ].filter(Boolean);
-    for (const el of bgTargets) {
-      try {
-        const p = parse(getComputedStyle(el).backgroundColor);
-        if (p && p.a >= 0.5) {
-          return isLight(p) ? 'light' : 'dark';
-        }
-      } catch {}
-    }
-
-    // 3 & 4. declarative signals (these can lie when SPA caches them, so last)
-    for (const el of [document.documentElement, document.body]) {
-      if (!el) continue;
-      const dt = el.getAttribute('data-theme') || el.getAttribute('data-mode');
-      if (dt === 'dark' || dt === 'light') return dt;
-      if (el.classList.contains('dark')) return 'dark';
-      if (el.classList.contains('light')) return 'light';
-    }
-
-    // 5. OS preference
-    if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
     return 'light';
   }
 

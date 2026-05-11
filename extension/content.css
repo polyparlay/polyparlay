@@ -138,6 +138,9 @@
   transition: transform 0.2s ease, opacity 0.2s ease !important;
   overflow: hidden !important;
 }
+/* Light theme — applied by the JS data-pw-theme attribute OR by the
+   @media block below for any user whose OS is in light mode (no JS
+   required, so the drawer is correct on first paint). */
 #polyparlay-preview[data-pw-theme="light"] {
   background: #ffffff !important;
   color: #111827 !important;
@@ -162,6 +165,44 @@
 }
 #polyparlay-preview[data-pw-theme="light"] .pw-preview-summary strong {
   color: #111827 !important;
+}
+
+/* Same rules but driven by OS preference, so light-mode users see a
+   light drawer even before the content script runs. We scope to
+   :not([data-pw-theme="dark"]) so the JS can still force dark if the
+   user explicitly overrides. */
+@media (prefers-color-scheme: light) {
+  #polyparlay-preview:not([data-pw-theme="dark"]) {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border-color: #e5e7eb !important;
+  }
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-head,
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-pleg,
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-summary,
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-footer {
+    border-color: #e5e7eb !important;
+  }
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-title,
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-pleg-q {
+    color: #111827 !important;
+  }
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-pleg-num {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+  }
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-footer {
+    background: #f9fafb !important;
+  }
+  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-summary strong {
+    color: #111827 !important;
+  }
+  /* Floating pill too */
+  #polyparlay-floating-btn:not([data-pw-theme="dark"]) {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border-color: #e5e7eb !important;
+  }
 }
 #polyparlay-preview.pw-hidden {
   transform: translateY(20px) !important;

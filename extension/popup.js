@@ -1342,15 +1342,10 @@ function systemPrefersLight() {
 }
 
 async function applyTheme() {
-  try {
-    const { pmTheme } = await chrome.storage.local.get(['pmTheme']);
-    // Priority: PM theme (synced via content script) > system preference > dark default
-    let theme = pmTheme;
-    if (!theme) theme = systemPrefersLight() ? 'light' : 'dark';
-    document.body.setAttribute('data-theme', theme);
-  } catch {
-    document.body.setAttribute('data-theme', systemPrefersLight() ? 'light' : 'dark');
-  }
+  // 'Native' = OS preference. PM-page sync is unreliable across SPAs and
+  // was producing stale dark-mode for light-OS users. OS prefers-color-scheme
+  // is the source of truth. We deliberately ignore the stored pmTheme.
+  document.body.setAttribute('data-theme', systemPrefersLight() ? 'light' : 'dark');
 }
 
 // Live-react to OS theme changes even before PM syncs
@@ -1889,10 +1884,6 @@ chrome.storage.onChanged.addListener((changes) => {
     renderLegs();
     renderSummary();
   }
-  if (changes.pmTheme) {
-    document.body.setAttribute(
-      'data-theme',
-      changes.pmTheme.newValue === 'light' ? 'light' : 'dark'
-    );
-  }
+  // pmTheme storage updates intentionally ignored — OS prefers-color-scheme
+  // is the single source of truth (see applyTheme).
 });
