@@ -1,0 +1,53 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="redLine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fecaca"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <linearGradient id="greenLine" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#86efac"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+
+  <!-- LEFT: red declining line (bad bet) -->
+  <g opacity="0.92">
+    <polyline points="14,30 30,46 46,68 56,86"
+              fill="none" stroke="url(#redLine)" stroke-width="6.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- down arrow tip -->
+    <path d="M56 86 L48 76 L62 78 Z" fill="#ef4444"/>
+    <!-- dot at start -->
+    <circle cx="14" cy="30" r="3.5" fill="#fecaca"/>
+  </g>
+
+  <!-- Center transformation badge -->
+  <g transform="translate(64 64)">
+    <circle r="16" fill="#0a0c14" stroke="#fbbf24" stroke-width="2"/>
+    <!-- chevron up (→) inside, gold -->
+    <path d="M-7 3 L0 -4 L7 3" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M-7 9 L0 2 L7 9" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+  </g>
+
+  <!-- RIGHT: green ascending line (rebalanced bet) -->
+  <g>
+    <polyline points="72,86 84,68 100,46 114,30"
+              fill="none" stroke="url(#greenLine)" stroke-width="6.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- up arrow tip -->
+    <path d="M114 30 L106 28 L108 42 Z" fill="#22c55e"/>
+    <!-- dot at end -->
+    <circle cx="114" cy="30" r="3.5" fill="#bbf7d0"/>
+  </g>
+
+  <!-- Caption strip -->
+  <text x="64" y="114" text-anchor="middle"
+        font-family="-apple-system, sans-serif" font-size="11" font-weight="900"
+        fill="#cbd5e1" letter-spacing="2">REBALANCED</text>
+</svg>
