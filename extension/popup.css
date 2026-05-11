@@ -169,18 +169,118 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   cursor: not-allowed;
 }
 
-.legs {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px;
-  max-height: 230px;
-  overflow-y: auto;
-  margin: 0 12px;
-  background: var(--surface-2);
+/* === PARLAY TICKET CARD ===
+   Legs body + perforated divider + math stub all baked into one card
+   styled like a real betting slip. */
+.parlay-ticket {
+  margin: 12px;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-left: 3px solid var(--muted);
   border-radius: 10px;
+  overflow: hidden;
+}
+.ticket-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px dashed var(--line);
+  background: var(--surface-2);
+}
+.ticket-head-title { flex: 1; }
+.ticket-head-count {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  opacity: 0.75;
+}
+.legs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+}
+/* Perforated divider — like the tear-off line on a betting slip stub */
+.ticket-perf {
+  position: relative;
+  height: 12px;
+  margin: 0;
+  background: var(--surface-2);
+}
+.ticket-perf::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  border-top: 1.5px dashed var(--line);
+  transform: translateY(-50%);
+}
+.ticket-perf::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+  transform: translateY(-50%);
+  box-shadow: calc(100vw) 0 0 0 var(--bg);
+  clip-path: inset(0 -8px 0 0);
+}
+.ticket-perf .perf-r,
+.ticket-perf::marker { display: none; }
+/* Stub (math footer) */
+.ticket-stub {
+  padding: 8px 12px 10px;
+  background: var(--surface);
+  background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.04), transparent);
+}
+.ticket-stub .row { padding: 3px 0; font-size: 12px; }
+.ticket-stub .row > span:last-child {
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 13px;
+}
+.ticket-stub .row-payout-actual > span:last-child {
+  color: var(--green);
+  font-weight: 800;
+  font-size: 15px;
+}
+.ticket-stub .row-payout-ref > span:last-child {
+  font-weight: 600;
+  font-size: 12px;
+  opacity: 0.78;
+}
+.ticket-stub #multiplier.value-accent { color: var(--accent); font-weight: 700; }
+.ticket-stub .row-hint {
+  font-size: 9px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  opacity: 0.55;
+  font-weight: 600;
+  margin-left: 4px;
+}
+.ticket-disclaimer {
+  font-size: 9.5px;
+  color: var(--muted);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line);
+  line-height: 1.4;
+  opacity: 0.85;
 }
 .empty {
   padding: 28px 16px;
@@ -1029,11 +1129,39 @@ summary.execute-summary {
   opacity: 0.75;
 }
 
+/* Inline analytics header — sits inside the card, no standalone header bar */
+.analytics-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(99, 102, 241, 0.25);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.analytics-head-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.55);
+}
+.analytics-head-title { flex: 1; }
+.analytics-head-count {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  opacity: 0.75;
+}
+
 /* Analytics — baked panel: free rows on top, blurred Pro rows below, inline
    unlock CTA at the bottom. The blur+CTA is the conversion hook. */
 .free-analytics {
   margin: 0 12px 12px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   background-color: var(--surface);
   background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02));
   border: 1px solid rgba(99, 102, 241, 0.32);

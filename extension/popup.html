@@ -18,17 +18,50 @@
       </div>
     </header>
 
-    <div class="section-header section-header-legs">
-      <span class="section-header-dot"></span>
-      <span class="section-header-title">Your parlay</span>
-      <span id="legsCount" class="section-header-count">0 legs</span>
-    </div>
-    <section id="legs" class="legs"></section>
+    <!-- Parlay ticket — legs body + perforated divider + math stub baked
+         into one cohesive card so the slip feels like an actual betting slip. -->
+    <section class="parlay-ticket">
+      <div class="ticket-head">
+        <span class="ticket-head-title">Your parlay</span>
+        <span id="legsCount" class="ticket-head-count">0 legs</span>
+      </div>
 
-    <section id="locked" class="locked hidden">
-      <div class="locked-title">Leg 4+ — Pro</div>
-      <div id="lockedPreview" class="locked-preview"></div>
-      <button id="upgrade" class="upgrade">Start 7-day free trial</button>
+      <div id="legs" class="legs"></div>
+
+      <section id="locked" class="locked hidden">
+        <div class="locked-title">Leg 4+ — Pro</div>
+        <div id="lockedPreview" class="locked-preview"></div>
+        <button id="upgrade" class="upgrade">Start 7-day free trial</button>
+      </section>
+
+      <!-- Perforated divider between legs and math stub -->
+      <div class="ticket-perf" aria-hidden="true"></div>
+
+      <!-- Math stub: stake input + payout numbers + brief disclaimer -->
+      <div class="ticket-stub">
+        <div class="row stake-row">
+          <label for="stake">Stake</label>
+          <div class="stake-input">
+            <span class="dollar">$</span>
+            <input id="stake" type="number" min="0" step="1" value="10" />
+          </div>
+        </div>
+        <div class="row row-payout-actual">
+          <span>You'll actually get <span class="row-hint">legs paid separately</span></span>
+          <span id="indSum">—</span>
+        </div>
+        <div class="row row-payout-ref">
+          <span>Combined multiplier <span class="row-hint">reference</span></span>
+          <span id="multiplier" class="value-accent">—</span>
+        </div>
+        <div class="row row-payout-ref">
+          <span>Hypothetical parlay <span class="row-hint">if combined</span></span>
+          <span id="maxPayout">—</span>
+        </div>
+        <div class="ticket-disclaimer">
+          PM pays each leg independently — PolyParlay analyses, doesn't execute.
+        </div>
+      </div>
     </section>
 
     <!-- Monte Carlo button — promoted ABOVE the fold (this is the conversion driver) -->
@@ -41,14 +74,19 @@
       <span class="pro-tag">PRO</span>
     </button>
 
-    <div class="section-header section-header-analytics">
-      <span class="section-header-dot"></span>
-      <span class="section-header-title">Analytics</span>
-      <span class="section-header-count">live</span>
-    </div>
     <section class="free-analytics">
-      <!-- FREE rows — low-value passthrough data anyone can get from PM directly -->
+      <div class="analytics-head">
+        <span class="analytics-head-dot"></span>
+        <span class="analytics-head-title">Analytics</span>
+        <span class="analytics-head-count">live</span>
+      </div>
+
+      <!-- FREE rows — Risk score teaser + passthrough data -->
       <div class="analytics-free">
+        <div class="row">
+          <span>Risk score <span class="row-hint">stake concentration + variance</span></span>
+          <span id="proRisk">—</span>
+        </div>
         <div class="row">
           <span>Resolves by</span>
           <span id="lastReso">—</span>
@@ -59,15 +97,11 @@
         </div>
       </div>
 
-      <!-- PRO rows — decision-making metrics. Visually blurred for free tier. -->
+      <!-- PRO rows — high-value decision metrics, blurred for free tier -->
       <div class="analytics-pro" id="analyticsPro">
         <div class="analytics-pro-label">
           <span class="lock-chip">🔒 PRO</span>
           <span class="analytics-pro-text">Decision-making signals</span>
-        </div>
-        <div class="row analytics-blur-row" data-pro-row="risk">
-          <span>Risk score <span class="row-hint">stake concentration + variance</span></span>
-          <span id="proRisk" class="blur-target">HIGH</span>
         </div>
         <div class="row analytics-blur-row" data-pro-row="drift">
           <span>24h price drift <span class="row-hint">momentum signal</span></span>
@@ -82,7 +116,6 @@
           <span id="proImprovePreview" class="blur-target">Flip leg 2 → NO</span>
         </div>
 
-        <!-- Inline unlock CTA — contextual, right under the blurred data -->
         <button type="button" class="analytics-unlock" id="analyticsUnlock">
           <span class="analytics-unlock-headline">Unlock decision-making data</span>
           <span class="analytics-unlock-sub">Start 7-day free trial · no card · cancel anytime</span>
@@ -95,37 +128,6 @@
       </div>
     </section>
 
-    <div class="section-header section-header-math">
-      <span class="section-header-dot"></span>
-      <span class="section-header-title">Parlay math</span>
-      <span class="section-header-count">reference</span>
-    </div>
-    <section class="summary">
-      <div class="summary-section">
-        <div class="row stake-row">
-          <label for="stake">Stake</label>
-          <div class="stake-input">
-            <span class="dollar">$</span>
-            <input id="stake" type="number" min="0" step="1" value="10" />
-          </div>
-        </div>
-        <div class="row">
-          <span>You'll actually get <span class="row-hint">legs paid separately</span></span>
-          <span id="indSum">—</span>
-        </div>
-        <div class="row">
-          <span>Combined multiplier <span class="row-hint">reference only</span></span>
-          <span id="multiplier" class="value-accent">—</span>
-        </div>
-        <div class="row">
-          <span>Hypothetical parlay <span class="row-hint">if executed as one</span></span>
-          <span id="maxPayout">—</span>
-        </div>
-      </div>
-      <div class="summary-disclaimer">
-        Polymarket pays each leg independently. PolyParlay analyses — it doesn't execute.
-      </div>
-    </section>
 
     <section id="simResults" class="sim-results hidden">
       <div class="sim-head">
