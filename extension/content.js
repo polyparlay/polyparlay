@@ -13,6 +13,34 @@
   const DEBUG = false;
   const log = (...a) => DEBUG && console.log('[PolyParlay]', ...a);
 
+  // After the extension reloads/updates, the chrome.runtime reference in
+  // already-injected content scripts goes stale. Any sendMessage/storage
+  // call from the stale script throws "Extension context invalidated."
+  // We detect this and surface a clear "reload page" message instead of
+  // a generic Error flash.
+  function isExtensionContextValid() {
+    try {
+      return Boolean(chrome && chrome.runtime && chrome.runtime.id);
+    } catch {
+      return false;
+    }
+  }
+
+  // True once we've detected an invalidated context. Prevents repeated
+  // sendMessage attempts that would each throw + log noise.
+  let contextInvalidated = false;
+  function markContextInvalidated() {
+    if (contextInvalidated) return;
+    contextInvalidated = true;
+    const btn = document.getElementById(BTN_ID);
+    if (btn) {
+      btn.classList.add('pw-disabled');
+      btn.title = 'PolyParlay was updated — reload this page to use it again';
+      const t = btn.querySelector('.pw-text');
+      if (t) t.textContent = 'Reload page';
+    }
+  }
+
   // -------- URL/slug detection --------
   // Known top-level segments on polymarket.com that are NOT market slugs.
   // Used to filter out non-market routes during the generic fallback below.
@@ -126,9 +154,14 @@
     const force = opts && opts.force;
     if (!force && t === lastTheme) return;
     lastTheme = t;
-    try {
-      chrome.storage.local.set({ pmTheme: t });
-    } catch {}
+    if (isExtensionContextValid()) {
+      try {
+        chrome.storage.local.set({ pmTheme: t });
+      } catch (err) {
+        const m = String(err && err.message || err);
+        if (/Extension context invalidated/i.test(m)) markContextInvalidated();
+      }
+    }
     document.documentElement.setAttribute('data-pw-theme', t);
     const btn = document.getElementById(BTN_ID);
     if (btn) btn.setAttribute('data-pw-theme', t);
@@ -183,10 +216,14 @@
     }
   }
   async function refreshBadge() {
+    if (!isExtensionContextValid()) { markContextInvalidated(); return; }
     try {
       const { slip } = await chrome.storage.local.get(['slip']);
       updateBadge(slip ? slip.legs.length : 0);
-    } catch {}
+    } catch (err) {
+      const m = String(err && err.message || err);
+      if (/Extension context invalidated/i.test(m)) markContextInvalidated();
+    }
   }
 
   // -------- Slide-out preview --------
@@ -211,9 +248,13 @@
     document.body.appendChild(p);
     p.querySelector('.pw-preview-close').addEventListener('click', () => hidePreview(true));
     p.querySelector('.pw-preview-popup').addEventListener('click', () => {
+      if (!isExtensionContextValid()) { markContextInvalidated(); return; }
       try {
         chrome.runtime.sendMessage({ type: 'openPopup' });
-      } catch {}
+      } catch (err) {
+        const m = String(err && err.message || err);
+        if (/Extension context invalidated/i.test(m)) markContextInvalidated();
+      }
     });
     return p;
   }
@@ -301,6 +342,10 @@
   // suspend after ~30s of idle; the first send returns undefined or throws.
   // Retry once or twice with a short delay so the click doesn't appear to fail.
   async function sendWithRetry(msg, retries = 2) {
+    if (!isExtensionContextValid()) {
+      markContextInvalidated();
+      throw new Error('Extension reloaded — refresh this page');
+    }
     let lastErr = null;
     for (let i = 0; i <= retries; i++) {
       try {
@@ -309,6 +354,14 @@
         lastErr = new Error('Service worker returned no response');
       } catch (err) {
         lastErr = err;
+        // Detect context-invalidated errors mid-retry and bail out — no
+        // amount of retrying will fix it, the page needs a reload.
+        const m = String(err && err.message || err);
+        if (/Extension context invalidated|Receiving end does not exist/i.test(m)
+            || !isExtensionContextValid()) {
+          markContextInvalidated();
+          throw new Error('Extension reloaded — refresh this page');
+        }
       }
       if (i < retries) await new Promise((r) => setTimeout(r, 120 + i * 80));
     }
