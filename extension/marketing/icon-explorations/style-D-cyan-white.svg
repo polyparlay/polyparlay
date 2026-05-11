@@ -1,16 +1,15 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
      font-family="Impact, 'Arial Black', sans-serif">
-  <!-- STYLE D: Reference #4 (cyan BOOM) — light blue jagged burst on
-       halftone-dotted background, WHITE bold text with black outline,
-       yellow + blue star accents. -->
+  <!-- STYLE D v2: Reference #4 (cyan BOOM) — halftone pulled tight to
+       the absolute corners so it never visually crosses the text. -->
 
   <defs>
-    <pattern id="hfD" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
-      <circle cx="3" cy="3" r="1.3" fill="#0a0c14" opacity="0.65"/>
+    <pattern id="hfD" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+      <circle cx="3.5" cy="3.5" r="1.1" fill="#0a0c14" opacity="0.55"/>
     </pattern>
     <radialGradient id="hfDfade" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="50%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="78%" stop-color="#000" stop-opacity="0"/>
       <stop offset="100%" stop-color="#000" stop-opacity="1"/>
     </radialGradient>
     <mask id="hfDmask">
@@ -18,10 +17,7 @@
     </mask>
   </defs>
 
-  <!-- White paper background -->
   <rect width="128" height="128" fill="#ffffff" rx="22"/>
-
-  <!-- Halftone dots ringing the corners -->
   <rect width="128" height="128" fill="url(#hfD)" mask="url(#hfDmask)"/>
 
   <!-- Cyan jagged burst -->
@@ -37,27 +33,22 @@
           stroke-linejoin="miter" stroke-miterlimit="3"/>
   </g>
 
-  <!-- HERO TEXT: "POLY" + "PARLAY" stacked, BIG WHITE bold with thick
-       black outline — the cyan reference uses white text not red -->
+  <!-- POLY + PARLAY stacked, big white bold with thick black outline -->
   <g transform="skewX(-12)" font-weight="900" text-anchor="middle">
-    <!-- POLY -->
     <text x="74" y="58" font-size="26" stroke="#0a0c14" stroke-width="7"
           stroke-linejoin="round" fill="#0a0c14" letter-spacing="-1.2">POLY</text>
     <text x="74" y="58" font-size="26" fill="#ffffff" letter-spacing="-1.2">POLY</text>
 
-    <!-- PARLAY (hero, longer string slightly smaller) -->
     <text x="74" y="92" font-size="26" stroke="#0a0c14" stroke-width="7"
           stroke-linejoin="round" fill="#0a0c14" letter-spacing="-1.6">PARLAY</text>
     <text x="74" y="92" font-size="26" fill="#ffffff" letter-spacing="-1.6">PARLAY</text>
   </g>
 
-  <!-- Yellow + blue star accents -->
+  <!-- Star accents, kept in absolute corners away from text -->
   <g stroke="#0a0c14" stroke-width="1.5" stroke-linejoin="miter">
-    <!-- yellow stars -->
-    <path d="M 14 16 L 17 22 L 23 23 L 17 24 L 14 30 L 11 24 L 5 23 L 11 22 Z" fill="#fde047"/>
-    <path d="M 114 110 L 117 116 L 123 117 L 117 118 L 114 124 L 111 118 L 105 117 L 111 116 Z" fill="#fde047"/>
-    <!-- blue stars -->
-    <path d="M 114 22 L 116 27 L 121 28 L 116 29 L 114 34 L 112 29 L 107 28 L 112 27 Z" fill="#3b82f6"/>
-    <path d="M 14 106 L 16 111 L 21 112 L 16 113 L 14 118 L 12 113 L 7 112 L 12 111 Z" fill="#3b82f6"/>
+    <path d="M 12 14 L 15 20 L 21 21 L 15 22 L 12 28 L 9 22 L 3 21 L 9 20 Z" fill="#fde047"/>
+    <path d="M 116 112 L 119 118 L 125 119 L 119 120 L 116 126 L 113 120 L 107 119 L 113 118 Z" fill="#fde047"/>
+    <path d="M 116 14 L 118 19 L 123 20 L 118 21 L 116 26 L 114 21 L 109 20 L 114 19 Z" fill="#3b82f6"/>
+    <path d="M 12 110 L 14 115 L 19 116 L 14 117 L 12 122 L 10 117 L 5 116 L 10 115 Z" fill="#3b82f6"/>
   </g>
 </svg>
