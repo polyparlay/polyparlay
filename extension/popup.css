@@ -282,6 +282,82 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   line-height: 1.4;
   opacity: 0.85;
 }
+
+/* Run-sim button when inline inside the ticket — no outer margin, flush
+   with the ticket interior, separator above so it reads as "between
+   legs and math stub." */
+.run-sim-box.run-sim-inline {
+  margin: 0;
+  border-radius: 8px;
+  border-top: 1px dashed var(--line);
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+/* Execute-menu inline inside the ticket footer — slim, full-width button */
+.execute-menu-inline {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.execute-menu-inline > .execute-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-strong);
+  background: var(--surface-2);
+  cursor: pointer;
+  list-style: none;
+}
+.execute-menu-inline > .execute-summary::-webkit-details-marker { display: none; }
+.execute-menu-inline > .execute-summary:hover { background: rgba(99, 102, 241, 0.06); }
+.execute-menu-inline .execute-icon {
+  font-size: 14px;
+  color: var(--accent);
+}
+.execute-menu-inline .execute-caret {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+.execute-menu-inline[open] .execute-caret { transform: rotate(180deg); }
+
+/* Retention / data-accumulation hook — sticky reason to convert past trial.
+   Frames the upgrade as "pay to keep YOUR data" rather than "pay to access
+   features," which converts harder. */
+.pro-retention {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.10), rgba(99, 102, 241, 0.04));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 8px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.pro-retention-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.pro-retention-body strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-strong);
+  font-size: 12px;
+}
+.pro-retention-body em {
+  font-style: normal;
+  color: var(--pro);
+  font-weight: 800;
+}
 .empty {
   padding: 28px 16px;
   text-align: center;

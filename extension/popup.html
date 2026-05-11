@@ -34,7 +34,38 @@
         <button id="upgrade" class="upgrade">Start 7-day free trial</button>
       </section>
 
-      <!-- Perforated divider between legs and math stub -->
+      <!-- Monte Carlo button — INSIDE the ticket between legs and math stub.
+           It's the bridge between "your slip" and "what the math says." -->
+      <button class="run-sim-box run-sim-inline" id="runSimBtn" type="button">
+        <span class="run-sim-icon" aria-hidden="true">🎲</span>
+        <span class="run-sim-content">
+          <span class="run-sim-title">Run Monte Carlo + Improve Odds</span>
+          <span class="run-sim-desc" id="runSimDesc">10K outcomes simulated · algorithm rebalances weak legs</span>
+        </span>
+        <span class="pro-tag">PRO</span>
+      </button>
+
+      <!-- Sim results expand IN PLACE (the button hides while open) -->
+      <section id="simResults" class="sim-results hidden">
+        <div class="sim-head">
+          <span id="simHeadLabel">Monte Carlo simulation</span>
+          <button id="simClose" class="sim-close" type="button" aria-label="Close">×</button>
+        </div>
+        <div class="sim-grid" id="simGrid"></div>
+        <div class="sim-foot">
+          Each iteration: independent bernoulli per leg using market-implied probabilities.
+          Payout assumes atomic parlay (all legs must hit).
+        </div>
+        <div id="improveOdds" class="improve-odds hidden">
+          <div class="improve-odds-info">
+            <div class="improve-odds-title">↗ Improve odds</div>
+            <div class="improve-odds-desc" id="improveOddsDesc"></div>
+          </div>
+          <button class="improve-odds-apply" id="improveOddsApply" type="button">Apply</button>
+        </div>
+      </section>
+
+      <!-- Perforated divider between sim/legs and math stub -->
       <div class="ticket-perf" aria-hidden="true"></div>
 
       <!-- Math stub: stake input + payout numbers + brief disclaimer -->
@@ -61,18 +92,27 @@
         <div class="ticket-disclaimer">
           PM pays each leg independently — PolyParlay analyses, doesn't execute.
         </div>
+
+        <!-- Execute menu pulled into the ticket as a slim footer action -->
+        <details class="execute-menu execute-menu-inline" id="executeMenu">
+          <summary class="execute-summary">
+            <span class="execute-icon">↗</span>
+            <span>Execute this parlay</span>
+            <span class="execute-caret">▾</span>
+          </summary>
+          <div class="execute-options">
+            <a class="execute-opt" href="https://parlays.predictshark.io" target="_blank" rel="noopener" data-exec="predictshark">
+              <div class="execute-opt-title">PredictShark <span class="exec-badge">on-chain</span></div>
+              <div class="execute-opt-desc">Combines all legs into a single Polygon contract. Real parlay execution — all legs must hit for payout.</div>
+            </a>
+            <button type="button" class="execute-opt" id="openAllLegs" data-exec="pm-manual">
+              <div class="execute-opt-title">Open each leg on Polymarket</div>
+              <div class="execute-opt-desc">Place positions independently. You get per-leg payouts that sum — not the parlay multiplier.</div>
+            </button>
+          </div>
+        </details>
       </div>
     </section>
-
-    <!-- Monte Carlo button — promoted ABOVE the fold (this is the conversion driver) -->
-    <button class="run-sim-box" id="runSimBtn" type="button">
-      <span class="run-sim-icon" aria-hidden="true">🎲</span>
-      <span class="run-sim-content">
-        <span class="run-sim-title">Run Monte Carlo + Improve Odds</span>
-        <span class="run-sim-desc" id="runSimDesc">10K outcomes simulated · algorithm rebalances weak legs</span>
-      </span>
-      <span class="pro-tag">PRO</span>
-    </button>
 
     <section class="free-analytics">
       <div class="analytics-head">
@@ -129,25 +169,6 @@
     </section>
 
 
-    <section id="simResults" class="sim-results hidden">
-      <div class="sim-head">
-        <span id="simHeadLabel">Monte Carlo simulation</span>
-        <button id="simClose" class="sim-close" type="button" aria-label="Close">×</button>
-      </div>
-      <div class="sim-grid" id="simGrid"></div>
-      <div class="sim-foot">
-        Each iteration: independent bernoulli per leg using market-implied probabilities.
-        Payout assumes atomic parlay (all legs must hit).
-      </div>
-      <div id="improveOdds" class="improve-odds hidden">
-        <div class="improve-odds-info">
-          <div class="improve-odds-title">↗ Improve odds</div>
-          <div class="improve-odds-desc" id="improveOddsDesc"></div>
-        </div>
-        <button class="improve-odds-apply" id="improveOddsApply" type="button">Apply</button>
-      </div>
-    </section>
-
     <section class="pro-section">
       <div class="pro-head">
         <span class="pro-tag">PRO</span>
@@ -174,6 +195,19 @@
         </div>
       </div>
 
+      <!-- Data-accumulation retention hook: clearly tell free/trial users
+           that their slip data + signals accumulate during trial and LOCK
+           if they don't pay. This is the conversion stickiness mechanism. -->
+      <div class="pro-retention">
+        <span class="pro-retention-icon">⏳</span>
+        <div class="pro-retention-body">
+          <strong>Your signals accumulate as you use the app.</strong>
+          Sim history, saved parlays, win-rate tracking, entry-vs-current drift
+          — all retained <em>only with paid Pro</em>. At trial end they lock; you
+          keep them by paying $149 within 7 days.
+        </div>
+      </div>
+
       <details class="pro-roadmap">
         <summary class="pro-roadmap-head">
           <span>Coming v1.0 (6 more)</span>
@@ -181,8 +215,10 @@
         </summary>
         <div class="pro-roadmap-list">
           <div class="pro-roadmap-row" data-pro="smart-money">🔒 Smart money agreement <span class="row-hint">top 10 wallets per leg</span></div>
-          <div class="pro-roadmap-row" data-pro="archive">🔒 Signal archive <span class="row-hint">your data — locks at trial end</span></div>
-          <div class="pro-roadmap-row" data-pro="performance">🔒 Signal performance <span class="row-hint">entry vs current price</span></div>
+          <div class="pro-roadmap-row" data-pro="archive">🔒 Signal archive <span class="row-hint">your accumulated data — locks at trial end</span></div>
+          <div class="pro-roadmap-row" data-pro="performance">🔒 Signal performance <span class="row-hint">entry vs current price · retained 90 days</span></div>
+          <div class="pro-roadmap-row" data-pro="parlay-history">🔒 Saved parlay history <span class="row-hint">all slips you built · trial locks them</span></div>
+          <div class="pro-roadmap-row" data-pro="winrate-tracking">🔒 Your win-rate over time <span class="row-hint">7d trial only seeds this — pay to keep</span></div>
           <div class="pro-roadmap-row" data-pro="live-parlays">🔒 Live saved parlay prices</div>
           <div class="pro-roadmap-row" data-pro="alerts">🔒 Real-time push alerts</div>
           <div class="pro-roadmap-row" data-pro="exit">🔒 Mass-exit signal <span class="row-hint">last 6h</span></div>
@@ -200,34 +236,13 @@
     </section>
 
     <section class="actions-group">
-      <div class="actions-title">Share &amp; execute</div>
+      <div class="actions-title">Share</div>
       <div class="actions-row">
         <button id="shareX" class="primary" disabled>Share to X</button>
         <button id="downloadTop" class="secondary" disabled>Download PNG</button>
       </div>
-      <details class="execute-menu" id="executeMenu">
-        <summary class="execute-summary">
-          <span class="execute-icon">↗</span>
-          <span>Execute this parlay</span>
-          <span class="execute-caret">▾</span>
-        </summary>
-        <div class="execute-options">
-          <a class="execute-opt" href="https://parlays.predictshark.io" target="_blank" rel="noopener" data-exec="predictshark">
-            <div class="execute-opt-title">PredictShark <span class="exec-badge">on-chain</span></div>
-            <div class="execute-opt-desc">Combines all legs into a single Polygon contract. Real parlay execution — all legs must hit for payout.</div>
-          </a>
-          <button type="button" class="execute-opt" id="openAllLegs" data-exec="pm-manual">
-            <div class="execute-opt-title">Open each leg on Polymarket</div>
-            <div class="execute-opt-desc">Place positions independently. You get per-leg payouts that sum — not the parlay multiplier.</div>
-          </button>
-        </div>
-      </details>
       <div id="shareStatus" class="share-status"></div>
     </section>
-
-    <div class="parlay-note">
-      Polymarket pays each leg independently. Use PredictShark above to execute as an all-or-nothing parlay.
-    </div>
 
     <footer>
       <span id="proTierIndicator" class="pro-tier-indicator">Free</span>

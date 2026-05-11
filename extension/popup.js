@@ -1454,7 +1454,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   const simClose = document.getElementById('simClose');
   if (simClose) {
-    simClose.addEventListener('click', () => toggleHidden('simResults', true));
+    simClose.addEventListener('click', () => {
+      toggleHidden('simResults', true);
+      // Restore the run-sim button when results close — the button and the
+      // results panel are mutually exclusive (results expand from the button's
+      // location instead of pushing below the fold).
+      const btn = document.getElementById('runSimBtn');
+      if (btn) btn.classList.remove('hidden');
+    });
   }
 
   // Pro CTA action — shared by the main bottom button AND the header pill.
@@ -1664,10 +1671,14 @@ function renderSimResults(r) {
   setText('simHeadLabel', `Monte Carlo · ${itLabel} sims`);
   toggleHidden('simResults', false);
 
+  // Hide the Run Sim button while the results panel is open — the panel takes
+  // its place in the layout so users see the simulation expand FROM where they
+  // clicked, not get pushed off-screen requiring a scroll.
+  const btn = document.getElementById('runSimBtn');
+  if (btn) btn.classList.add('hidden');
+
   // Render Improve Odds at the bottom of the panel after sim results render
   renderImproveOdds();
-
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // Improve Odds — always visible at the bottom of the Monte Carlo sim panel.
