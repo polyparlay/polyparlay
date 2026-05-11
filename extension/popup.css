@@ -60,7 +60,7 @@ body {
 header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
 }
@@ -71,13 +71,66 @@ header {
   font-weight: 700;
   letter-spacing: 0.2px;
   color: var(--text-strong);
+  flex-shrink: 0;
+}
+.brand .name {
+  font-size: 15px;
+  font-weight: 800;
+}
+.brand .brand-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.85;
+  display: none; /* shown via media query when there's room */
 }
 .brand .dot {
-  width: 10px; height: 10px; border-radius: 50%;
+  width: 11px; height: 11px; border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
 }
-.head-actions { display: flex; gap: 4px; }
+.head-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* Header CTA — context-aware conversion pill */
+.header-cta {
+  flex: 1;
+  min-width: 0;
+  margin: 0 4px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: filter 0.12s ease, transform 0.1s ease;
+  background: var(--pro);
+  color: #0a0c12;
+}
+.header-cta:hover { filter: brightness(1.08); }
+.header-cta:active { transform: scale(0.97); }
+.header-cta.cta-trial {
+  background: rgba(99, 102, 241, 0.18);
+  color: var(--accent);
+  border: 1px solid rgba(99, 102, 241, 0.42);
+}
+.header-cta.cta-paid {
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--pro);
+  border: 1px solid rgba(245, 158, 11, 0.42);
+}
+.header-cta.cta-expired {
+  background: rgba(239, 68, 68, 0.16);
+  color: var(--red);
+  border: 1px solid rgba(239, 68, 68, 0.38);
+}
+.header-cta.is-empty { display: none; }
 button.ghost {
   background: transparent;
   color: var(--muted);

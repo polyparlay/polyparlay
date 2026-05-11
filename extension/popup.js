@@ -403,6 +403,29 @@ async function applyProState() {
     else upgradeBtn.textContent = 'Renew Pro — $149/year';
   }
 
+  // Header conversion CTA — context-aware pill that's always visible at the top
+  const headerCta = document.getElementById('headerCta');
+  if (headerCta) {
+    headerCta.classList.remove('cta-trial', 'cta-paid', 'cta-expired');
+    if (state.tier === 'free') {
+      headerCta.textContent = '🔥 Try Pro free →';
+      headerCta.title = '7-day free trial · no card required · $149/yr after';
+    } else if (state.tier === 'trial') {
+      const dayLabel = state.daysLeft === 1 ? '1 day' : state.daysLeft + ' days';
+      headerCta.textContent = `⏱ Trial · ${dayLabel} left`;
+      headerCta.title = 'Pay $149 to lock in Pro · cancel anytime';
+      headerCta.classList.add('cta-trial');
+    } else if (state.tier === 'paid') {
+      headerCta.textContent = '⭐ Pro active';
+      headerCta.title = 'Pro until ' + new Date(state.expiresAt).toLocaleDateString();
+      headerCta.classList.add('cta-paid');
+    } else {
+      headerCta.textContent = 'Trial expired · Renew';
+      headerCta.title = '$149/yr · on-chain payment, no subscription';
+      headerCta.classList.add('cta-expired');
+    }
+  }
+
   // Footer tier indicator
   const tierEl = document.getElementById('proTierIndicator');
   if (tierEl) {
@@ -1373,22 +1396,29 @@ document.addEventListener('DOMContentLoaded', () => {
     simClose.addEventListener('click', () => toggleHidden('simResults', true));
   }
 
-  // Main Pro CTA — starts trial when free, opens payment when trial/expired
-  const proMainCta = document.getElementById('proMainCta');
-  if (proMainCta) {
-    proMainCta.addEventListener('click', async () => {
-      const state = await getProState();
-      if (state.tier === 'free') {
-        await startTrial();
-        await applyProState();
-        renderLegs();
-        renderSummary();
-      } else {
-        // Trial / Expired / Paid → all go to payment page (worker-backed)
-        chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=main-cta' });
-      }
-    });
+  // Pro CTA action — shared by the main bottom button AND the header pill.
+  // free → start trial in-extension (instant unlock + toast)
+  // anything else → upgrade page (Polygon payment flow)
+  async function handleProCtaClick(source) {
+    const state = await getProState();
+    if (state.tier === 'free') {
+      await startTrial();
+      await applyProState();
+      showTrialToast();
+      renderLegs();
+      renderSummary();
+    } else {
+      chrome.tabs.create({
+        url: `https://polyparlay.io/upgrade?from=${encodeURIComponent(source)}`
+      });
+    }
   }
+
+  const proMainCta = document.getElementById('proMainCta');
+  if (proMainCta) proMainCta.addEventListener('click', () => handleProCtaClick('main-cta'));
+
+  const headerCta = document.getElementById('headerCta');
+  if (headerCta) headerCta.addEventListener('click', () => handleProCtaClick('header-cta'));
 
   // Pro Preview toggle removed — state machine is the single source of truth.
   // For local dev: open DevTools console and run
