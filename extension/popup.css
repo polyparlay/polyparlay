@@ -95,10 +95,11 @@ header {
 
 /* Header CTA — context-aware conversion pill */
 .header-cta {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
-  margin: 0 4px;
-  padding: 5px 10px;
+  max-width: 50%;
+  margin: 0 8px;
+  padding: 5px 12px;
   border: 0;
   border-radius: 999px;
   font-family: inherit;
@@ -131,6 +132,7 @@ header {
   border: 1px solid rgba(239, 68, 68, 0.38);
 }
 .header-cta.is-empty { display: none; }
+.header-cta:empty { display: none; }
 button.ghost {
   background: transparent;
   color: var(--muted);
@@ -329,14 +331,14 @@ button.upgrade:hover { filter: brightness(1.05); }
   padding: 4px 0;
   color: var(--muted);
 }
-.row span:last-child { color: var(--text-strong); font-weight: 500; }
+.row > span:last-child { color: var(--text-strong); font-weight: 500; }
 .row.big { font-size: 15px; padding: 6px 0; }
-.row.big span:last-child { font-weight: 800; font-size: 22px; }
-.row.big.payout span:last-child { font-size: 24px; }
+.row.big > span:last-child { font-weight: 800; font-size: 22px; }
+.row.big.payout > span:last-child { font-size: 24px; }
 #multiplier.value-accent {
   font-size: 26px;
 }
-.row.payout span:last-child { color: var(--green); }
+.row.payout > span:last-child { color: var(--green); }
 .stake-row { padding: 8px 0; }
 .stake-input {
   display: flex;
