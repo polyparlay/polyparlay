@@ -18,6 +18,11 @@
       </div>
     </header>
 
+    <div class="section-header section-header-legs">
+      <span class="section-header-dot"></span>
+      <span class="section-header-title">Your parlay</span>
+      <span id="legsCount" class="section-header-count">0 legs</span>
+    </div>
     <section id="legs" class="legs"></section>
 
     <section id="locked" class="locked hidden">
@@ -26,6 +31,49 @@
       <button id="upgrade" class="upgrade">Start 7-day free trial</button>
     </section>
 
+    <!-- Monte Carlo button — promoted ABOVE the fold (this is the conversion driver) -->
+    <button class="run-sim-box" id="runSimBtn" type="button">
+      <span class="run-sim-icon" aria-hidden="true">🎲</span>
+      <span class="run-sim-content">
+        <span class="run-sim-title">Run Monte Carlo + Improve Odds</span>
+        <span class="run-sim-desc" id="runSimDesc">10K outcomes simulated · algorithm rebalances weak legs</span>
+      </span>
+      <span class="pro-tag">PRO</span>
+    </button>
+
+    <div class="section-header section-header-analytics">
+      <span class="section-header-dot"></span>
+      <span class="section-header-title">Free analytics</span>
+      <span class="section-header-count">live</span>
+    </div>
+    <section class="free-analytics">
+      <div class="row">
+        <span>Risk score</span>
+        <span id="proRisk">—</span>
+      </div>
+      <div class="row">
+        <span>Slip 24h volume</span>
+        <span id="proVol24">—</span>
+      </div>
+      <div class="row">
+        <span>24h price drift <span class="row-hint">avg across legs</span></span>
+        <span id="proDrift">—</span>
+      </div>
+      <div class="row">
+        <span>Resolves by</span>
+        <span id="lastReso">—</span>
+      </div>
+      <div class="warning hidden" id="concentrationWarn">
+        <span class="warn-icon">⚠</span>
+        <span id="concentrationText"></span>
+      </div>
+    </section>
+
+    <div class="section-header section-header-math">
+      <span class="section-header-dot"></span>
+      <span class="section-header-title">Parlay math</span>
+      <span class="section-header-count">reference</span>
+    </div>
     <section class="summary">
       <div class="summary-section">
         <div class="row stake-row">
@@ -52,39 +100,6 @@
         Polymarket pays each leg independently. PolyParlay analyses — it doesn't execute.
       </div>
     </section>
-
-    <section class="free-analytics">
-      <div class="section-label">Free analytics</div>
-      <div class="row">
-        <span>Risk score</span>
-        <span id="proRisk">—</span>
-      </div>
-      <div class="row">
-        <span>Slip 24h volume</span>
-        <span id="proVol24">—</span>
-      </div>
-      <div class="row">
-        <span>24h price drift <span class="row-hint">avg across legs</span></span>
-        <span id="proDrift">—</span>
-      </div>
-      <div class="row">
-        <span>Resolves by</span>
-        <span id="lastReso">—</span>
-      </div>
-      <div class="warning hidden" id="concentrationWarn">
-        <span class="warn-icon">⚠</span>
-        <span id="concentrationText"></span>
-      </div>
-    </section>
-
-    <button class="run-sim-box" id="runSimBtn" type="button">
-      <span class="run-sim-icon" aria-hidden="true">🎲</span>
-      <span class="run-sim-content">
-        <span class="run-sim-title">Run Monte Carlo + Improve Odds</span>
-        <span class="run-sim-desc" id="runSimDesc">10K outcomes simulated · algorithm rebalances weak legs</span>
-      </span>
-      <span class="pro-tag">PRO</span>
-    </button>
 
     <section id="simResults" class="sim-results hidden">
       <div class="sim-head">

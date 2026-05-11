@@ -707,6 +707,12 @@ function renderLegs() {
   const container = document.getElementById('legs');
   container.innerHTML = '';
 
+  const countEl = document.getElementById('legsCount');
+  if (countEl) {
+    const n = currentSlip.legs.length;
+    countEl.textContent = n === 1 ? '1 leg' : `${n} legs`;
+  }
+
   if (!currentSlip.legs.length) {
     const empty = document.createElement('div');
     empty.className = 'empty';
