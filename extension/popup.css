@@ -1134,25 +1134,84 @@ body.state-paid .pro-row-locked {
   border-left: 2px solid var(--pro);
 }
 
-/* Lock the sim button + show a small lock badge when state=free/expired */
+/* Lock the sim button when state=free/expired — make it OBVIOUSLY pro-gated
+   so clicking doesn't feel like a no-op. */
 body.state-free .run-sim-box,
 body.state-expired .run-sim-box {
   position: relative;
-  filter: saturate(0.6) brightness(0.85);
+  overflow: hidden;
+  border-color: rgba(245, 158, 11, 0.5);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(245, 158, 11, 0.04) 0,
+    rgba(245, 158, 11, 0.04) 6px,
+    transparent 6px,
+    transparent 12px
+  );
 }
-body.state-free .run-sim-box::before,
-body.state-expired .run-sim-box::before {
-  content: '🔒';
+body.state-free .run-sim-box::after,
+body.state-expired .run-sim-box::after {
+  content: '🔒 PRO · Click to start free trial';
   position: absolute;
-  top: 50%;
-  right: 14px;
-  transform: translateY(-50%);
-  font-size: 14px;
+  top: 0; right: 0;
+  background: var(--pro);
+  color: #0a0c12;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  padding: 3px 8px;
+  border-bottom-left-radius: 8px;
   z-index: 2;
 }
 body.state-free .run-sim-box .pro-tag,
 body.state-expired .run-sim-box .pro-tag {
-  opacity: 0.6;
+  display: none;
+}
+body.state-free .run-sim-box .run-sim-icon,
+body.state-expired .run-sim-box .run-sim-icon {
+  opacity: 0.45;
+}
+
+/* "+ Add another leg" button — appears at the bottom of the legs list */
+.add-leg-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1.5px dashed var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.add-leg-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(99, 102, 241, 0.05);
+}
+.add-leg-plus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+.add-leg-btn:hover .add-leg-plus {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
 }
 
 /* Footer tier indicator */

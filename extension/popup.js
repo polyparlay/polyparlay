@@ -712,12 +712,14 @@ function renderLegs() {
     empty.className = 'empty';
     empty.innerHTML = '<strong>No legs yet</strong>Open a Polymarket market and click "+ Add to slip"';
     container.appendChild(empty);
+    appendAddLegButton(container);
     return;
   }
 
   // Free tier: show first FREE_LEG_LIMIT legs as active, rest as locked
   const visible = currentSlip.legs.slice(0, FREE_LEG_LIMIT);
   visible.forEach((leg, i) => container.appendChild(renderLeg(leg, i)));
+  appendAddLegButton(container);
 
   // Locked preview block
   const lockedSection = document.getElementById('locked');
@@ -739,6 +741,18 @@ function renderLegs() {
   } else {
     lockedSection.classList.add('hidden');
   }
+}
+
+function appendAddLegButton(container) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'add-leg-btn';
+  btn.innerHTML = '<span class="add-leg-plus">+</span> Add another leg';
+  btn.title = 'Opens Polymarket — find a market and use the floating + pill';
+  btn.addEventListener('click', () => {
+    chrome.tabs.create({ url: 'https://polymarket.com/markets' });
+  });
+  container.appendChild(btn);
 }
 
 function renderLeg(leg, idx) {
