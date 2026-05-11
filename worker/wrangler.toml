@@ -2,9 +2,13 @@ name = "polyparlay-verify"
 main = "verify.js"
 compatibility_date = "2026-05-01"
 
+# Non-secret config (safe to commit):
+[vars]
+PAYMENT_ADDRESS = "0x9548B8E9554a1968843B3C380431b10996247c88"
+
 # Secrets to set after `wrangler login`:
 #   wrangler secret put POLYGONSCAN_KEY      (free at polygonscan.com/myapikey)
-#   wrangler secret put PAYMENT_ADDRESS      (your Polygon receiving wallet, 0x...)
+# (PAYMENT_ADDRESS is set above as a plain var — override via secret if you ever rotate wallets)
 #
 # Deploy:
 #   cd worker/

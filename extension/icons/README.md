@@ -1,29 +1,30 @@
 # PolyParlay icon options
 
-Five SVG concepts. Pick whichever lands hardest. The currently active extension icon is `icon.svg` — replace it with one of the others to swap.
+The current `icon.svg` (× multiplier with a green profit arrow piercing through it) is the active extension icon. All options say one thing: **this app makes your bets more profitable.** Green = profit, up-arrow = your line goes up, × = multi-leg multiplier.
 
-| File | Concept | Vibe |
+| File | Concept | Why it sells |
 |---|---|---|
-| `icon.svg` | **All-seeing-eye pyramid with × pupil** (current) | Provocative degen-finance, PM "smart money watching" energy |
-| `icon-lightning.svg` | Lightning bolt branching into 3 legs + × badge | Strike-fast, momentum, "your parlay just hit" |
-| `icon-skull.svg` | Stylized skull with × eyes (one purple, one gold) | Live-and-die-by-the-parlay degen energy |
-| `icon-flame.svg` | Flame with × in the core | "Hot bet" / fire emoji culture |
-| `icon-diamond.svg` | Faceted diamond with gold × carved in | Diamond-hands crypto-native |
+| `icon.svg` | **× multiplier + green up-arrow piercing through** (current) | Multiplier is the parlay math; arrow is the profit. Most universal "your number goes up" symbol. |
+| `icon-upchart.svg` | Three bars (legs) growing taller + green line graph trending up with arrowhead | Literal "each leg climbs, your line goes up-and-to-the-right." Reads as analytics/sim. |
+| `icon-slip-arrow.svg` | Parlay slip with green arrow shooting up out of it | Slip = parlay you build; arrow = profit lift after Improve-Odds. |
+| `icon-chipstack.svg` | Three chips stacked (gold/purple/green), each higher, × on top, green arrow rising | Casino chip stack growing = profit. Tactile, hard to misread. |
+| `icon-money-multiply.svg` | Gold dollar coin with green × multiplier badge + small up-arrow | Most literal: money × multiplier = bigger money. Reads instantly. |
+
+Provocative legacy set (kept around but they don't sell ROI):
+
+- `icon-lightning.svg` · `icon-skull.svg` · `icon-flame.svg` · `icon-diamond.svg` — degen vibes only.
 
 ## Pick + ship
 
-Once you've decided which icon, generate the 3 sizes Chrome Web Store requires:
-
 ```bash
-# Pick one and replace 'icon.svg' below with your choice
-PICK=icon.svg
+PICK=icon.svg                 # or icon-upchart.svg / icon-slip-arrow.svg / icon-chipstack.svg / icon-money-multiply.svg
 cd /Users/clawdlawd/polyparlay
 rsvg-convert -w 16  extension/icons/$PICK -o extension/icons/icon16.png
 rsvg-convert -w 48  extension/icons/$PICK -o extension/icons/icon48.png
 rsvg-convert -w 128 extension/icons/$PICK -o extension/icons/icon128.png
 ```
 
-Then add this block to `extension/manifest.json` (near the bottom, before the closing brace):
+Then add to `extension/manifest.json` (before closing brace):
 
 ```json
 "icons": {
@@ -33,8 +34,6 @@ Then add this block to `extension/manifest.json` (near the bottom, before the cl
 }
 ```
 
-Commit + push and you're CWS-submission-ready.
-
 ## Preview without converting
 
-Open any of these `.svg` files directly in Chrome — they render natively at any size. Quick way to compare before committing.
+Open any `.svg` directly in Chrome — renders natively. Quick way to compare before committing.

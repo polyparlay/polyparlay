@@ -1,0 +1,42 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="slip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f9fafb"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="arrow" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#16a34a"/>
+      <stop offset="100%" stop-color="#86efac"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+
+  <!-- Parlay slip ticket, tilted -->
+  <g transform="translate(64 72) rotate(-8)">
+    <!-- Back slip (stack effect) -->
+    <rect x="-34" y="-44" width="62" height="84" rx="6" fill="#94a3b8" opacity="0.4" transform="translate(6 6)"/>
+    <!-- Front slip -->
+    <rect x="-34" y="-44" width="62" height="84" rx="6" fill="url(#slip)" stroke="#94a3b8" stroke-width="1.5"/>
+    <!-- Slip rows = parlay legs -->
+    <rect x="-26" y="-34" width="46" height="6" rx="2" fill="#1a1f3a" opacity="0.85"/>
+    <rect x="-26" y="-22" width="36" height="4" rx="2" fill="#6366f1" opacity="0.75"/>
+    <rect x="-26" y="-12" width="46" height="6" rx="2" fill="#1a1f3a" opacity="0.85"/>
+    <rect x="-26" y="0" width="38" height="4" rx="2" fill="#6366f1" opacity="0.75"/>
+    <rect x="-26" y="10" width="46" height="6" rx="2" fill="#1a1f3a" opacity="0.85"/>
+    <rect x="-26" y="22" width="32" height="4" rx="2" fill="#6366f1" opacity="0.75"/>
+    <!-- Dashed perforation -->
+    <line x1="-34" y1="-2" x2="28" y2="-2" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+  </g>
+
+  <!-- Big green profit arrow shooting up-right out of the slip -->
+  <g>
+    <line x1="40" y1="98" x2="110" y2="22"
+          stroke="url(#arrow)" stroke-width="11" stroke-linecap="round"/>
+    <path d="M110 22 L86 24 L106 44 Z" fill="#22c55e" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+</svg>
