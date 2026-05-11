@@ -1,72 +1,99 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
-     font-family="'Bangers', 'Impact', 'Anton', 'Arial Black', sans-serif">
+     font-family="Impact, 'Arial Black', sans-serif">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0c14"/>
-      <stop offset="100%" stop-color="#1a1f3a"/>
-    </linearGradient>
-    <linearGradient id="burstFill" x1="0" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#fef3c7"/>
-      <stop offset="38%" stop-color="#fbbf24"/>
-      <stop offset="100%" stop-color="#dc2626"/>
-    </linearGradient>
-    <radialGradient id="burstHi" cx="32%" cy="28%" r="55%">
-      <stop offset="0%" stop-color="#fffbeb" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="#fffbeb" stop-opacity="0"/>
+    <!-- Halftone dot pattern — small black dots on transparent for that
+         printed-comic stipple feel in the corners -->
+    <pattern id="halftone" x="0" y="0" width="6" height="6"
+             patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.2" fill="#0a0c14" opacity="0.55"/>
+    </pattern>
+    <radialGradient id="halftoneFade" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="1"/>
     </radialGradient>
+    <mask id="halftoneMask">
+      <rect width="128" height="128" fill="url(#halftoneFade)"/>
+    </mask>
   </defs>
 
-  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+  <!-- Off-white card background (classic comic-page paper) -->
+  <rect width="128" height="128" fill="#f5f1e8" rx="22" ry="22"/>
+
+  <!-- Halftone dot stipple in corners only -->
+  <rect width="128" height="128" fill="url(#halftone)" mask="url(#halftoneMask)"/>
 
   <!-- ==========================================================
-       BOOM bubble — 9 irregular spikes (variable lengths!), deep
-       notches, sharp angular tips. Tilted -10° for comic energy.
-       Spike vertex coords laid out clockwise from top.
+       Outer BLUE starburst — 11 irregular jagged spikes with
+       variable lengths. Sharp miter corners, heavy black outline.
+       Tilted -8° for comic-page energy.
        ========================================================== -->
-  <g transform="rotate(-10 64 64)">
+  <g transform="rotate(-8 64 64)">
+    <!-- BLUE outer burst, with drop shadow -->
+    <path d="M 64 2
+             L 76 28 L 104 8 L 96 36 L 124 20 L 100 48
+             L 126 64 L 100 80 L 122 102 L 94 90 L 102 124
+             L 74 98 L 60 126 L 50 96 L 22 122 L 32 92
+             L 4 108 L 22 78 L 0 64 L 26 52 L 8 28
+             L 36 38 L 30 2 L 50 30 Z"
+          fill="#000" opacity="0.35" transform="translate(2 4)"/>
 
-    <!-- Drop shadow -->
-    <path d="M 64 3
-             L 80 30 L 116 12 L 96 40 L 124 56
-             L 100 70 L 118 102 L 88 86 L 80 124
-             L 60 92 L 30 118 L 44 84 L 8 88
-             L 32 64 L 6 36 L 40 42 L 30 8 L 56 32 Z"
-          fill="#000" opacity="0.5" transform="translate(2.5 3.5)"/>
+    <path d="M 64 2
+             L 76 28 L 104 8 L 96 36 L 124 20 L 100 48
+             L 126 64 L 100 80 L 122 102 L 94 90 L 102 124
+             L 74 98 L 60 126 L 50 96 L 22 122 L 32 92
+             L 4 108 L 22 78 L 0 64 L 26 52 L 8 28
+             L 36 38 L 30 2 L 50 30 Z"
+          fill="#2563eb"
+          stroke="#0a0c14" stroke-width="4.5" stroke-linejoin="miter" stroke-miterlimit="3"/>
 
-    <!-- Outer outline + fill -->
-    <path d="M 64 3
-             L 80 30 L 116 12 L 96 40 L 124 56
-             L 100 70 L 118 102 L 88 86 L 80 124
-             L 60 92 L 30 118 L 44 84 L 8 88
-             L 32 64 L 6 36 L 40 42 L 30 8 L 56 32 Z"
-          fill="url(#burstFill)"
-          stroke="#0a0c14" stroke-width="4" stroke-linejoin="miter" stroke-miterlimit="2"/>
+    <!-- ==========================================================
+         Inner YELLOW cloud-burst — 9 rounded scallops (Q-curves).
+         Smaller, sits inside the blue spikes. Heavy black outline.
+         ========================================================== -->
+    <path d="M 64 30
+             Q 80 22 86 39
+             Q 102 42 96 58
+             Q 108 70 92 80
+             Q 92 96 76 94
+             Q 64 106 52 94
+             Q 36 96 36 80
+             Q 20 70 32 58
+             Q 26 42 42 39
+             Q 48 22 64 30 Z"
+          fill="#fde047"
+          stroke="#0a0c14" stroke-width="3.5" stroke-linejoin="round"/>
 
-    <!-- Inner highlight halo (printed-comic feel) -->
-    <path d="M 64 3
-             L 80 30 L 116 12 L 96 40 L 124 56
-             L 100 70 L 118 102 L 88 86 L 80 124
-             L 60 92 L 30 118 L 44 84 L 8 88
-             L 32 64 L 6 36 L 40 42 L 30 8 L 56 32 Z"
-          fill="url(#burstHi)"/>
+    <!-- ==========================================================
+         Text: stacked POLY / PARLAY! — italic skewed, bold,
+         red-on-white-on-black 3-layer comic lettering.
+         ========================================================== -->
+    <g transform="skewX(-12)" font-weight="900" text-anchor="middle">
+      <!-- POLY (top line, slightly smaller) -->
+      <text x="68" y="60" font-size="20"
+            stroke="#0a0c14" stroke-width="6" stroke-linejoin="round" fill="#0a0c14"
+            letter-spacing="-0.5">POLY</text>
+      <text x="68" y="60" font-size="20"
+            stroke="#ffffff" stroke-width="3" stroke-linejoin="round" fill="#ffffff"
+            letter-spacing="-0.5">POLY</text>
+      <text x="68" y="60" font-size="20" fill="#dc2626" letter-spacing="-0.5">POLY</text>
 
-    <!-- TEXT: "POLY" / "PARLAY" stacked, white-stroked black fill for
-         comic-lettering emboss. Anchored to fit inside the inner area. -->
-    <g text-anchor="middle" font-weight="900">
-      <!-- POLY (top) -->
-      <text x="64" y="58" font-size="22" fill="#ffffff" stroke="#ffffff"
-            stroke-width="4" stroke-linejoin="round" letter-spacing="-0.5">POLY</text>
-      <text x="64" y="58" font-size="22" fill="#0a0c14" letter-spacing="-0.5">POLY</text>
-      <!-- PARLAY (bottom) -->
-      <text x="64" y="80" font-size="19" fill="#ffffff" stroke="#ffffff"
-            stroke-width="4" stroke-linejoin="round" letter-spacing="-1">PARLAY</text>
-      <text x="64" y="80" font-size="19" fill="#0a0c14" letter-spacing="-1">PARLAY</text>
+      <!-- PARLAY! (bottom line, the hero text) -->
+      <text x="68" y="88" font-size="24"
+            stroke="#0a0c14" stroke-width="7" stroke-linejoin="round" fill="#0a0c14"
+            letter-spacing="-1">PARLAY!</text>
+      <text x="68" y="88" font-size="24"
+            stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round" fill="#ffffff"
+            letter-spacing="-1">PARLAY!</text>
+      <text x="68" y="88" font-size="24" fill="#dc2626" letter-spacing="-1">PARLAY!</text>
     </g>
   </g>
 
-  <!-- Tiny accent specks (manga/comic stippling vibe) outside the burst -->
-  <circle cx="18" cy="18" r="2" fill="#fbbf24" opacity="0.7"/>
-  <circle cx="112" cy="20" r="1.5" fill="#fbbf24" opacity="0.65"/>
-  <circle cx="108" cy="112" r="1.8" fill="#fbbf24" opacity="0.6"/>
-  <circle cx="16" cy="108" r="1.4" fill="#fbbf24" opacity="0.7"/>
+  <!-- Small yellow stars sparking out around the burst (comic accents) -->
+  <g fill="#fde047" stroke="#0a0c14" stroke-width="1.5" stroke-linejoin="miter">
+    <path d="M 16 18 L 18 22 L 22 23 L 18 24 L 16 28 L 14 24 L 10 23 L 14 22 Z"/>
+    <path d="M 112 24 L 114 28 L 119 29 L 114 30 L 112 34 L 110 30 L 105 29 L 110 28 Z"/>
+    <path d="M 18 108 L 20 112 L 24 113 L 20 114 L 18 118 L 16 114 L 12 113 L 16 112 Z"/>
+    <path d="M 108 102 L 110 106 L 115 107 L 110 108 L 108 112 L 106 108 L 101 107 L 106 106 Z"/>
+  </g>
 </svg>
