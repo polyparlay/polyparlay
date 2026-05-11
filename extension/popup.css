@@ -314,14 +314,17 @@ button.upgrade {
 }
 button.upgrade:hover { filter: brightness(1.05); }
 
+/* Summary = utility strip (NOT the hero).
+   PolyParlay analyzes and improves; it doesn't execute parlays.
+   Multiplier / max payout are reference numbers shown small,
+   not the value-prop centerpiece. The real hero is the Monte
+   Carlo sim + free analytics rows below. */
 .summary {
-  margin: 0 12px 12px;
-  padding: 14px 16px;
+  margin: 0 12px 8px;
+  padding: 8px 12px;
   background-color: var(--surface);
-  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(245, 158, 11, 0.03));
   border: 1px solid var(--line);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
 }
 .summary .summary-section {
   padding: 0;
@@ -330,15 +333,15 @@ button.upgrade:hover { filter: brightness(1.05); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 0;
+  padding: 3px 0;
   color: var(--muted);
 }
 .row > span:last-child { color: var(--text-strong); font-weight: 500; }
-.row.big { font-size: 15px; padding: 6px 0; }
-.row.big > span:last-child { font-weight: 800; font-size: 22px; }
-.row.big.payout > span:last-child { font-size: 24px; }
+.row.big { font-size: 12px; padding: 3px 0; }
+.row.big > span:last-child { font-weight: 700; font-size: 14px; }
+.row.big.payout > span:last-child { font-size: 14px; }
 #multiplier.value-accent {
-  font-size: 26px;
+  font-size: 14px;
 }
 .row.payout > span:last-child { color: var(--green); }
 .stake-row { padding: 8px 0; }
@@ -455,7 +458,6 @@ button[disabled] { opacity: 0.45; cursor: not-allowed; }
 }
 #multiplier.value-accent {
   color: var(--accent);
-  text-shadow: 0 0 24px rgba(99, 102, 241, 0.18);
 }
 .share-status {
   padding: 0 12px 8px;

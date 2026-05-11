@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PolyParlay — Parlay Builder for Polymarket",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Build multi-leg parlays from Polymarket markets. Run 10K Monte Carlo simulations, auto-rebalance weak legs, share viral slip cards. Information only — no execution.",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
