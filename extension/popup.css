@@ -259,17 +259,19 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   color: var(--text-strong);
   font-size: 13px;
 }
+/* All right-column values share font-size 13 for column alignment.
+   Color + weight do the hierarchy work instead of size. */
 .ticket-stub .row-payout-actual > span:last-child {
   color: var(--green);
   font-weight: 800;
-  font-size: 15px;
+  font-size: 13px;
 }
 .ticket-stub .row-payout-ref > span:last-child {
   font-weight: 600;
   font-size: 12px;
-  opacity: 0.78;
+  opacity: 0.72;
 }
-.ticket-stub #multiplier.value-accent { color: var(--accent); font-weight: 700; }
+.ticket-stub #multiplier.value-accent { color: var(--accent); font-weight: 700; font-size: 13px; }
 .ticket-stub .row-hint {
   font-size: 9px;
   letter-spacing: 0.4px;
@@ -557,27 +559,28 @@ button.upgrade:hover { filter: brightness(1.05); }
   font-size: 14px;
 }
 .row.payout > span:last-child { color: var(--green); }
-.stake-row { padding: 8px 0; }
+.stake-row { padding: 4px 0; }
 .stake-input {
   display: flex;
   align-items: center;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 5px;
   overflow: hidden;
 }
 .stake-input .dollar {
-  padding: 0 8px;
+  padding: 0 6px;
   color: var(--muted);
+  font-size: 12px;
 }
 .stake-input input {
   background: transparent;
   border: 0;
   color: var(--text-strong);
   font-size: 13px;
-  font-weight: 600;
-  padding: 6px 8px 6px 0;
-  width: 90px;
+  font-weight: 700;
+  padding: 3px 6px 3px 0;
+  width: 70px;
   text-align: right;
   outline: none;
 }
