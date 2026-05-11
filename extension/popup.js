@@ -1024,15 +1024,30 @@ function drawCard() {
     ctx.fillStyle = dirFg;
     ctx.fillText(label, 115, y - 1);
 
-    // Question — bumped 21px → 24px so it stays legible after X feed thumbnail crop
+    // Question — bumped 21px → 24px so it stays legible after X feed thumbnail crop.
+    // Word-boundary truncation (avoids cutting mid-word like '$7.0B at market...')
     const questionX = 113 + dirW + 8;
     ctx.fillStyle = '#f9fafb';
     ctx.font = '600 24px -apple-system, sans-serif';
     const maxW = W - questionX - 200;
     let q = leg.question || 'Market';
     if (ctx.measureText(q).width > maxW) {
-      while (q.length > 4 && ctx.measureText(q + '…').width > maxW) q = q.slice(0, -1);
-      q = q + '…';
+      const words = q.split(' ');
+      let trimmed = '';
+      while (words.length > 1) {
+        words.pop();
+        const candidate = words.join(' ') + '…';
+        if (ctx.measureText(candidate).width <= maxW) { trimmed = candidate; break; }
+      }
+      if (!trimmed) {
+        // Single very-long word — fall back to char truncation
+        trimmed = q;
+        while (trimmed.length > 4 && ctx.measureText(trimmed + '…').width > maxW) {
+          trimmed = trimmed.slice(0, -1);
+        }
+        trimmed = trimmed + '…';
+      }
+      q = trimmed;
     }
     ctx.fillText(q, questionX, y);
 

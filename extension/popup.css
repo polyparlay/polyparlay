@@ -296,6 +296,35 @@ button.upgrade:hover { filter: brightness(1.05); }
   gap: 8px;
   padding: 10px 12px;
 }
+
+/* Share & Execute grouped section — consistent styling with other section blocks */
+.actions-group {
+  margin: 0 12px 12px;
+  padding: 12px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.actions-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.actions-group .actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.actions-group .actions-row button {
+  width: 100%;
+}
+.actions-group .execute-menu {
+  margin: 0;
+}
 button.primary, button.secondary {
   border: 0;
   border-radius: 6px;
