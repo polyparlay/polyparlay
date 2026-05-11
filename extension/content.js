@@ -264,8 +264,9 @@
     const p = ensurePreview();
     if (!p) return;
     // Re-evaluate theme every time the drawer opens so it matches PM's
-    // CURRENT theme, not whatever was cached at content-script init time.
-    syncTheme({ force: true });
+    // CURRENT theme. Wrapped because any computed-style edge case must
+    // not be allowed to crash the preview render below.
+    try { syncTheme({ force: true }); } catch (e) { log('syncTheme threw', e); }
     renderPreview(p, slip, status);
     p.classList.remove('pw-hidden');
     if (hideTimer) clearTimeout(hideTimer);
@@ -381,12 +382,18 @@
         const finalSlip = (resp.slip || slip);
         flashButton(resp.message || 'Added', '#16a34a');
         updateBadge(resp.legCount);
-        showPreview(finalSlip, resp.message || 'Added');
+        // Wrap showPreview so a downstream render/theme exception can't
+        // bubble into the outer catch and turn a successful add into a
+        // red "Error" flash.
+        try {
+          showPreview(finalSlip, resp.message || 'Added');
+        } catch (renderErr) {
+          // eslint-disable-next-line no-console
+          console.warn('[PolyParlay] showPreview threw after successful add', renderErr);
+        }
       } else {
         const errMsg = (resp && resp.error) || 'Could not add';
         flashButton(errMsg, '#dc2626');
-        // ALWAYS console.warn with diagnostic data so the user can paste back
-        // when sports/live markets fail. DevTools console > popup status reports.
         // eslint-disable-next-line no-console
         console.warn('[PolyParlay] Add failed', {
           error: errMsg,
@@ -396,21 +403,24 @@
           pageTitle: document.title,
           ogUrlMeta: document.querySelector('meta[property="og:url"]')?.getAttribute('content') || null
         });
-        const { slip } = await chrome.storage.local.get(['slip']);
-        showPreview(slip || null, errMsg + ' · check DevTools for details');
+        try {
+          const { slip } = await chrome.storage.local.get(['slip']);
+          showPreview(slip || null, errMsg + ' · check DevTools for details');
+        } catch {}
       }
     } catch (err) {
-      // Surface the actual error text instead of a generic 'Error' flash
+      // Show the actual error text (truncated for the pill) — DO NOT
+      // also flash a generic 'Error' afterwards (that masked the real
+      // cause). Caller can inspect DevTools console for full detail.
       // eslint-disable-next-line no-console
       console.warn('[PolyParlay] handleAdd threw', err);
       const msg = (err && err.message) ? err.message : String(err);
-      flashButton(msg.slice(0, 24), '#dc2626');
+      flashButton(msg.slice(0, 24) || 'Send failed', '#dc2626');
       try {
         const { slip } = await chrome.storage.local.get(['slip']);
         showPreview(slip || null, 'Send failed: ' + msg);
       } catch {}
       log('addLeg error', err);
-      flashButton('Error', '#dc2626');
     } finally {
       if (btn) btn.classList.remove('pw-busy');
     }
