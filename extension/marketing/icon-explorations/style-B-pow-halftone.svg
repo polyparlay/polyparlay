@@ -1,11 +1,10 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
      font-family="Impact, 'Arial Black', sans-serif">
   <!-- STYLE B v2: Reference #2 (POW!) — cyan jagged burst with SUBTLE
-       halftone only at spike-tips, large yellow cloud fully covers the
-       text horizontally so the pattern never sits behind the letters. -->
+       halftone only at spike-tips, large yellow ellipse fully covers
+       the text horizontally so the pattern never sits behind letters. -->
 
   <defs>
-    <!-- Wider pattern + lower opacity = halftone texture, not visual noise -->
     <pattern id="hfB" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
       <circle cx="4" cy="4" r="1.1" fill="#0a0c14" opacity="0.45"/>
     </pattern>
@@ -22,7 +21,6 @@
 
   <rect width="128" height="128" fill="#f5f1e8" rx="22"/>
 
-  <!-- Cyan jagged burst -->
   <g transform="rotate(-7 64 64)">
     <path d="M 64 4
              L 78 26 L 104 6 L 96 32 L 124 18 L 102 44
@@ -34,26 +32,23 @@
           stroke-linejoin="miter" stroke-miterlimit="3"/>
   </g>
 
-  <!-- Halftone INSIDE the burst silhouette — subtle now -->
   <g clip-path="url(#burstClipB)">
     <rect width="128" height="128" fill="url(#hfB)"/>
   </g>
 
-  <!-- LARGER yellow cloud — fully covers the text horizontally so the
-       halftone never sits under any letter. -->
+  <!-- Large yellow ellipse — fully covers text horizontally -->
   <ellipse cx="64" cy="66" rx="58" ry="32"
            fill="#fde047" stroke="#0a0c14" stroke-width="3.5"/>
 
-  <!-- HERO TEXT — POLY + PARLAY stacked, 3D extruded italic red -->
   <g transform="skewX(-14)" font-weight="900" text-anchor="middle">
-    <!-- POLY (top) -->
+    <!-- POLY top -->
     <text x="74" y="60" font-size="22" fill="#0a0c14"
           letter-spacing="-1" dx="3" dy="3">POLY</text>
     <text x="74" y="60" font-size="22" stroke="#0a0c14" stroke-width="6"
           stroke-linejoin="round" fill="#0a0c14" letter-spacing="-1">POLY</text>
     <text x="74" y="60" font-size="22" fill="#dc2626" letter-spacing="-1">POLY</text>
 
-    <!-- PARLAY! (hero) -->
+    <!-- PARLAY! hero -->
     <text x="74" y="90" font-size="28" fill="#0a0c14"
           letter-spacing="-2" dx="4" dy="4">PARLAY!</text>
     <text x="74" y="90" font-size="28" stroke="#0a0c14" stroke-width="7"

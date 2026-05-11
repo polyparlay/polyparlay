@@ -1,0 +1,91 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="slip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="charred" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c2d12"/>
+      <stop offset="50%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="35%" stop-color="#f97316"/>
+      <stop offset="75%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <radialGradient id="hot" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+  <rect width="128" height="128" fill="url(#hot)" rx="28" ry="28"/>
+
+  <!-- Slip — bottom intact, top edge ON FIRE with charred/glowing transition -->
+  <g transform="translate(64 84)">
+    <!-- Body of slip -->
+    <path d="M-28 -28 L28 -28 L28 22
+             L22 28 L16 22 L10 28 L4 22 L-2 28 L-8 22 L-14 28 L-20 22 L-26 28 L-28 26 Z"
+          fill="url(#slip)" stroke="#92400e" stroke-width="1.5"/>
+    <!-- Body content rows -->
+    <rect x="-22" y="-10" width="40" height="3" rx="1.5" fill="#1a1f3a"/>
+    <rect x="-22" y="-3" width="30" height="2.5" rx="1.25" fill="#6366f1" opacity="0.78"/>
+    <rect x="-22" y="4" width="40" height="3" rx="1.5" fill="#1a1f3a"/>
+    <rect x="-22" y="11" width="26" height="2.5" rx="1.25" fill="#6366f1" opacity="0.78"/>
+
+    <!-- Burning top edge — wavy charred zone -->
+    <path d="M-28 -28
+             Q-22 -32 -16 -28
+             Q-10 -32 -4 -28
+             Q2 -32 8 -28
+             Q14 -32 20 -28
+             Q26 -32 28 -28
+             L28 -22
+             Q22 -18 16 -22
+             Q10 -18 4 -22
+             Q-2 -18 -8 -22
+             Q-14 -18 -20 -22
+             Q-26 -18 -28 -22 Z"
+          fill="url(#charred)"/>
+    <!-- Ember dots glowing along char line -->
+    <circle cx="-18" cy="-26" r="1.8" fill="#fef3c7"/>
+    <circle cx="-4" cy="-25" r="1.5" fill="#fbbf24"/>
+    <circle cx="12" cy="-26" r="1.8" fill="#fef3c7"/>
+    <circle cx="22" cy="-25" r="1.4" fill="#fbbf24"/>
+  </g>
+
+  <!-- BIG flame rising above the burning slip — emoji-style fat tongue -->
+  <g transform="translate(64 36)">
+    <path d="M0 -30
+             C 14 -22, 20 -8, 18 4
+             C 24 -2, 28 10, 24 18
+             C 28 22, 22 28, 14 28
+             C 6 26, -2 22, -8 28
+             C -16 26, -22 18, -18 10
+             C -26 6, -28 -8, -20 -14
+             C -12 -18, -6 -22, -2 -26 Z"
+          fill="url(#flame)"/>
+    <!-- Hot core -->
+    <path d="M2 -16
+             C 10 -10, 12 4, 8 12
+             C 12 14, 8 22, 0 22
+             C -8 20, -12 12, -10 4
+             C -12 -4, -6 -12, 0 -14 Z"
+          fill="#fef3c7" opacity="0.88"/>
+    <!-- White-hot center spark -->
+    <ellipse cx="0" cy="6" rx="3" ry="6" fill="#ffffff" opacity="0.7"/>
+  </g>
+
+  <!-- Floating embers around the flame -->
+  <circle cx="32" cy="48" r="1.5" fill="#fbbf24" opacity="0.7"/>
+  <circle cx="98" cy="42" r="1.2" fill="#f97316" opacity="0.6"/>
+  <circle cx="42" cy="28" r="1" fill="#fef3c7" opacity="0.8"/>
+  <circle cx="92" cy="62" r="1.4" fill="#fbbf24" opacity="0.6"/>
+</svg>

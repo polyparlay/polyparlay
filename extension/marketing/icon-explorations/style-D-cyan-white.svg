@@ -1,7 +1,7 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
      font-family="Impact, 'Arial Black', sans-serif">
-  <!-- STYLE D v2: Reference #4 (cyan BOOM) — halftone pulled tight to
-       the absolute corners so it never visually crosses the text. -->
+  <!-- STYLE D v2: Reference #4 (cyan BOOM) — halftone pulled to absolute
+       corners only, never touches the text or burst. -->
 
   <defs>
     <pattern id="hfD" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
@@ -20,7 +20,6 @@
   <rect width="128" height="128" fill="#ffffff" rx="22"/>
   <rect width="128" height="128" fill="url(#hfD)" mask="url(#hfDmask)"/>
 
-  <!-- Cyan jagged burst -->
   <g transform="rotate(-6 64 64)">
     <path d="M 64 8
              L 76 30 L 100 12 L 92 38 L 118 28
@@ -33,7 +32,6 @@
           stroke-linejoin="miter" stroke-miterlimit="3"/>
   </g>
 
-  <!-- POLY + PARLAY stacked, big white bold with thick black outline -->
   <g transform="skewX(-12)" font-weight="900" text-anchor="middle">
     <text x="74" y="58" font-size="26" stroke="#0a0c14" stroke-width="7"
           stroke-linejoin="round" fill="#0a0c14" letter-spacing="-1.2">POLY</text>
@@ -44,7 +42,6 @@
     <text x="74" y="92" font-size="26" fill="#ffffff" letter-spacing="-1.6">PARLAY</text>
   </g>
 
-  <!-- Star accents, kept in absolute corners away from text -->
   <g stroke="#0a0c14" stroke-width="1.5" stroke-linejoin="miter">
     <path d="M 12 14 L 15 20 L 21 21 L 15 22 L 12 28 L 9 22 L 3 21 L 9 20 Z" fill="#fde047"/>
     <path d="M 116 112 L 119 118 L 125 119 L 119 120 L 116 126 L 113 120 L 107 119 L 113 118 Z" fill="#fde047"/>
