@@ -28,13 +28,6 @@
 
     <section class="summary">
       <div class="summary-section">
-        <div class="row big">
-          <span class="row-label-stack">
-            <span>Multiplier</span>
-            <span class="row-hint">if all legs hit</span>
-          </span>
-          <span id="multiplier" class="value-accent">—</span>
-        </div>
         <div class="row stake-row">
           <label for="stake">Stake</label>
           <div class="stake-input">
@@ -42,13 +35,21 @@
             <input id="stake" type="number" min="0" step="1" value="10" />
           </div>
         </div>
-        <div class="row big payout">
-          <span class="row-label-stack">
-            <span>Max payout</span>
-            <span class="row-hint">if all hit</span>
-          </span>
+        <div class="row">
+          <span>You'll actually get <span class="row-hint">legs paid separately</span></span>
+          <span id="indSum">—</span>
+        </div>
+        <div class="row">
+          <span>Combined multiplier <span class="row-hint">reference only</span></span>
+          <span id="multiplier" class="value-accent">—</span>
+        </div>
+        <div class="row">
+          <span>Hypothetical parlay <span class="row-hint">if executed as one</span></span>
           <span id="maxPayout">—</span>
         </div>
+      </div>
+      <div class="summary-disclaimer">
+        Polymarket pays each leg independently. PolyParlay analyses — it doesn't execute.
       </div>
     </section>
 
@@ -65,10 +66,6 @@
       <div class="row">
         <span>24h price drift <span class="row-hint">avg across legs</span></span>
         <span id="proDrift">—</span>
-      </div>
-      <div class="row">
-        <span>Independent payout <span class="row-hint">no parlay, even split</span></span>
-        <span id="indSum">—</span>
       </div>
       <div class="row">
         <span>Resolves by</span>

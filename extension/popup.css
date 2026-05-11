@@ -326,6 +326,21 @@ button.upgrade:hover { filter: brightness(1.05); }
   border: 1px solid var(--line);
   border-radius: 8px;
 }
+.summary-disclaimer {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line);
+  line-height: 1.35;
+  opacity: 0.85;
+}
+/* "You'll actually get" — the honest payout, give it the green-money tint
+   so users' eyes land on it instead of the hypothetical numbers below. */
+.summary .row:nth-of-type(2) > span:last-child {
+  color: var(--green);
+  font-weight: 700;
+}
 .summary .summary-section {
   padding: 0;
 }

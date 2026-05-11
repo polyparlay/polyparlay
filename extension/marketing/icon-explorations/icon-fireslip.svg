@@ -1,0 +1,73 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="100%" stop-color="#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="flame-outer" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="55%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="flame-inner" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <linearGradient id="slip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fefce8"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <radialGradient id="hotGlow" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
+  <rect width="128" height="128" fill="url(#hotGlow)" rx="28" ry="28"/>
+
+  <!-- Slip ticket (parchment style, slight tilt) -->
+  <g transform="translate(64 78) rotate(-4)">
+    <!-- Back shadow slip -->
+    <path d="M-26 -34 L26 -34 L26 28
+             L20 34 L14 28 L8 34 L2 28 L-4 34 L-10 28 L-16 34 L-22 28 L-26 34 Z"
+          fill="#92400e" opacity="0.35" transform="translate(4 3)"/>
+    <!-- Front slip -->
+    <path d="M-26 -34 L26 -34 L26 28
+             L20 34 L14 28 L8 34 L2 28 L-4 34 L-10 28 L-16 34 L-22 28 L-26 34 Z"
+          fill="url(#slip)" stroke="#92400e" stroke-width="1.5"/>
+    <!-- Slip header band -->
+    <rect x="-22" y="-30" width="44" height="6" rx="2" fill="#92400e" opacity="0.85"/>
+    <!-- Slip rows = legs -->
+    <rect x="-22" y="-18" width="36" height="3" rx="1.5" fill="#1a1f3a"/>
+    <rect x="-22" y="-12" width="28" height="2.5" rx="1.25" fill="#6366f1" opacity="0.75"/>
+    <rect x="-22" y="-4" width="36" height="3" rx="1.5" fill="#1a1f3a"/>
+    <rect x="-22" y="2" width="24" height="2.5" rx="1.25" fill="#6366f1" opacity="0.75"/>
+    <rect x="-22" y="10" width="36" height="3" rx="1.5" fill="#1a1f3a"/>
+    <rect x="-22" y="16" width="20" height="2.5" rx="1.25" fill="#6366f1" opacity="0.75"/>
+  </g>
+
+  <!-- 🔥 flame rising behind slip top -->
+  <g transform="translate(64 38)">
+    <!-- Outer flame body (emoji-style asymmetric tongue) -->
+    <path d="M0 -28
+             C 12 -22, 18 -10, 16 0
+             C 22 -4, 24 6, 22 14
+             C 24 16, 20 22, 14 24
+             C 8 22, 2 18, -4 22
+             C -10 24, -16 18, -14 12
+             C -20 8, -22 -2, -16 -8
+             C -10 -12, -6 -16, -2 -22 Z"
+          fill="url(#flame-outer)"/>
+    <!-- Inner flame core (yellow hot center) -->
+    <path d="M2 -16
+             C 8 -10, 10 -2, 8 6
+             C 12 8, 10 14, 4 16
+             C -2 14, -6 10, -8 4
+             C -10 -2, -6 -10, 0 -14
+             C 1 -15, 1.5 -15.5, 2 -16 Z"
+          fill="url(#flame-inner)" opacity="0.92"/>
+    <!-- Tiny white-hot spark -->
+    <ellipse cx="-1" cy="4" rx="2.5" ry="4" fill="#fffbeb" opacity="0.85"/>
+  </g>
+</svg>
