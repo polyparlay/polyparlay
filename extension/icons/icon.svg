@@ -1,42 +1,97 @@
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+     font-family="Impact, 'Arial Black', 'Helvetica Neue', sans-serif">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0c14"/>
-      <stop offset="100%" stop-color="#1a1f3a"/>
-    </linearGradient>
-    <linearGradient id="x" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#a5b4fc"/>
-      <stop offset="100%" stop-color="#6366f1"/>
-    </linearGradient>
-    <linearGradient id="arrow" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#22c55e"/>
-      <stop offset="100%" stop-color="#86efac"/>
-    </linearGradient>
-    <radialGradient id="profitGlow" cx="80%" cy="22%" r="55%">
-      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+    <pattern id="halftone" x="0" y="0" width="6" height="6"
+             patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.2" fill="#0a0c14" opacity="0.55"/>
+    </pattern>
+    <radialGradient id="halftoneFade" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="68%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="1"/>
     </radialGradient>
+    <mask id="halftoneMask">
+      <rect width="128" height="128" fill="url(#halftoneFade)"/>
+    </mask>
   </defs>
 
-  <!-- Background -->
-  <rect width="128" height="128" fill="url(#bg)" rx="28" ry="28"/>
-  <rect width="128" height="128" fill="url(#profitGlow)" rx="28" ry="28"/>
+  <!-- Off-white comic-page paper background -->
+  <rect width="128" height="128" fill="#f5f1e8" rx="22" ry="22"/>
 
-  <!-- Big × multiplier as the base symbol -->
-  <g transform="translate(64 70)">
-    <rect x="-30" y="-9" width="60" height="18" rx="9" fill="url(#x)" transform="rotate(45)"/>
-    <rect x="-30" y="-9" width="60" height="18" rx="9" fill="url(#x)" transform="rotate(-45)"/>
+  <!-- Halftone corner stipple -->
+  <rect width="128" height="128" fill="url(#halftone)" mask="url(#halftoneMask)"/>
+
+  <!-- ==========================================================
+       Blue starburst backdrop (slightly bigger than v3 so it
+       contains the bigger PARLAY! text without orphan letters).
+       ========================================================== -->
+  <g transform="rotate(-7 64 64)">
+    <!-- Drop shadow -->
+    <path d="M 64 8
+             L 74 30 L 96 14 L 90 38 L 116 26
+             L 98 50 L 122 64 L 98 78 L 116 102
+             L 90 90 L 96 114 L 74 98 L 64 120
+             L 54 98 L 32 114 L 38 90 L 12 102
+             L 30 78 L 6 64 L 30 50 L 12 26
+             L 38 38 L 32 14 L 54 30 Z"
+          fill="#000" opacity="0.32" transform="translate(2 4)"/>
+
+    <!-- Blue burst -->
+    <path d="M 64 8
+             L 74 30 L 96 14 L 90 38 L 116 26
+             L 98 50 L 122 64 L 98 78 L 116 102
+             L 90 90 L 96 114 L 74 98 L 64 120
+             L 54 98 L 32 114 L 38 90 L 12 102
+             L 30 78 L 6 64 L 30 50 L 12 26
+             L 38 38 L 32 14 L 54 30 Z"
+          fill="#2563eb"
+          stroke="#0a0c14" stroke-width="4" stroke-linejoin="miter" stroke-miterlimit="3"/>
+
+    <!-- Yellow cloud-burst inner (back to scalloped, more comic-y) -->
+    <path d="M 64 30
+             Q 80 22 88 38
+             Q 104 42 96 58
+             Q 108 70 92 80
+             Q 92 96 76 94
+             Q 64 106 52 94
+             Q 36 96 36 80
+             Q 20 70 32 58
+             Q 24 42 40 38
+             Q 48 22 64 30 Z"
+          fill="#fde047"
+          stroke="#0a0c14" stroke-width="3" stroke-linejoin="round"/>
   </g>
 
-  <!-- Green profit arrow rising up-right, piercing through the × -->
-  <g>
-    <!-- Arrow shaft (thick green line going up-right) -->
-    <line x1="24" y1="100" x2="108" y2="20"
-          stroke="url(#arrow)" stroke-width="11" stroke-linecap="round"/>
-    <!-- Arrowhead -->
-    <path d="M108 20 L84 24 L104 44 Z" fill="#22c55e" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/>
-    <!-- Highlight stripe along the arrow for sheen -->
-    <line x1="28" y1="96" x2="100" y2="28"
-          stroke="#bbf7d0" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  <!-- ==========================================================
+       TEXT — POLY subtitle (small) + PARLAY! hero (HUGE), both
+       italic skewed. Text overflows the yellow cloud on the sides.
+       ========================================================== -->
+  <g transform="skewX(-14)" font-weight="900" text-anchor="middle">
+
+    <!-- POLY — subtitle, smaller, no red fill (kicker text feel) -->
+    <text x="74" y="56" font-size="22"
+          stroke="#0a0c14" stroke-width="7" stroke-linejoin="round" fill="#0a0c14"
+          letter-spacing="-1.2">POLY</text>
+    <text x="74" y="56" font-size="22"
+          stroke="#ffffff" stroke-width="3" stroke-linejoin="round" fill="#ffffff"
+          letter-spacing="-1.2">POLY</text>
+    <text x="74" y="56" font-size="22" fill="#fde047" letter-spacing="-1.2">POLY</text>
+
+    <!-- PARLAY! — the hero, MASSIVE -->
+    <text x="74" y="96" font-size="34"
+          stroke="#0a0c14" stroke-width="9" stroke-linejoin="round" fill="#0a0c14"
+          letter-spacing="-2">PARLAY!</text>
+    <text x="74" y="96" font-size="34"
+          stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round" fill="#ffffff"
+          letter-spacing="-2">PARLAY!</text>
+    <text x="74" y="96" font-size="34" fill="#dc2626" letter-spacing="-2">PARLAY!</text>
+  </g>
+
+  <!-- Yellow star sparks in the corners -->
+  <g fill="#fde047" stroke="#0a0c14" stroke-width="1.5" stroke-linejoin="miter">
+    <path d="M 14 16 L 17 22 L 23 23 L 17 24 L 14 30 L 11 24 L 5 23 L 11 22 Z"/>
+    <path d="M 113 18 L 116 24 L 122 25 L 116 26 L 113 32 L 110 26 L 104 25 L 110 24 Z"/>
+    <path d="M 16 106 L 19 112 L 25 113 L 19 114 L 16 120 L 13 114 L 7 113 L 13 112 Z"/>
+    <path d="M 112 108 L 115 114 L 121 115 L 115 116 L 112 122 L 109 116 L 103 115 L 109 114 Z"/>
   </g>
 </svg>

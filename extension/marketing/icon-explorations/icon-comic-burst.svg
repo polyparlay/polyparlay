@@ -1,5 +1,5 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
-     font-family="Impact, 'Arial Black', sans-serif">
+     font-family="Impact, 'Arial Black', 'Helvetica Neue', sans-serif">
   <defs>
     <pattern id="halftone" x="0" y="0" width="6" height="6"
              patternUnits="userSpaceOnUse">
@@ -7,7 +7,7 @@
     </pattern>
     <radialGradient id="halftoneFade" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="70%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="68%" stop-color="#000" stop-opacity="0"/>
       <stop offset="100%" stop-color="#000" stop-opacity="1"/>
     </radialGradient>
     <mask id="halftoneMask">
@@ -18,71 +18,80 @@
   <!-- Off-white comic-page paper background -->
   <rect width="128" height="128" fill="#f5f1e8" rx="22" ry="22"/>
 
-  <!-- Halftone dot stipple in corners only -->
+  <!-- Halftone corner stipple -->
   <rect width="128" height="128" fill="url(#halftone)" mask="url(#halftoneMask)"/>
 
   <!-- ==========================================================
-       SMALLER blue burst — backdrop only. Inset from edges so the
-       text can overflow it on the left/right like reference KAPOW.
+       Blue starburst backdrop (slightly bigger than v3 so it
+       contains the bigger PARLAY! text without orphan letters).
        ========================================================== -->
-  <g transform="rotate(-6 64 64)">
+  <g transform="rotate(-7 64 64)">
     <!-- Drop shadow -->
-    <path d="M 64 14
-             L 72 32 L 92 18 L 88 38 L 110 30
-             L 96 50 L 116 64 L 96 78 L 110 98
-             L 88 90 L 92 110 L 72 96 L 64 114
-             L 56 96 L 36 110 L 40 90 L 18 98
-             L 32 78 L 12 64 L 32 50 L 18 30
-             L 40 38 L 36 18 L 56 32 Z"
-          fill="#000" opacity="0.3" transform="translate(2 3)"/>
+    <path d="M 64 8
+             L 74 30 L 96 14 L 90 38 L 116 26
+             L 98 50 L 122 64 L 98 78 L 116 102
+             L 90 90 L 96 114 L 74 98 L 64 120
+             L 54 98 L 32 114 L 38 90 L 12 102
+             L 30 78 L 6 64 L 30 50 L 12 26
+             L 38 38 L 32 14 L 54 30 Z"
+          fill="#000" opacity="0.32" transform="translate(2 4)"/>
 
-    <!-- Blue starburst -->
-    <path d="M 64 14
-             L 72 32 L 92 18 L 88 38 L 110 30
-             L 96 50 L 116 64 L 96 78 L 110 98
-             L 88 90 L 92 110 L 72 96 L 64 114
-             L 56 96 L 36 110 L 40 90 L 18 98
-             L 32 78 L 12 64 L 32 50 L 18 30
-             L 40 38 L 36 18 L 56 32 Z"
+    <!-- Blue burst -->
+    <path d="M 64 8
+             L 74 30 L 96 14 L 90 38 L 116 26
+             L 98 50 L 122 64 L 98 78 L 116 102
+             L 90 90 L 96 114 L 74 98 L 64 120
+             L 54 98 L 32 114 L 38 90 L 12 102
+             L 30 78 L 6 64 L 30 50 L 12 26
+             L 38 38 L 32 14 L 54 30 Z"
           fill="#2563eb"
           stroke="#0a0c14" stroke-width="4" stroke-linejoin="miter" stroke-miterlimit="3"/>
 
-    <!-- Inner yellow cloud — small, sits inside burst as fill -->
-    <ellipse cx="64" cy="64" rx="40" ry="32" fill="#fde047"
-             stroke="#0a0c14" stroke-width="3"/>
+    <!-- Yellow cloud-burst inner (back to scalloped, more comic-y) -->
+    <path d="M 64 30
+             Q 80 22 88 38
+             Q 104 42 96 58
+             Q 108 70 92 80
+             Q 92 96 76 94
+             Q 64 106 52 94
+             Q 36 96 36 80
+             Q 20 70 32 58
+             Q 24 42 40 38
+             Q 48 22 64 30 Z"
+          fill="#fde047"
+          stroke="#0a0c14" stroke-width="3" stroke-linejoin="round"/>
   </g>
 
   <!-- ==========================================================
-       GIANT TEXT — the hero. Stacked POLY / PARLAY!, BIG enough
-       to overflow the burst on left/right. Italic skewed, 3-layer
-       comic lettering (black outer / white mid / red fill).
+       TEXT — POLY subtitle (small) + PARLAY! hero (HUGE), both
+       italic skewed. Text overflows the yellow cloud on the sides.
        ========================================================== -->
   <g transform="skewX(-14)" font-weight="900" text-anchor="middle">
 
-    <!-- POLY (top line) — 30px -->
-    <text x="72" y="62" font-size="30"
-          stroke="#0a0c14" stroke-width="8" stroke-linejoin="round" fill="#0a0c14"
-          letter-spacing="-1">POLY</text>
-    <text x="72" y="62" font-size="30"
-          stroke="#ffffff" stroke-width="4" stroke-linejoin="round" fill="#ffffff"
-          letter-spacing="-1">POLY</text>
-    <text x="72" y="62" font-size="30" fill="#dc2626" letter-spacing="-1">POLY</text>
+    <!-- POLY — subtitle, smaller, no red fill (kicker text feel) -->
+    <text x="74" y="56" font-size="22"
+          stroke="#0a0c14" stroke-width="7" stroke-linejoin="round" fill="#0a0c14"
+          letter-spacing="-1.2">POLY</text>
+    <text x="74" y="56" font-size="22"
+          stroke="#ffffff" stroke-width="3" stroke-linejoin="round" fill="#ffffff"
+          letter-spacing="-1.2">POLY</text>
+    <text x="74" y="56" font-size="22" fill="#fde047" letter-spacing="-1.2">POLY</text>
 
-    <!-- PARLAY! (bottom line) — 26px (longer string) -->
-    <text x="72" y="94" font-size="26"
-          stroke="#0a0c14" stroke-width="8" stroke-linejoin="round" fill="#0a0c14"
-          letter-spacing="-1.5">PARLAY!</text>
-    <text x="72" y="94" font-size="26"
-          stroke="#ffffff" stroke-width="4" stroke-linejoin="round" fill="#ffffff"
-          letter-spacing="-1.5">PARLAY!</text>
-    <text x="72" y="94" font-size="26" fill="#dc2626" letter-spacing="-1.5">PARLAY!</text>
+    <!-- PARLAY! — the hero, MASSIVE -->
+    <text x="74" y="96" font-size="34"
+          stroke="#0a0c14" stroke-width="9" stroke-linejoin="round" fill="#0a0c14"
+          letter-spacing="-2">PARLAY!</text>
+    <text x="74" y="96" font-size="34"
+          stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round" fill="#ffffff"
+          letter-spacing="-2">PARLAY!</text>
+    <text x="74" y="96" font-size="34" fill="#dc2626" letter-spacing="-2">PARLAY!</text>
   </g>
 
-  <!-- Small yellow star sparks around the burst -->
+  <!-- Yellow star sparks in the corners -->
   <g fill="#fde047" stroke="#0a0c14" stroke-width="1.5" stroke-linejoin="miter">
-    <path d="M 14 18 L 17 24 L 23 25 L 17 26 L 14 32 L 11 26 L 5 25 L 11 24 Z"/>
-    <path d="M 114 20 L 117 26 L 123 27 L 117 28 L 114 34 L 111 28 L 105 27 L 111 26 Z"/>
-    <path d="M 18 106 L 20 110 L 24 111 L 20 112 L 18 116 L 16 112 L 12 111 L 16 110 Z"/>
-    <path d="M 110 108 L 112 112 L 116 113 L 112 114 L 110 118 L 108 114 L 104 113 L 108 112 Z"/>
+    <path d="M 14 16 L 17 22 L 23 23 L 17 24 L 14 30 L 11 24 L 5 23 L 11 22 Z"/>
+    <path d="M 113 18 L 116 24 L 122 25 L 116 26 L 113 32 L 110 26 L 104 25 L 110 24 Z"/>
+    <path d="M 16 106 L 19 112 L 25 113 L 19 114 L 16 120 L 13 114 L 7 113 L 13 112 Z"/>
+    <path d="M 112 108 L 115 114 L 121 115 L 115 116 L 112 122 L 109 116 L 103 115 L 109 114 Z"/>
   </g>
 </svg>
