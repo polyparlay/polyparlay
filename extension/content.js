@@ -295,6 +295,24 @@
     statusEl.textContent = status || '';
   }
 
+  // Wrap chrome.runtime.sendMessage with a wake-and-retry. MV3 service workers
+  // suspend after ~30s of idle; the first send returns undefined or throws.
+  // Retry once or twice with a short delay so the click doesn't appear to fail.
+  async function sendWithRetry(msg, retries = 2) {
+    let lastErr = null;
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const resp = await chrome.runtime.sendMessage(msg);
+        if (resp !== undefined) return resp;
+        lastErr = new Error('Service worker returned no response');
+      } catch (err) {
+        lastErr = err;
+      }
+      if (i < retries) await new Promise((r) => setTimeout(r, 120 + i * 80));
+    }
+    throw lastErr || new Error('Send failed');
+  }
+
   // -------- Add leg flow --------
   async function handleAdd(e) {
     if (e) {
@@ -304,14 +322,13 @@
     const detected = extractSlug();
     const btn = document.getElementById(BTN_ID);
     if (!detected) {
-      // Surface the URL so the user can tell us what pattern we're missing
       showPreview(null, 'No market detected at ' + window.location.pathname);
       flashButton('No market here', '#dc2626');
       return;
     }
     if (btn) btn.classList.add('pw-busy');
     try {
-      const resp = await chrome.runtime.sendMessage({
+      const resp = await sendWithRetry({
         type: 'addLeg',
         detected,
         pageTitle: document.title,
@@ -341,6 +358,15 @@
         showPreview(slip || null, errMsg + ' · check DevTools for details');
       }
     } catch (err) {
+      // Surface the actual error text instead of a generic 'Error' flash
+      // eslint-disable-next-line no-console
+      console.warn('[PolyParlay] handleAdd threw', err);
+      const msg = (err && err.message) ? err.message : String(err);
+      flashButton(msg.slice(0, 24), '#dc2626');
+      try {
+        const { slip } = await chrome.storage.local.get(['slip']);
+        showPreview(slip || null, 'Send failed: ' + msg);
+      } catch {}
       log('addLeg error', err);
       flashButton('Error', '#dc2626');
     } finally {

@@ -54,6 +54,34 @@
       </div>
     </section>
 
+    <section class="free-analytics">
+      <div class="section-label">Free analytics</div>
+      <div class="row">
+        <span>Risk score</span>
+        <span id="proRisk">—</span>
+      </div>
+      <div class="row">
+        <span>Slip 24h volume</span>
+        <span id="proVol24">—</span>
+      </div>
+      <div class="row">
+        <span>24h price drift <span class="row-hint">avg across legs</span></span>
+        <span id="proDrift">—</span>
+      </div>
+      <div class="row">
+        <span>Independent payout <span class="row-hint">no parlay, even split</span></span>
+        <span id="indSum">—</span>
+      </div>
+      <div class="row">
+        <span>Resolves by</span>
+        <span id="lastReso">—</span>
+      </div>
+      <div class="warning hidden" id="concentrationWarn">
+        <span class="warn-icon">⚠</span>
+        <span id="concentrationText"></span>
+      </div>
+    </section>
+
     <button class="run-sim-box" id="runSimBtn" type="button">
       <span class="run-sim-icon" aria-hidden="true">🎲</span>
       <span class="run-sim-content">
@@ -129,65 +157,39 @@
       </button>
     </section>
 
-    <section class="free-analytics">
-      <div class="section-label">Free analytics</div>
-      <div class="row">
-        <span>Risk score</span>
-        <span id="proRisk">—</span>
-      </div>
-      <div class="row">
-        <span>Slip 24h volume</span>
-        <span id="proVol24">—</span>
-      </div>
-      <div class="row">
-        <span>24h price drift <span class="row-hint">avg across legs</span></span>
-        <span id="proDrift">—</span>
-      </div>
-      <div class="row">
-        <span>Independent payout <span class="row-hint">no parlay, even split</span></span>
-        <span id="indSum">—</span>
-      </div>
-      <div class="row">
-        <span>Resolves by</span>
-        <span id="lastReso">—</span>
-      </div>
-      <div class="warning hidden" id="concentrationWarn">
-        <span class="warn-icon">⚠</span>
-        <span id="concentrationText"></span>
-      </div>
-    </section>
-
-    <section class="actions">
-      <button id="shareX" class="primary" disabled>Share to X</button>
-      <button id="downloadTop" class="secondary" disabled>Download PNG</button>
-    </section>
-    <div id="shareStatus" class="share-status"></div>
-
-    <details class="execute-menu" id="executeMenu">
-      <summary class="execute-summary">
-        <span class="execute-icon">↗</span>
-        <span>Execute this parlay</span>
-        <span class="execute-caret">▾</span>
-      </summary>
-      <div class="execute-options">
-        <a class="execute-opt" href="https://parlays.predictshark.io" target="_blank" rel="noopener" data-exec="predictshark">
-          <div class="execute-opt-title">PredictShark <span class="exec-badge">on-chain</span></div>
-          <div class="execute-opt-desc">Combines all legs into a single Polygon contract. Real parlay execution — all legs must hit for payout.</div>
-        </a>
-        <button type="button" class="execute-opt" id="openAllLegs" data-exec="pm-manual">
-          <div class="execute-opt-title">Open each leg on Polymarket</div>
-          <div class="execute-opt-desc">Place positions independently. You get per-leg payouts that sum — not the parlay multiplier.</div>
-        </button>
-      </div>
-    </details>
-
-    <div class="parlay-note">
-      PolyParlay is informational. The multiplier shown assumes a true parlay (all-or-nothing). Polymarket itself pays each leg independently — use an on-chain service to execute as a parlay.
-    </div>
-
     <section id="cardWrap" class="card-wrap hidden">
       <canvas id="card" width="1200" height="630"></canvas>
     </section>
+
+    <section class="actions-group">
+      <div class="actions-title">Share &amp; execute</div>
+      <div class="actions-row">
+        <button id="shareX" class="primary" disabled>Share to X</button>
+        <button id="downloadTop" class="secondary" disabled>Download PNG</button>
+      </div>
+      <details class="execute-menu" id="executeMenu">
+        <summary class="execute-summary">
+          <span class="execute-icon">↗</span>
+          <span>Execute this parlay</span>
+          <span class="execute-caret">▾</span>
+        </summary>
+        <div class="execute-options">
+          <a class="execute-opt" href="https://parlays.predictshark.io" target="_blank" rel="noopener" data-exec="predictshark">
+            <div class="execute-opt-title">PredictShark <span class="exec-badge">on-chain</span></div>
+            <div class="execute-opt-desc">Combines all legs into a single Polygon contract. Real parlay execution — all legs must hit for payout.</div>
+          </a>
+          <button type="button" class="execute-opt" id="openAllLegs" data-exec="pm-manual">
+            <div class="execute-opt-title">Open each leg on Polymarket</div>
+            <div class="execute-opt-desc">Place positions independently. You get per-leg payouts that sum — not the parlay multiplier.</div>
+          </button>
+        </div>
+      </details>
+      <div id="shareStatus" class="share-status"></div>
+    </section>
+
+    <div class="parlay-note">
+      PolyParlay is informational. Multiplier assumes a true parlay (all-or-nothing). Polymarket pays each leg independently — use PredictShark to execute as a parlay.
+    </div>
 
     <footer>
       <span id="proTierIndicator" class="pro-tier-indicator">Free</span>
