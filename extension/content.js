@@ -103,49 +103,48 @@
     return /(?:^|\.)polymarket\.com$/.test(window.location.hostname);
   }
 
-  // -------- Theme sync — trust the actual VISUAL rendering first because
-  // PM (and many SPAs) keep stale class="dark" / data-theme="dark" on the
-  // root even when the visible page is rendered in light. Order:
-  //   1. Computed bg color of body/html/main/#__next (first opaque wins)
-  //   2. Computed text color of body (inverted — light text => dark page)
-  //   3. Explicit data-theme/data-mode attribute
-  //   4. Explicit .dark/.light class
-  //   5. <meta name="color-scheme">
-  //   6. OS prefers-color-scheme
+  // -------- Theme sync — body TEXT color is the most reliable signal
+  // because (unlike bg, which can be transparent or stale-cached on SPAs)
+  // text is always set to an explicit non-transparent value matching the
+  // actual rendered page. Light text => dark page; dark text => light page.
   function detectTheme() {
     const parse = (s) => {
       const m = (s || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
       if (!m) return null;
       return { r: +m[1], g: +m[2], b: +m[3], a: m[4] != null ? +m[4] : 1 };
     };
+    const isLight = (rgb) => rgb.r + rgb.g + rgb.b >= 384;
 
-    // 1. computed bg — try several roots, first one with real opacity wins.
-    //    This is the authoritative "what does the user actually see" signal.
+    // 1. PRIMARY: body text color (inverted -> theme). This is what users see.
+    if (document.body) {
+      try {
+        const p = parse(getComputedStyle(document.body).color);
+        if (p && p.a >= 0.5) {
+          // text is LIGHT (sum >= 384) means the page bg is DARK
+          return isLight(p) ? 'dark' : 'light';
+        }
+      } catch {}
+    }
+
+    // 2. SECONDARY: try common content roots' computed bg (text might be
+    // unset on body for some SPAs). First opaque bg wins.
     const bgTargets = [
-      document.body,
-      document.documentElement,
       document.querySelector('main'),
       document.querySelector('#__next'),
       document.querySelector('[class*="layout"]'),
+      document.body,
+      document.documentElement,
     ].filter(Boolean);
     for (const el of bgTargets) {
       try {
         const p = parse(getComputedStyle(el).backgroundColor);
         if (p && p.a >= 0.5) {
-          return p.r + p.g + p.b < 384 ? 'dark' : 'light';
+          return isLight(p) ? 'light' : 'dark';
         }
       } catch {}
     }
 
-    // 2. body text color — light text on transparent bg implies a dark page
-    if (document.body) {
-      try {
-        const p = parse(getComputedStyle(document.body).color);
-        if (p) return p.r + p.g + p.b > 384 ? 'dark' : 'light';
-      } catch {}
-    }
-
-    // 3 & 4. fall back to declarative signals (these can lie when SPA caches them)
+    // 3 & 4. declarative signals (these can lie when SPA caches them, so last)
     for (const el of [document.documentElement, document.body]) {
       if (!el) continue;
       const dt = el.getAttribute('data-theme') || el.getAttribute('data-mode');
@@ -154,28 +153,23 @@
       if (el.classList.contains('light')) return 'light';
     }
 
-    // 5. <meta color-scheme>
-    const metaScheme = document.querySelector('meta[name="color-scheme"]');
-    if (metaScheme) {
-      const v = (metaScheme.getAttribute('content') || '').toLowerCase();
-      if (v.includes('only dark') || v === 'dark') return 'dark';
-      if (v.includes('only light') || v === 'light') return 'light';
-    }
-
-    // 6. OS
+    // 5. OS preference
     if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
     return 'light';
   }
 
+  // lastTheme intentionally allowed to be re-evaluated on every syncTheme;
+  // we don't memoize across calls because PM can flip themes via user setting
+  // changes that don't fire location-change events.
   let lastTheme = null;
-  function syncTheme() {
+  function syncTheme(opts) {
     const t = detectTheme();
-    if (t === lastTheme) return;
+    const force = opts && opts.force;
+    if (!force && t === lastTheme) return;
     lastTheme = t;
     try {
       chrome.storage.local.set({ pmTheme: t });
     } catch {}
-    // Apply to floating button + preview drawer
     document.documentElement.setAttribute('data-pw-theme', t);
     const btn = document.getElementById(BTN_ID);
     if (btn) btn.setAttribute('data-pw-theme', t);
@@ -269,6 +263,9 @@
   function showPreview(slip, status) {
     const p = ensurePreview();
     if (!p) return;
+    // Re-evaluate theme every time the drawer opens so it matches PM's
+    // CURRENT theme, not whatever was cached at content-script init time.
+    syncTheme({ force: true });
     renderPreview(p, slip, status);
     p.classList.remove('pw-hidden');
     if (hideTimer) clearTimeout(hideTimer);
