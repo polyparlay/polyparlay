@@ -301,12 +301,13 @@ let lastRebalance = null;
 //   - 'free'  = neither
 //   - 'expired' = had trial that ended without payment (= 'free' but UX differs)
 
-// One-time hard reset to free tier on this version. Runs on the first popup
-// load after install/update to 1.0.15, then sets the flag so it's a no-op
-// thereafter. Lets operator walk the end-to-end upgrade journey as a real
-// free user. Cycle states via the footer tier pill if you need to revisit.
-const FORCE_FREE_RESET_VERSION = '1.0.15';
+// One-time free-tier reset is a no-op in production. Kept as a stub so the
+// applyProState wiring continues to compile; flip FORCE_FREE_RESET_VERSION
+// to a future version string only when you need to wipe state across all
+// installs again (typically only for major schema changes).
+const FORCE_FREE_RESET_VERSION = null;
 async function maybeForceFreeReset() {
+  if (!FORCE_FREE_RESET_VERSION) return;
   const { lastFreeResetVersion } = await chrome.storage.local.get(['lastFreeResetVersion']);
   if (lastFreeResetVersion === FORCE_FREE_RESET_VERSION) return;
   await chrome.storage.local.remove(['proState']);
@@ -1499,12 +1500,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Dev affordance: click the footer tier pill to cycle through
   //   free → trial → paid → expired → free
-  // Lets you preview every lockout state without resetting chrome.storage.
-  // Visually: cursor:pointer + hover so it's obvious the pill is clickable.
+  // Production-gated: only enabled when localStorage.polyparlay_dev === '1'.
+  // To enable in your own browser: open the popup, then in DevTools console:
+  //   localStorage.setItem('polyparlay_dev', '1')
+  // and reopen the popup. To turn off: localStorage.removeItem('polyparlay_dev').
+  // Without this flag a public user clicking the footer pill does nothing —
+  // they can't accidentally (or deliberately) flip themselves to Paid.
   const tierEl = document.getElementById('proTierIndicator');
-  if (tierEl) {
+  const devCycleEnabled = (() => {
+    try { return localStorage.getItem('polyparlay_dev') === '1'; }
+    catch { return false; }
+  })();
+  if (tierEl && devCycleEnabled) {
     tierEl.style.cursor = 'pointer';
-    tierEl.title = 'Click to cycle state (Free → Trial → Paid → Expired)';
+    tierEl.title = 'DEV: Click to cycle state (Free → Trial → Paid → Expired)';
     tierEl.addEventListener('click', async (e) => {
       e.preventDefault();
       const { proState } = await chrome.storage.local.get(['proState']);
