@@ -1,0 +1,68 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+     font-family="Impact, 'Arial Black', sans-serif">
+  <!-- STYLE B: Reference #2 (POW!) — blue jagged burst FILLED with halftone
+       dots, yellow cloud center, single hero word in red. -->
+
+  <defs>
+    <pattern id="hf" x="0" y="0" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="2.5" r="1" fill="#0a0c14" opacity="0.8"/>
+    </pattern>
+    <clipPath id="burstClipB">
+      <path d="M 64 4
+               L 78 26 L 104 6 L 96 32 L 124 18 L 102 44
+               L 126 64 L 102 84 L 124 110 L 96 96 L 104 122
+               L 78 102 L 64 124 L 50 102 L 24 122 L 32 96
+               L 4 110 L 26 84 L 2 64 L 26 44 L 4 18
+               L 32 32 L 24 6 L 50 26 Z"
+            transform="rotate(-7 64 64)"/>
+    </clipPath>
+  </defs>
+
+  <!-- Off-white paper -->
+  <rect width="128" height="128" fill="#f5f1e8" rx="22"/>
+
+  <!-- Burst body (cyan blue) -->
+  <g transform="rotate(-7 64 64)">
+    <path d="M 64 4
+             L 78 26 L 104 6 L 96 32 L 124 18 L 102 44
+             L 126 64 L 102 84 L 124 110 L 96 96 L 104 122
+             L 78 102 L 64 124 L 50 102 L 24 122 L 32 96
+             L 4 110 L 26 84 L 2 64 L 26 44 L 4 18
+             L 32 32 L 24 6 L 50 26 Z"
+          fill="#7dd3fc" stroke="#0a0c14" stroke-width="4.5"
+          stroke-linejoin="miter" stroke-miterlimit="3"/>
+  </g>
+
+  <!-- Halftone dots OVERLAID inside the burst silhouette -->
+  <g clip-path="url(#burstClipB)">
+    <rect width="128" height="128" fill="url(#hf)"/>
+  </g>
+
+  <!-- Yellow cloud center (sits on top of halftone) -->
+  <path d="M 64 32
+           Q 80 22 88 38
+           Q 102 42 94 56
+           Q 106 70 92 78
+           Q 92 94 76 92
+           Q 64 104 52 92
+           Q 36 94 36 78
+           Q 22 70 34 56
+           Q 26 42 40 38
+           Q 48 22 64 32 Z"
+        fill="#fde047" stroke="#0a0c14" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- HERO TEXT: "PARLAY!" only — single big word, 3D italic red -->
+  <g transform="skewX(-14)" font-weight="900" text-anchor="middle">
+    <!-- Drop shadow -->
+    <text x="78" y="80" font-size="32" fill="#0a0c14"
+          letter-spacing="-2" dx="4" dy="4">PARLAY!</text>
+    <!-- Black thick outline -->
+    <text x="78" y="80" font-size="32" stroke="#0a0c14" stroke-width="7"
+          stroke-linejoin="round" fill="#0a0c14" letter-spacing="-2">PARLAY!</text>
+    <!-- White inner outline -->
+    <text x="78" y="80" font-size="32" stroke="#ffffff" stroke-width="3.5"
+          stroke-linejoin="round" fill="#ffffff" letter-spacing="-2">PARLAY!</text>
+    <!-- Red fill -->
+    <text x="78" y="80" font-size="32" fill="#dc2626" letter-spacing="-2">PARLAY!</text>
+  </g>
+</svg>
