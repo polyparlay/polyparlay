@@ -1071,6 +1071,14 @@ body.state-expired .run-sim-box .pro-tag {
   font-weight: 700;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.12s ease, transform 0.1s ease;
+}
+.pro-tier-indicator:hover {
+  filter: brightness(1.18);
+}
+.pro-tier-indicator:active {
+  transform: scale(0.94);
 }
 .pro-tier-indicator.tier-free { background: var(--line); color: var(--muted); }
 .pro-tier-indicator.tier-trial { background: rgba(99,102,241,0.25); color: var(--accent); }

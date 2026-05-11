@@ -1402,13 +1402,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (next) applyProState();
   });
 
-  // Dev affordance: Shift+click the footer tier pill to cycle through
+  // Dev affordance: click the footer tier pill to cycle through
   //   free → trial → paid → expired → free
-  // Useful for previewing each lockout state without resetting storage manually.
+  // Lets you preview every lockout state without resetting chrome.storage.
+  // Visually: cursor:pointer + hover so it's obvious the pill is clickable.
   const tierEl = document.getElementById('proTierIndicator');
   if (tierEl) {
+    tierEl.style.cursor = 'pointer';
+    tierEl.title = 'Click to cycle state (Free → Trial → Paid → Expired)';
     tierEl.addEventListener('click', async (e) => {
-      if (!e.shiftKey) return;
       e.preventDefault();
       const { proState } = await chrome.storage.local.get(['proState']);
       const now = Date.now();
