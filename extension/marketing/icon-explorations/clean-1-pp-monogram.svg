@@ -1,0 +1,20 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+     font-family="-apple-system, 'Inter', 'Helvetica Neue', Arial, sans-serif">
+  <!-- CLEAN OPTION 1: PP monogram — bold wordmark, single color block,
+       reads cleanly at every size. Most pro/universal direction. -->
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg1)" rx="22"/>
+
+  <!-- "PP" — bold black weight, slight overlap for a custom-feel monogram.
+       First P in white, second P in lighter purple for visual depth. -->
+  <g font-weight="900" font-size="78" text-anchor="middle">
+    <text x="44" y="90" fill="#ffffff" letter-spacing="-4">P</text>
+    <text x="84" y="90" fill="#a5b4fc" letter-spacing="-4">P</text>
+  </g>
+</svg>

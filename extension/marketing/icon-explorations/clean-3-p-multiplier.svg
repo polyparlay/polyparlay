@@ -1,0 +1,27 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+     font-family="-apple-system, 'Inter', 'Helvetica Neue', Arial, sans-serif">
+  <!-- CLEAN OPTION 3: Big bold "P" with a × multiplier badge in the
+       corner. "P" = PolyParlay; "×" = parlay multiplier math. Single
+       letter + accent badge survives toolbar size. -->
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" fill="url(#bg3)" rx="22"/>
+
+  <!-- Big bold P, centered -->
+  <text x="56" y="100" font-weight="900" font-size="110" fill="#ffffff"
+        letter-spacing="-6" text-anchor="middle">P</text>
+
+  <!-- × multiplier badge — top-right corner, amber for accent -->
+  <g transform="translate(98 32)">
+    <circle r="22" fill="#fbbf24" stroke="#0a0c14" stroke-width="2.5"/>
+    <line x1="-9" y1="-9" x2="9" y2="9" stroke="#0a0c14"
+          stroke-width="5" stroke-linecap="round"/>
+    <line x1="-9" y1="9" x2="9" y2="-9" stroke="#0a0c14"
+          stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>
