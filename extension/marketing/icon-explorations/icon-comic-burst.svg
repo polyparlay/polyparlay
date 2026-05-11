@@ -1,8 +1,6 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
      font-family="Impact, 'Arial Black', sans-serif">
   <defs>
-    <!-- Halftone dot pattern — small black dots on transparent for that
-         printed-comic stipple feel in the corners -->
     <pattern id="halftone" x="0" y="0" width="6" height="6"
              patternUnits="userSpaceOnUse">
       <circle cx="3" cy="3" r="1.2" fill="#0a0c14" opacity="0.55"/>
@@ -17,83 +15,74 @@
     </mask>
   </defs>
 
-  <!-- Off-white card background (classic comic-page paper) -->
+  <!-- Off-white comic-page paper background -->
   <rect width="128" height="128" fill="#f5f1e8" rx="22" ry="22"/>
 
   <!-- Halftone dot stipple in corners only -->
   <rect width="128" height="128" fill="url(#halftone)" mask="url(#halftoneMask)"/>
 
   <!-- ==========================================================
-       Outer BLUE starburst — 11 irregular jagged spikes with
-       variable lengths. Sharp miter corners, heavy black outline.
-       Tilted -8° for comic-page energy.
+       SMALLER blue burst — backdrop only. Inset from edges so the
+       text can overflow it on the left/right like reference KAPOW.
        ========================================================== -->
-  <g transform="rotate(-8 64 64)">
-    <!-- BLUE outer burst, with drop shadow -->
-    <path d="M 64 2
-             L 76 28 L 104 8 L 96 36 L 124 20 L 100 48
-             L 126 64 L 100 80 L 122 102 L 94 90 L 102 124
-             L 74 98 L 60 126 L 50 96 L 22 122 L 32 92
-             L 4 108 L 22 78 L 0 64 L 26 52 L 8 28
-             L 36 38 L 30 2 L 50 30 Z"
-          fill="#000" opacity="0.35" transform="translate(2 4)"/>
+  <g transform="rotate(-6 64 64)">
+    <!-- Drop shadow -->
+    <path d="M 64 14
+             L 72 32 L 92 18 L 88 38 L 110 30
+             L 96 50 L 116 64 L 96 78 L 110 98
+             L 88 90 L 92 110 L 72 96 L 64 114
+             L 56 96 L 36 110 L 40 90 L 18 98
+             L 32 78 L 12 64 L 32 50 L 18 30
+             L 40 38 L 36 18 L 56 32 Z"
+          fill="#000" opacity="0.3" transform="translate(2 3)"/>
 
-    <path d="M 64 2
-             L 76 28 L 104 8 L 96 36 L 124 20 L 100 48
-             L 126 64 L 100 80 L 122 102 L 94 90 L 102 124
-             L 74 98 L 60 126 L 50 96 L 22 122 L 32 92
-             L 4 108 L 22 78 L 0 64 L 26 52 L 8 28
-             L 36 38 L 30 2 L 50 30 Z"
+    <!-- Blue starburst -->
+    <path d="M 64 14
+             L 72 32 L 92 18 L 88 38 L 110 30
+             L 96 50 L 116 64 L 96 78 L 110 98
+             L 88 90 L 92 110 L 72 96 L 64 114
+             L 56 96 L 36 110 L 40 90 L 18 98
+             L 32 78 L 12 64 L 32 50 L 18 30
+             L 40 38 L 36 18 L 56 32 Z"
           fill="#2563eb"
-          stroke="#0a0c14" stroke-width="4.5" stroke-linejoin="miter" stroke-miterlimit="3"/>
+          stroke="#0a0c14" stroke-width="4" stroke-linejoin="miter" stroke-miterlimit="3"/>
 
-    <!-- ==========================================================
-         Inner YELLOW cloud-burst — 9 rounded scallops (Q-curves).
-         Smaller, sits inside the blue spikes. Heavy black outline.
-         ========================================================== -->
-    <path d="M 64 30
-             Q 80 22 86 39
-             Q 102 42 96 58
-             Q 108 70 92 80
-             Q 92 96 76 94
-             Q 64 106 52 94
-             Q 36 96 36 80
-             Q 20 70 32 58
-             Q 26 42 42 39
-             Q 48 22 64 30 Z"
-          fill="#fde047"
-          stroke="#0a0c14" stroke-width="3.5" stroke-linejoin="round"/>
-
-    <!-- ==========================================================
-         Text: stacked POLY / PARLAY! — italic skewed, bold,
-         red-on-white-on-black 3-layer comic lettering.
-         ========================================================== -->
-    <g transform="skewX(-12)" font-weight="900" text-anchor="middle">
-      <!-- POLY (top line, slightly smaller) -->
-      <text x="68" y="60" font-size="20"
-            stroke="#0a0c14" stroke-width="6" stroke-linejoin="round" fill="#0a0c14"
-            letter-spacing="-0.5">POLY</text>
-      <text x="68" y="60" font-size="20"
-            stroke="#ffffff" stroke-width="3" stroke-linejoin="round" fill="#ffffff"
-            letter-spacing="-0.5">POLY</text>
-      <text x="68" y="60" font-size="20" fill="#dc2626" letter-spacing="-0.5">POLY</text>
-
-      <!-- PARLAY! (bottom line, the hero text) -->
-      <text x="68" y="88" font-size="24"
-            stroke="#0a0c14" stroke-width="7" stroke-linejoin="round" fill="#0a0c14"
-            letter-spacing="-1">PARLAY!</text>
-      <text x="68" y="88" font-size="24"
-            stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round" fill="#ffffff"
-            letter-spacing="-1">PARLAY!</text>
-      <text x="68" y="88" font-size="24" fill="#dc2626" letter-spacing="-1">PARLAY!</text>
-    </g>
+    <!-- Inner yellow cloud — small, sits inside burst as fill -->
+    <ellipse cx="64" cy="64" rx="40" ry="32" fill="#fde047"
+             stroke="#0a0c14" stroke-width="3"/>
   </g>
 
-  <!-- Small yellow stars sparking out around the burst (comic accents) -->
+  <!-- ==========================================================
+       GIANT TEXT — the hero. Stacked POLY / PARLAY!, BIG enough
+       to overflow the burst on left/right. Italic skewed, 3-layer
+       comic lettering (black outer / white mid / red fill).
+       ========================================================== -->
+  <g transform="skewX(-14)" font-weight="900" text-anchor="middle">
+
+    <!-- POLY (top line) — 30px -->
+    <text x="72" y="62" font-size="30"
+          stroke="#0a0c14" stroke-width="8" stroke-linejoin="round" fill="#0a0c14"
+          letter-spacing="-1">POLY</text>
+    <text x="72" y="62" font-size="30"
+          stroke="#ffffff" stroke-width="4" stroke-linejoin="round" fill="#ffffff"
+          letter-spacing="-1">POLY</text>
+    <text x="72" y="62" font-size="30" fill="#dc2626" letter-spacing="-1">POLY</text>
+
+    <!-- PARLAY! (bottom line) — 26px (longer string) -->
+    <text x="72" y="94" font-size="26"
+          stroke="#0a0c14" stroke-width="8" stroke-linejoin="round" fill="#0a0c14"
+          letter-spacing="-1.5">PARLAY!</text>
+    <text x="72" y="94" font-size="26"
+          stroke="#ffffff" stroke-width="4" stroke-linejoin="round" fill="#ffffff"
+          letter-spacing="-1.5">PARLAY!</text>
+    <text x="72" y="94" font-size="26" fill="#dc2626" letter-spacing="-1.5">PARLAY!</text>
+  </g>
+
+  <!-- Small yellow star sparks around the burst -->
   <g fill="#fde047" stroke="#0a0c14" stroke-width="1.5" stroke-linejoin="miter">
-    <path d="M 16 18 L 18 22 L 22 23 L 18 24 L 16 28 L 14 24 L 10 23 L 14 22 Z"/>
-    <path d="M 112 24 L 114 28 L 119 29 L 114 30 L 112 34 L 110 30 L 105 29 L 110 28 Z"/>
-    <path d="M 18 108 L 20 112 L 24 113 L 20 114 L 18 118 L 16 114 L 12 113 L 16 112 Z"/>
-    <path d="M 108 102 L 110 106 L 115 107 L 110 108 L 108 112 L 106 108 L 101 107 L 106 106 Z"/>
+    <path d="M 14 18 L 17 24 L 23 25 L 17 26 L 14 32 L 11 26 L 5 25 L 11 24 Z"/>
+    <path d="M 114 20 L 117 26 L 123 27 L 117 28 L 114 34 L 111 28 L 105 27 L 111 26 Z"/>
+    <path d="M 18 106 L 20 110 L 24 111 L 20 112 L 18 116 L 16 112 L 12 111 L 16 110 Z"/>
+    <path d="M 110 108 L 112 112 L 116 113 L 112 114 L 110 118 L 108 114 L 104 113 L 108 112 Z"/>
   </g>
 </svg>
