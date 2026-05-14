@@ -1,0 +1,89 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="55%" stop-color="#0e1322"/>
+      <stop offset="100%" stop-color="#161a2e"/>
+    </linearGradient>
+    <radialGradient id="glow3" cx="78%" cy="78%" r="55%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1f3a"/>
+      <stop offset="100%" stop-color="#141829"/>
+    </linearGradient>
+    <filter id="blur3"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+
+  <rect width="1280" height="800" fill="url(#bg3)"/>
+  <rect width="1280" height="800" fill="url(#glow3)"/>
+
+  <!-- LEFT: headline -->
+  <text x="90" y="250" font-size="56" font-weight="900" fill="#f9fafb">Free analytics now.</text>
+  <text x="90" y="314" font-size="56" font-weight="900" fill="#f9fafb">Pro signals when</text>
+  <text x="90" y="378" font-size="56" font-weight="900" fill="#f9fafb">you're ready.</text>
+  <text x="90" y="442" font-size="26" font-weight="500" fill="#9ca3af">Risk score, resolution dates and 24h volume are free.</text>
+  <text x="90" y="476" font-size="26" font-weight="500" fill="#9ca3af">Pro unlocks price drift, expected ROI and Improve Odds.</text>
+
+  <g transform="translate(90 530)">
+    <rect width="290" height="44" rx="22" fill="#6366f1" fill-opacity="0.14" stroke="#6366f1" stroke-opacity="0.45"/>
+    <text x="145" y="29" text-anchor="middle" font-size="15" font-weight="800" fill="#a5b4fc">7-DAY FREE TRIAL · NO CARD</text>
+  </g>
+
+  <!-- RIGHT: analytics card -->
+  <g transform="translate(770 130)">
+    <rect width="420" height="540" rx="16" fill="url(#card3)"
+          stroke="#6366f1" stroke-opacity="0.4" stroke-width="1.5"/>
+
+    <!-- analytics header -->
+    <circle cx="26" cy="34" r="5" fill="#6366f1"/>
+    <text x="40" y="40" font-size="13" font-weight="800" fill="#a5b4fc" letter-spacing="1">ANALYTICS</text>
+    <text x="396" y="40" text-anchor="end" font-size="11" font-weight="700" fill="#6b7280">LIVE</text>
+    <line x1="20" y1="52" x2="400" y2="52" stroke="#6366f1" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <!-- FREE rows -->
+    <text x="22" y="84" font-size="14" fill="#9ca3af">Risk score</text>
+    <text x="398" y="84" text-anchor="end" font-size="14" font-weight="700" fill="#fbbf24">MODERATE</text>
+
+    <text x="22" y="114" font-size="14" fill="#9ca3af">Resolves by</text>
+    <text x="398" y="114" text-anchor="end" font-size="14" font-weight="700" fill="#f9fafb">31 May 2026</text>
+
+    <text x="22" y="144" font-size="14" fill="#9ca3af">Slip 24h volume</text>
+    <text x="398" y="144" text-anchor="end" font-size="14" font-weight="700" fill="#f9fafb">$143.0K</text>
+
+    <!-- divider -->
+    <line x1="20" y1="166" x2="400" y2="166" stroke="#6366f1" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <!-- PRO label -->
+    <rect x="20" y="180" width="52" height="18" rx="4" fill="#f59e0b"/>
+    <text x="46" y="193" text-anchor="middle" font-size="10" font-weight="900" fill="#0a0c14">🔒 PRO</text>
+    <text x="82" y="193" font-size="10" font-weight="800" fill="#6366f1" letter-spacing="0.8">DECISION-MAKING SIGNALS</text>
+
+    <!-- blurred PRO rows -->
+    <text x="22" y="226" font-size="14" fill="#9ca3af">24h price drift</text>
+    <text x="398" y="226" text-anchor="end" font-size="14" font-weight="800" fill="#6366f1" filter="url(#blur3)">+37.0pp</text>
+
+    <text x="22" y="256" font-size="14" fill="#9ca3af">Expected ROI</text>
+    <text x="398" y="256" text-anchor="end" font-size="14" font-weight="800" fill="#6366f1" filter="url(#blur3)">+12.4%</text>
+
+    <text x="22" y="286" font-size="14" fill="#9ca3af">Improve Odds</text>
+    <text x="398" y="286" text-anchor="end" font-size="14" font-weight="800" fill="#6366f1" filter="url(#blur3)">Flip leg 2</text>
+
+    <!-- unlock CTA -->
+    <g transform="translate(20 308)">
+      <rect width="380" height="56" rx="8" fill="#6366f1"/>
+      <text x="190" y="26" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">Unlock decision-making data</text>
+      <text x="190" y="44" text-anchor="middle" font-size="11" font-weight="600" fill="#e0e7ff">Start 7-day free trial · no card · cancel anytime</text>
+    </g>
+
+    <!-- pro section preview -->
+    <line x1="20" y1="392" x2="400" y2="392" stroke="#2c3142" stroke-width="1"/>
+    <text x="22" y="418" font-size="11" font-weight="800" fill="#fbbf24" letter-spacing="0.6">INCLUDED WITH PRO</text>
+    <text x="22" y="442" font-size="12.5" fill="#d1d5db">✓ Monte Carlo simulation — 10,000 outcomes</text>
+    <text x="22" y="464" font-size="12.5" fill="#d1d5db">✓ Improve Odds rebalancer</text>
+    <text x="22" y="486" font-size="12.5" fill="#d1d5db">✓ Unlimited legs (free is capped at 3)</text>
+    <text x="22" y="508" font-size="12.5" fill="#d1d5db">✓ Watermark-free shareable slip cards</text>
+  </g>
+</svg>
