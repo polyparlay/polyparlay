@@ -52,10 +52,10 @@ Injects the "+ Add to slip" floating pill on Polymarket market pages so users ca
 PolyParlay's Cloudflare Worker (polyparlay-verify.workers.dev) verifies Pro subscription payments on Polygon. Only called when the user explicitly submits the wallet address they paid from on our upgrade page.
 ```
 
-### `https://polyparlay.io/*`
+### `https://polyparlay.app/*`
 
 ```
-The polyparlay.io upgrade page calls back into the extension to mark Pro as active after on-chain payment verification succeeds. This is gated by externally_connectable so only our domain can message the extension.
+The polyparlay.app upgrade page calls back into the extension to mark Pro as active after on-chain payment verification succeeds. This is gated by externally_connectable so only our domain can message the extension.
 ```
 
 ---

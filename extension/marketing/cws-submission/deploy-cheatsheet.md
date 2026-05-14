@@ -24,9 +24,9 @@ When the build finishes, your URL will be something like `https://polyparlay-xyz
 
 ### Set the custom domain
 
-1. In the Vercel project: Settings → Domains → Add → `polyparlay.io`
+1. In the Vercel project: Settings → Domains → Add → `polyparlay.app`
 2. Vercel gives you DNS records to add at your registrar (A or CNAME)
-3. After DNS propagates (5–30 min), https://polyparlay.io and https://polyparlay.io/privacy work
+3. After DNS propagates (5–30 min), https://polyparlay.app and https://polyparlay.app/privacy work
 
 ### CLI alternative (if you prefer terminal)
 
@@ -85,7 +85,7 @@ The web/upgrade.html change needs to redeploy. If Vercel is hooked to GitHub, ju
 
 ```bash
 cd /Users/clawdlawd/polyparlay/extension
-zip -r ../polyparlay-v1.0.27.zip . \
+zip -r ../polyparlay-v1.0.30.zip . \
   -x "marketing/*" \
   -x ".DS_Store" \
   -x "**/.DS_Store" \
@@ -96,19 +96,19 @@ zip -r ../polyparlay-v1.0.27.zip . \
   -x "icons/README.md"
 ```
 
-This zip is what you upload to CWS. Already built once at the repo root as `polyparlay-v1.0.27.zip`.
+This zip is what you upload to CWS. Already built once at the repo root as `polyparlay-v1.0.30.zip`.
 
 ---
 
 ## 5. Submit to Chrome Web Store
 
 1. Register your developer account ($5 one-time): https://chrome.google.com/webstore/devconsole/register
-2. New item → upload `polyparlay-v1.0.27.zip`
+2. New item → upload `polyparlay-v1.0.30.zip`
 3. Fill the listing form using the copy in `extension/marketing/cws-submission/listing-copy.md`
 4. Fill permission justifications using `extension/marketing/cws-submission/permissions-justifications.md`
 5. Upload screenshots (1280×800 each) per `extension/marketing/cws-submission/screenshot-specs.md`
 6. Optional: upload `extension/marketing/promo-tiles/small-440x280.png` and `marquee-1400x560.png`
-7. Privacy URL: `https://polyparlay.io/privacy` (must already be deployed!)
+7. Privacy URL: `https://polyparlay.app/privacy` (must already be deployed!)
 8. Submit for review → typically 1–3 business days
 
 ---

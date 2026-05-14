@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PolyParlay — Parlay Builder for Polymarket",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "description": "Build multi-leg parlays from Polymarket. 10K Monte Carlo, auto-rebalance weak legs, shareable slip cards.",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
@@ -10,7 +10,7 @@
     "https://polymarket.com/*",
     "https://*.polymarket.com/*",
     "https://*.workers.dev/*",
-    "https://polyparlay.io/*"
+    "https://polyparlay.app/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -38,6 +38,6 @@
     }
   ],
   "externally_connectable": {
-    "matches": ["https://polyparlay.io/*", "https://*.polyparlay.io/*"]
+    "matches": ["https://polyparlay.app/*", "https://*.polyparlay.app/*"]
   }
 }

@@ -246,7 +246,7 @@ async function openExtensionUI() {
   }
 }
 
-// External messages from the polyparlay.io upgrade page (defined in
+// External messages from the polyparlay.app upgrade page (defined in
 // manifest.externally_connectable). When user pays + verifies on the upgrade
 // page, the page calls chrome.runtime.sendMessage(EXTENSION_ID, {...}) to
 // flip the extension's proState to 'paid'.

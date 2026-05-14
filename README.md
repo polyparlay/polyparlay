@@ -39,7 +39,7 @@ polyparlay/
 - Generate 1200×630 slip card via Canvas (Twitter/OG card dimensions)
 - Download PNG or copy shareable link (slip data encoded in URL hash)
 - Share to X with pre-filled tweet text + slip URL
-- Open shared slips at `polyparlay.io/slip#<encoded>` — works without the extension installed
+- Open shared slips at `polyparlay.app/slip#<encoded>` — works without the extension installed
 - 4th-leg gate with "would jump to N×" preview copy (Pro upsell hook)
 - Outbound `?ref=polyparlay` referral on every Polymarket/Kalshi click-through
 
@@ -93,7 +93,7 @@ The Smart Money Feed is what changes the economics. Without it, this is a $10-15
 You need **both**, not either-or:
 
 - **GitHub** hosts the source code (the git repo you've been committing into). Makes the project public, gets you a star count, satisfies HN/r/Polymarket "show me the code" requests, lands you in the Awesome-PM-Tools directory.
-- **Vercel** hosts the static website (`polyparlay.io`, `polyparlay.io/upgrade`, `polyparlay.io/slip`). Serves the actual pages users visit.
+- **Vercel** hosts the static website (`polyparlay.app`, `polyparlay.app/upgrade`, `polyparlay.app/slip`). Serves the actual pages users visit.
 
 The clean flow is **GitHub → Vercel auto-deploy**: push to GitHub, Vercel watches the `web/` subdirectory and rebuilds on every push. One source of truth, automatic deploys. You set this up once in 5 minutes.
 
@@ -101,7 +101,7 @@ The clean flow is **GitHub → Vercel auto-deploy**: push to GitHub, Vercel watc
 
 ### 1. Domain + handles
 
-- [ ] Register `polyparlay.io` on Namecheap or Cloudflare Domains (~$12/yr)
+- [ ] Register `polyparlay.app` on Namecheap or Cloudflare Domains (~$12/yr)
 - [ ] Verify `@polyparlay` X handle availability and grab it
 - [ ] Create dedicated `polyparlay@gmail.com` (CWS owner email; never personal)
 
@@ -157,7 +157,7 @@ git push -u origin master
    - **Build Command:** (leave empty)
    - **Output Directory:** (leave empty — Vercel serves the `web/` directory as-is)
 5. Deploy. Every subsequent `git push` auto-deploys.
-6. In Vercel project settings → Domains, add `polyparlay.io`. Vercel gives you the DNS records to add at your registrar (an A record + a CNAME).
+6. In Vercel project settings → Domains, add `polyparlay.app`. Vercel gives you the DNS records to add at your registrar (an A record + a CNAME).
 
 **Alternative one-off deploy (no auto-deploy):**
 
@@ -190,7 +190,7 @@ Note the deployed URL (e.g. `polyparlay-verify.YOUR_SUBDOMAIN.workers.dev`). Pas
 - [ ] `web/upgrade.html` → `YOUR_EXTENSION_ID` (after CWS publishes — used to message the extension on successful payment)
 - [ ] `extension/popup.js` → `VERIFY_URL` constant (same deployed worker URL)
 - [ ] `extension/popup.js` → `REF_CODE` (your PM/Kalshi affiliate code, if you sign up for those programs)
-- [ ] `web/privacy.html` → replace `hello@polyparlay.io` with your real contact email
+- [ ] `web/privacy.html` → replace `hello@polyparlay.app` with your real contact email
 
 ### 7. Submit to Chrome Web Store
 
@@ -240,7 +240,7 @@ If by day 30 from CWS approval:
 - 3-leg cap is enforced in popup but a determined user can edit `chrome.storage.local` directly. Acceptable for v1; tighten in v1.1 if abuse appears.
 - "Open on Polymarket" links carry `?ref=polyparlay` — replace with your verified affiliate code before launch. PM and Kalshi must accept these as referrals or commissions don't accrue.
 - Outcome cards are not yet implemented — they fire on market resolution. Requires either polling Gamma for resolution status or a separate web service. Defer to v1.1.
-- The popup's "Pro upgrade" button opens `polyparlay.io/upgrade` which doesn't exist yet. Stub the upgrade page on Cloudflare Pages before going live.
+- The popup's "Pro upgrade" button opens `polyparlay.app/upgrade` which doesn't exist yet. Stub the upgrade page on Cloudflare Pages before going live.
 - No icon files yet. Chrome will use defaults; Web Store submission requires real PNGs.
 
 ## Roadmap

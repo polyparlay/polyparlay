@@ -13,7 +13,7 @@ Built PolyParlay — a Chrome extension that turns Polymarket markets into multi
 
 Free tier covers most of it. Pro is $149/yr, on-chain.
 
-https://polyparlay.io
+https://polyparlay.app
 ```
 
 Attach: `02-rebalanced-by-algo.png`
@@ -29,7 +29,7 @@ build a parlay from any Polymarket market → see the win rate distribution → 
 
 free tier covers 3 legs + analytics. Pro unlocks Monte Carlo + unlimited legs.
 
-https://polyparlay.io
+https://polyparlay.app
 ```
 
 Attach: `01-audacious-lottery-parlay.png`
@@ -45,7 +45,7 @@ multi-leg parlays for Polymarket. 10K Monte Carlo sim. auto-rebalances your weak
 
 chrome extension. free + Pro $149/yr.
 
-https://polyparlay.io
+https://polyparlay.app
 ```
 
 Attach: `03-balanced-plus-EV.png`
@@ -82,7 +82,7 @@ hot first 24h of PolyParlay:
 
 top combo so far: [paste a screenshot of an actual user slip if you have one, or your own]
 
-https://polyparlay.io
+https://polyparlay.app
 ```
 
 (Replace X/Y/Z with real numbers from Vercel/Chrome Web Store analytics.)

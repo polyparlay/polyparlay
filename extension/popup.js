@@ -2,7 +2,7 @@
 // Renders slip, computes multiplier, generates Canvas card, shares.
 
 const FREE_LEG_LIMIT = 3;
-const VIEWER_BASE = 'https://polyparlay.io/slip';
+const VIEWER_BASE = 'https://polyparlay.app/slip';
 const REF_CODE = 'polyparlay'; // placeholder — replace with verified PM/Kalshi referral codes before publishing
 
 // Append referral parameter to outbound platform links
@@ -1248,7 +1248,7 @@ function drawCard() {
   // visual noise in a shareable image. Just the brand watermark now.
   ctx.fillStyle = '#6b7280';
   ctx.font = '700 14px -apple-system, sans-serif';
-  ctx.fillText('polyparlay.io', 60, H - 28);
+  ctx.fillText('polyparlay.app', 60, H - 28);
   ctx.fillStyle = '#4b5563';
   ctx.font = '500 12px -apple-system, sans-serif';
   ctx.textAlign = 'right';
@@ -1377,7 +1377,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('shareX').addEventListener('click', shareToX);
   document.getElementById('downloadTop').addEventListener('click', downloadCard);
   document.getElementById('upgrade').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=leg-gate' });
+    chrome.tabs.create({ url: 'https://polyparlay.app/upgrade?from=leg-gate' });
   });
   // addCurrent button was removed in v1.0.6 (the floating pill on PM pages
   // handles adding legs). Guard the listener so a missing element doesn't
@@ -1390,7 +1390,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainCta = document.getElementById('proMainCta');
   if (mainCta) {
     mainCta.addEventListener('click', () => {
-      chrome.tabs.create({ url: 'https://polyparlay.io/upgrade?from=main-cta' });
+      chrome.tabs.create({ url: 'https://polyparlay.app/upgrade?from=main-cta' });
     });
   }
 
@@ -1402,7 +1402,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const feature = el.getAttribute('data-pro') || 'unknown';
       chrome.tabs.create({
-        url: `https://polyparlay.io/upgrade?from=slip-${encodeURIComponent(feature)}`
+        url: `https://polyparlay.app/upgrade?from=slip-${encodeURIComponent(feature)}`
       });
     });
   });
@@ -1473,7 +1473,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderSummary();
     } else {
       chrome.tabs.create({
-        url: `https://polyparlay.io/upgrade?from=${encodeURIComponent(source)}`
+        url: `https://polyparlay.app/upgrade?from=${encodeURIComponent(source)}`
       });
     }
   }
@@ -1493,7 +1493,7 @@ document.addEventListener('DOMContentLoaded', () => {
   maybeForceFreeReset().then(() => applyProState());
 
   // After initial render, sync from worker in the background so an external
-  // payment (made on polyparlay.io/upgrade) gets reflected without a manual reload.
+  // payment (made on polyparlay.app/upgrade) gets reflected without a manual reload.
   syncProFromWorker().then((next) => {
     if (next) applyProState();
   });

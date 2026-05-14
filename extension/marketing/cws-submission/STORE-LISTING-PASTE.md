@@ -86,14 +86,14 @@ GRAPHIC ASSETS
 ADDITIONAL FIELDS
 ═══════════════════════════════════════════
 
-**Official URL**: leave as None (you'd need Google Search Console verification of polyparlay.io — skip for v1)
+**Official URL**: leave as None (you'd need Google Search Console verification of polyparlay.app — skip for v1)
 
 **Homepage URL**:
-`https://polyparlay.io`
+`https://polyparlay.app`
 
 **Support URL**:
-`https://polyparlay.io/privacy`
-(or `mailto:hello@polyparlay.io` if you prefer — but a URL ranks better)
+`https://polyparlay.app/privacy`
+(or `mailto:hello@polyparlay.app` if you prefer — but a URL ranks better)
 
 **Mature content**: leave UNCHECKED — PolyParlay is an analysis tool, not a gambling platform. (If a reviewer pushes back because it's prediction-market adjacent, you can revisit, but it does not facilitate betting directly.)
 
@@ -105,7 +105,7 @@ OTHER TABS (not "Store listing")
 - Single purpose: see listing-copy.md "Single-purpose statement"
 - Permission justifications: see permissions-justifications.md (one per field)
 - Data usage: tick everything NO per permissions-justifications.md
-- Privacy policy URL: `https://polyparlay.io/privacy` (must be live first — deploy Vercel)
+- Privacy policy URL: `https://polyparlay.app/privacy` (must be live first — deploy Vercel)
 
 **Distribution tab**:
 - Visibility: Public (or Unlisted if you want a soft launch)
