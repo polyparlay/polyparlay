@@ -1,0 +1,130 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <pattern id="dotgrid1" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#0a0c14" fill-opacity="0.07"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="#f5f1e8"/>
+  <rect width="1200" height="675" fill="url(#dotgrid1)"/>
+
+  <!-- Top ticker strip -->
+  <rect x="0" y="0" width="1200" height="36" fill="#0a0c14"/>
+  <text x="40" y="22" font-family="'JetBrains Mono', ui-monospace, monospace"
+        font-size="12" font-weight="700" fill="#f5f1e8" letter-spacing="2.5">
+    ● LIVE · POLYPARLAY V1.0 · CHROME EXTENSION · 10K MONTE CARLO · POLYGON ON-CHAIN
+  </text>
+  <circle cx="46" cy="18" r="3.5" fill="#16a34a"/>
+
+  <!-- LEFT — brand + headline -->
+  <text x="60" y="120" font-family="'JetBrains Mono', monospace"
+        font-size="14" font-weight="700" fill="#4f46e5" letter-spacing="3">// NEW · CHROME EXTENSION</text>
+  <text x="60" y="200" font-size="74" font-weight="900" fill="#0a0c14" letter-spacing="-2.5">The parlay builder</text>
+  <text x="60" y="270" font-size="74" font-weight="900" fill="#0a0c14" letter-spacing="-2.5">
+    <tspan text-decoration="line-through" text-decoration-color="#dc2626" text-decoration-thickness="3" fill="#0a0c14" opacity="0.55">Polymarket</tspan>
+    <tspan fill="#b45309"> forgot</tspan>
+  </text>
+  <text x="60" y="340" font-size="74" font-weight="900" fill="#0a0c14" letter-spacing="-2.5">to ship.</text>
+
+  <text x="60" y="402" font-size="22" font-weight="500" fill="#1f2937">
+    Stack 3+ markets · 10K Monte Carlo · Improve Odds rebalancer
+  </text>
+
+  <!-- Brutalist CTA -->
+  <g transform="translate(60 446)">
+    <rect x="4" y="4" width="290" height="64" rx="10" fill="#0a0c14"/>
+    <rect width="290" height="64" rx="10" fill="#4f46e5" stroke="#0a0c14" stroke-width="2"/>
+    <text x="145" y="42" text-anchor="middle" font-size="20" font-weight="800" fill="#ffffff">Install free →</text>
+  </g>
+  <text x="60" y="556" font-family="'JetBrains Mono', monospace"
+        font-size="13" font-weight="700" fill="#0a0c14" letter-spacing="2">POLYPARLAY.APP</text>
+
+  <!-- RIGHT — parlay-ticket card mockup -->
+  <g transform="translate(720 80)">
+    <rect x="6" y="6" width="420" height="540" rx="14" fill="#0a0c14"/>
+    <rect width="420" height="540" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+
+    <!-- ticket header -->
+    <rect x="0" y="0" width="420" height="42" fill="#f5f1e8"/>
+    <line x1="0" y1="42" x2="420" y2="42" stroke="#0a0c14" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <text x="20" y="28" font-family="'JetBrains Mono', monospace"
+          font-size="12" font-weight="700" fill="#4f46e5" letter-spacing="1.6">// YOUR PARLAY</text>
+    <text x="400" y="28" text-anchor="end" font-family="'JetBrains Mono', monospace"
+          font-size="12" font-weight="700" fill="#0a0c14" letter-spacing="1.2">03 LEGS</text>
+
+    <!-- Leg 1 -->
+    <g transform="translate(18 60)">
+      <rect width="384" height="62" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
+      <text x="14" y="24" font-size="15" font-weight="700" fill="#0a0c14">Fed cuts rates in June 2026</text>
+      <text x="14" y="46" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="0.6" fill="#6b6f7a">
+        <tspan font-weight="800" fill="#16a34a">YES</tspan> · RESOLVES 18 JUN
+      </text>
+      <text x="370" y="38" text-anchor="end" font-family="'JetBrains Mono', monospace"
+            font-size="17" font-weight="800" fill="#0a0c14">$0.62</text>
+    </g>
+
+    <!-- Leg 2 — FLIPPED -->
+    <g transform="translate(18 134)">
+      <rect x="3" y="3" width="384" height="62" rx="7" fill="#16a34a"/>
+      <rect width="384" height="62" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
+      <text x="14" y="24" font-size="15" font-weight="700" fill="#0a0c14">BTC above $100K by May 31
+        <tspan font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800"
+               fill="#16a34a" letter-spacing="1">  ↗ FLIPPED</tspan>
+      </text>
+      <text x="14" y="46" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="0.6" fill="#6b6f7a">
+        <tspan font-weight="800" fill="#dc2626">NO</tspan> · RESOLVES 31 MAY
+      </text>
+      <text x="370" y="38" text-anchor="end" font-family="'JetBrains Mono', monospace"
+            font-size="17" font-weight="800" fill="#0a0c14">$0.71</text>
+    </g>
+
+    <!-- Leg 3 -->
+    <g transform="translate(18 208)">
+      <rect width="384" height="62" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
+      <text x="14" y="24" font-size="15" font-weight="700" fill="#0a0c14">Trump signs exec order this wk</text>
+      <text x="14" y="46" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="0.6" fill="#6b6f7a">
+        <tspan font-weight="800" fill="#16a34a">YES</tspan> · RESOLVES 16 MAY
+      </text>
+      <text x="370" y="38" text-anchor="end" font-family="'JetBrains Mono', monospace"
+            font-size="17" font-weight="800" fill="#0a0c14">$0.58</text>
+    </g>
+
+    <!-- Run sim button (black tile) -->
+    <g transform="translate(18 290)">
+      <rect x="3" y="3" width="384" height="56" rx="8" fill="#fbbf24"/>
+      <rect width="384" height="56" rx="8" fill="#0a0c14"/>
+      <text x="34" y="36" font-size="22">🎲</text>
+      <text x="74" y="28" font-size="15" font-weight="800" fill="#fdfcf7">Run Monte Carlo + Improve Odds</text>
+      <text x="74" y="46" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600"
+            fill="#a5b4fc" letter-spacing="0.5">10K SIMS · ALGO REBALANCES WEAK LEGS</text>
+    </g>
+
+    <!-- Perforation -->
+    <line x1="0" y1="372" x2="420" y2="372" stroke="#0a0c14" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <circle cx="0" cy="372" r="5" fill="#f5f1e8" stroke="#0a0c14" stroke-width="1.5"/>
+    <circle cx="420" cy="372" r="5" fill="#f5f1e8" stroke="#0a0c14" stroke-width="1.5"/>
+
+    <!-- Math stub -->
+    <g transform="translate(22 388)">
+      <text x="0" y="22" font-size="14" fill="#6b6f7a">You'll actually get</text>
+      <text x="376" y="22" text-anchor="end" font-family="'JetBrains Mono', monospace"
+            font-size="18" font-weight="900" fill="#16a34a">$16.72 MAX</text>
+
+      <text x="0" y="52" font-size="14" fill="#6b6f7a">Combined multiplier</text>
+      <text x="376" y="52" text-anchor="end" font-family="'JetBrains Mono', monospace"
+            font-size="16" font-weight="800" fill="#4f46e5">4.11×</text>
+
+      <text x="0" y="78" font-size="14" fill="#6b6f7a">Hypothetical parlay</text>
+      <text x="376" y="78" text-anchor="end" font-family="'JetBrains Mono', monospace"
+            font-size="14" font-weight="700" fill="#0a0c14" opacity="0.65">$41.06</text>
+    </g>
+  </g>
+
+  <!-- Bottom-right brand mark -->
+  <g transform="translate(1100 615)">
+    <rect width="60" height="46" rx="8" fill="#0a0c14"/>
+    <text x="14" y="33" font-size="22" font-weight="900" fill="#4f46e5" letter-spacing="-2">P</text>
+    <text x="32" y="33" font-size="22" font-weight="900" fill="#fbbf24" letter-spacing="-2">P</text>
+  </g>
+</svg>

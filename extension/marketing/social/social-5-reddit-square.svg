@@ -1,0 +1,94 @@
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <pattern id="dg5" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#0a0c14" fill-opacity="0.07"/>
+    </pattern>
+  </defs>
+  <rect width="1080" height="1080" fill="#f5f1e8"/>
+  <rect width="1080" height="1080" fill="url(#dg5)"/>
+
+  <rect x="0" y="0" width="1080" height="42" fill="#0a0c14"/>
+  <text x="40" y="26" font-family="'JetBrains Mono', monospace"
+        font-size="13" font-weight="700" fill="#f5f1e8" letter-spacing="2.5">
+    ● LIVE · POLYPARLAY V1.0 · 10K MONTE CARLO · POLYGON
+  </text>
+  <circle cx="46" cy="22" r="4" fill="#16a34a"/>
+
+  <!-- Brand mark + name -->
+  <g transform="translate(60 90)">
+    <rect width="80" height="80" rx="14" fill="#0a0c14" stroke="#0a0c14" stroke-width="2"/>
+    <text x="22" y="56" font-size="42" font-weight="900" fill="#4f46e5" letter-spacing="-3">P</text>
+    <text x="48" y="56" font-size="42" font-weight="900" fill="#fbbf24" letter-spacing="-3">P</text>
+  </g>
+  <text x="158" y="148" font-size="44" font-weight="900" fill="#0a0c14" letter-spacing="-1.5">PolyParlay</text>
+  <text x="158" y="178" font-family="'JetBrains Mono', monospace"
+        font-size="13" font-weight="700" fill="#4f46e5" letter-spacing="2.5">// PARLAY BUILDER FOR POLYMARKET</text>
+
+  <!-- Big claim -->
+  <text x="60" y="270" font-size="60" font-weight="900" fill="#0a0c14" letter-spacing="-1.8">Stack 3+ markets.</text>
+  <text x="60" y="338" font-size="60" font-weight="900" fill="#0a0c14" letter-spacing="-1.8">Simulate 10,000 runs.</text>
+  <text x="60" y="406" font-size="60" font-weight="900" fill="#b45309" letter-spacing="-1.8">Rebalance weak legs.</text>
+
+  <!-- Value lift: BEFORE/AFTER row -->
+  <g transform="translate(60 460)">
+    <!-- BEFORE -->
+    <rect x="6" y="6" width="450" height="220" rx="14" fill="#0a0c14"/>
+    <rect width="450" height="220" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+    <text x="20" y="38" font-family="'JetBrains Mono', monospace"
+          font-size="13" font-weight="800" fill="#dc2626" letter-spacing="1.5">BEFORE · YOUR SLIP</text>
+    <text x="225" y="130" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+          font-size="78" font-weight="900" fill="#dc2626" letter-spacing="-3">4.3%</text>
+    <text x="225" y="170" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+          font-size="14" font-weight="700" fill="#6b6f7a" letter-spacing="2">SIM WIN RATE</text>
+    <text x="225" y="200" text-anchor="middle" font-size="15" fill="#1f2937">23.1× multiplier · weak leg dragging</text>
+
+    <!-- Arrow -->
+    <g transform="translate(480 110)">
+      <circle r="34" fill="#fbbf24" stroke="#0a0c14" stroke-width="2"/>
+      <text x="0" y="9" text-anchor="middle" font-size="28" font-weight="900" fill="#0a0c14">↗</text>
+    </g>
+
+    <!-- AFTER -->
+    <g transform="translate(514 0)">
+      <rect x="6" y="6" width="450" height="220" rx="14" fill="#16a34a"/>
+      <rect width="450" height="220" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+      <text x="20" y="38" font-family="'JetBrains Mono', monospace"
+            font-size="13" font-weight="800" fill="#16a34a" letter-spacing="1.5">AFTER · IMPROVE ODDS</text>
+      <text x="225" y="130" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+            font-size="78" font-weight="900" fill="#16a34a" letter-spacing="-3">25.5%</text>
+      <text x="225" y="170" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+            font-size="14" font-weight="700" fill="#6b6f7a" letter-spacing="2">SIM WIN RATE</text>
+      <text x="225" y="200" text-anchor="middle" font-size="15" fill="#1f2937">One leg flipped · same exposure</text>
+    </g>
+  </g>
+
+  <!-- Feature pills -->
+  <g transform="translate(60 730)">
+    <rect width="290" height="56" rx="28" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+    <text x="145" y="36" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+          font-size="15" font-weight="800" fill="#0a0c14" letter-spacing="1.5">CHROME EXTENSION</text>
+
+    <rect x="306" width="240" height="56" rx="28" fill="#dcfce7" stroke="#0a0c14" stroke-width="2"/>
+    <text x="426" y="36" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+          font-size="15" font-weight="800" fill="#0a0c14" letter-spacing="1.5">● FREE TIER</text>
+
+    <rect x="562" width="260" height="56" rx="28" fill="#fef3c7" stroke="#0a0c14" stroke-width="2"/>
+    <text x="692" y="36" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+          font-size="15" font-weight="800" fill="#0a0c14" letter-spacing="1.5">★ PRO 149 USDC</text>
+  </g>
+
+  <!-- Big install CTA -->
+  <g transform="translate(60 830)">
+    <rect x="6" y="6" width="960" height="100" rx="14" fill="#0a0c14"/>
+    <rect width="960" height="100" rx="14" fill="#4f46e5" stroke="#0a0c14" stroke-width="2"/>
+    <text x="480" y="64" text-anchor="middle" font-size="32" font-weight="900" fill="#ffffff" letter-spacing="-0.5">
+      Install free → polyparlay.app
+    </text>
+  </g>
+
+  <text x="540" y="1010" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+        font-size="14" font-weight="700" fill="#6b6f7a" letter-spacing="2.5">
+    NO WALLET CONNECT · NO PAYMENT PROCESSOR · ON-CHAIN VERIFIED
+  </text>
+</svg>

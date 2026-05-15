@@ -1,0 +1,78 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <pattern id="dg4" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#0a0c14" fill-opacity="0.07"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="675" fill="#f5f1e8"/>
+  <rect width="1200" height="675" fill="url(#dg4)"/>
+
+  <rect x="0" y="0" width="1200" height="36" fill="#0a0c14"/>
+  <text x="40" y="22" font-family="'JetBrains Mono', monospace"
+        font-size="12" font-weight="700" fill="#f5f1e8" letter-spacing="2.5">
+    ● THE THING POLYMARKET DOESN'T SHIP — WE BUILT IT
+  </text>
+  <circle cx="46" cy="18" r="3.5" fill="#16a34a"/>
+
+  <!-- Headline -->
+  <text x="600" y="110" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+        font-size="14" font-weight="700" fill="#4f46e5" letter-spacing="3">// SIDE BY SIDE</text>
+  <text x="600" y="170" text-anchor="middle" font-size="56" font-weight="900"
+        fill="#0a0c14" letter-spacing="-1.8">Polymarket pays each leg.</text>
+  <text x="600" y="226" text-anchor="middle" font-size="56" font-weight="900"
+        fill="#b45309" letter-spacing="-1.8">PolyParlay does the math.</text>
+
+  <!-- LEFT — what Polymarket shows -->
+  <g transform="translate(60 290)">
+    <rect x="6" y="6" width="510" height="320" rx="14" fill="#0a0c14" opacity="0.15"/>
+    <rect width="510" height="320" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="1.5"/>
+
+    <!-- Label -->
+    <rect x="20" y="20" width="180" height="32" rx="6" fill="#fee2e2" stroke="#0a0c14" stroke-width="1.5"/>
+    <text x="110" y="41" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+          font-size="13" font-weight="800" fill="#7f1d1d" letter-spacing="1.2">POLYMARKET ALONE</text>
+
+    <!-- Generic per-leg view -->
+    <text x="20" y="84" font-size="17" font-weight="700" fill="#0a0c14">3 separate bets on 3 separate pages.</text>
+
+    <g transform="translate(20 110)">
+      <text x="0" y="0" font-size="14" fill="#1f2937">✗  No combined multiplier shown</text>
+      <text x="0" y="32" font-size="14" fill="#1f2937">✗  No win-rate distribution</text>
+      <text x="0" y="64" font-size="14" fill="#1f2937">✗  No "improve my odds" button</text>
+      <text x="0" y="96" font-size="14" fill="#1f2937">✗  No shareable slip card</text>
+      <text x="0" y="128" font-size="14" fill="#1f2937">✗  You eyeball the math yourself</text>
+    </g>
+
+    <text x="20" y="280" font-family="'JetBrains Mono', monospace"
+          font-size="11" font-weight="700" fill="#6b6f7a" letter-spacing="1.5">RESULT · YOU BET BLIND</text>
+  </g>
+
+  <!-- RIGHT — what PolyParlay shows -->
+  <g transform="translate(630 290)">
+    <rect x="6" y="6" width="510" height="320" rx="14" fill="#16a34a"/>
+    <rect width="510" height="320" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+
+    <rect x="20" y="20" width="190" height="32" rx="6" fill="#dcfce7" stroke="#0a0c14" stroke-width="1.5"/>
+    <text x="115" y="41" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+          font-size="13" font-weight="800" fill="#14532d" letter-spacing="1.2">+ POLYPARLAY</text>
+
+    <text x="20" y="84" font-size="17" font-weight="700" fill="#0a0c14">One slip. Live math. Improve it.</text>
+
+    <g transform="translate(20 110)">
+      <text x="0" y="0" font-size="14" font-weight="600" fill="#16a34a">✓  <tspan fill="#0a0c14" font-weight="500">Combined multiplier + honest payout</tspan></text>
+      <text x="0" y="32" font-size="14" font-weight="600" fill="#16a34a">✓  <tspan fill="#0a0c14" font-weight="500">10K Monte Carlo · real win-rate distribution</tspan></text>
+      <text x="0" y="64" font-size="14" font-weight="600" fill="#16a34a">✓  <tspan fill="#0a0c14" font-weight="500">Improve Odds — auto-flips weak legs</tspan></text>
+      <text x="0" y="96" font-size="14" font-weight="600" fill="#16a34a">✓  <tspan fill="#0a0c14" font-weight="500">1200×630 viral slip cards</tspan></text>
+      <text x="0" y="128" font-size="14" font-weight="600" fill="#16a34a">✓  <tspan fill="#0a0c14" font-weight="500">Risk score · drift · expected ROI</tspan></text>
+    </g>
+
+    <text x="20" y="280" font-family="'JetBrains Mono', monospace"
+          font-size="11" font-weight="800" fill="#16a34a" letter-spacing="1.5">RESULT · YOU SHIP BETTER PARLAYS</text>
+  </g>
+
+  <text x="600" y="630" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+        font-size="16" font-weight="800" fill="#0a0c14" letter-spacing="2.5">
+    POLYPARLAY.APP · FREE CHROME EXTENSION
+  </text>
+</svg>

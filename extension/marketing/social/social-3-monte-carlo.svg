@@ -1,0 +1,122 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <pattern id="dg3" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#0a0c14" fill-opacity="0.07"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="675" fill="#f5f1e8"/>
+  <rect width="1200" height="675" fill="url(#dg3)"/>
+
+  <rect x="0" y="0" width="1200" height="36" fill="#0a0c14"/>
+  <text x="40" y="22" font-family="'JetBrains Mono', monospace"
+        font-size="12" font-weight="700" fill="#f5f1e8" letter-spacing="2.5">
+    ● 10,000 SIMULATIONS PER SLIP · REAL WIN-RATE DISTRIBUTION · NO EYE-BALL MATH
+  </text>
+  <circle cx="46" cy="18" r="3.5" fill="#16a34a"/>
+
+  <!-- LEFT -->
+  <text x="60" y="100" font-family="'JetBrains Mono', monospace"
+        font-size="13" font-weight="700" fill="#4f46e5" letter-spacing="3">// THE PRO HOOK</text>
+  <text x="60" y="160" font-size="56" font-weight="900" fill="#0a0c14" letter-spacing="-1.8">Don't guess your</text>
+  <text x="60" y="220" font-size="56" font-weight="900" fill="#0a0c14" letter-spacing="-1.8">win rate.</text>
+  <text x="60" y="280" font-size="56" font-weight="900" fill="#b45309" letter-spacing="-1.8">Simulate it.</text>
+
+  <text x="60" y="340" font-size="21" font-weight="500" fill="#1f2937">Run your slip 10,000 times. See the actual</text>
+  <text x="60" y="370" font-size="21" font-weight="500" fill="#1f2937">distribution of outcomes — not eyeball math.</text>
+
+  <!-- Stats badges -->
+  <g transform="translate(60 410)">
+    <rect width="180" height="80" rx="10" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+    <rect x="3" y="3" width="180" height="80" rx="10" fill="none"/>
+    <text x="14" y="28" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700"
+          fill="#6b6f7a" letter-spacing="1.5">WIN RATE</text>
+    <text x="14" y="64" font-family="'JetBrains Mono', monospace" font-size="32" font-weight="900"
+          fill="#16a34a" letter-spacing="-1">25.5%</text>
+
+    <rect x="200" width="180" height="80" rx="10" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+    <text x="214" y="28" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700"
+          fill="#6b6f7a" letter-spacing="1.5">EXPECTED ROI</text>
+    <text x="214" y="64" font-family="'JetBrains Mono', monospace" font-size="32" font-weight="900"
+          fill="#16a34a" letter-spacing="-1">+12.4%</text>
+
+    <rect x="400" width="180" height="80" rx="10" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+    <text x="414" y="28" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700"
+          fill="#6b6f7a" letter-spacing="1.5">MULTIPLIER</text>
+    <text x="414" y="64" font-family="'JetBrains Mono', monospace" font-size="32" font-weight="900"
+          fill="#4f46e5" letter-spacing="-1">3.9×</text>
+  </g>
+
+  <text x="60" y="540" font-family="'JetBrains Mono', monospace"
+        font-size="14" font-weight="700" fill="#0a0c14" letter-spacing="2">POLYPARLAY.APP · CHROME EXTENSION</text>
+
+  <!-- RIGHT — Histogram visual -->
+  <g transform="translate(680 80)">
+    <rect x="6" y="6" width="460" height="520" rx="14" fill="#0a0c14"/>
+    <rect width="460" height="520" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="2"/>
+
+    <!-- Card header -->
+    <rect x="0" y="0" width="460" height="42" fill="#f5f1e8"/>
+    <line x1="0" y1="42" x2="460" y2="42" stroke="#0a0c14" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <text x="20" y="28" font-family="'JetBrains Mono', monospace"
+          font-size="12" font-weight="700" fill="#4f46e5" letter-spacing="1.6">// MONTE CARLO · 10,000 SIMS</text>
+
+    <!-- Title above histogram -->
+    <text x="22" y="76" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700"
+          fill="#6b6f7a" letter-spacing="1.5">PAYOUT DISTRIBUTION</text>
+
+    <!-- Histogram bars -->
+    <g transform="translate(22 90)">
+      <!-- Y axis label -->
+      <text x="-2" y="20" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6b6f7a">9276</text>
+      <text x="-2" y="220" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6b6f7a">0</text>
+
+      <!-- Bars: 7 buckets -->
+      <rect x="20"  y="40"  width="50" height="180" fill="#dc2626" opacity="0.85"/>
+      <rect x="74"  y="120" width="50" height="100" fill="#f97316" opacity="0.85"/>
+      <rect x="128" y="180" width="50" height="40"  fill="#fbbf24" opacity="0.85"/>
+      <rect x="182" y="190" width="50" height="30"  fill="#a3a3a3" opacity="0.4"/>
+      <rect x="236" y="194" width="50" height="26"  fill="#86efac" opacity="0.85"/>
+      <rect x="290" y="200" width="50" height="20"  fill="#22c55e" opacity="0.85"/>
+      <rect x="344" y="208" width="50" height="12"  fill="#16a34a" opacity="1"/>
+
+      <!-- All bars have ink border -->
+      <g fill="none" stroke="#0a0c14" stroke-width="1.5">
+        <rect x="20"  y="40"  width="50" height="180"/>
+        <rect x="74"  y="120" width="50" height="100"/>
+        <rect x="128" y="180" width="50" height="40"/>
+        <rect x="182" y="190" width="50" height="30"/>
+        <rect x="236" y="194" width="50" height="26"/>
+        <rect x="290" y="200" width="50" height="20"/>
+        <rect x="344" y="208" width="50" height="12"/>
+      </g>
+
+      <!-- X axis line -->
+      <line x1="0" y1="220" x2="410" y2="220" stroke="#0a0c14" stroke-width="2"/>
+
+      <!-- X labels -->
+      <text x="45"  y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#dc2626" font-weight="700">-$10</text>
+      <text x="99"  y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6f7a">-$5</text>
+      <text x="153" y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6f7a">$0</text>
+      <text x="207" y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6f7a">$10</text>
+      <text x="261" y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6f7a">$20</text>
+      <text x="315" y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6f7a">$30</text>
+      <text x="369" y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#16a34a" font-weight="700">$40+</text>
+    </g>
+
+    <!-- Improve Odds banner inside the card -->
+    <g transform="translate(20 366)">
+      <rect width="420" height="130" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+      <text x="16" y="28" font-family="'JetBrains Mono', monospace"
+            font-size="11" font-weight="900" fill="#14532d" letter-spacing="1.5">↗ IMPROVE ODDS</text>
+      <text x="16" y="60" font-size="17" font-weight="800" fill="#0a0c14">Flip leg 2 (BTC) NO → YES</text>
+      <text x="16" y="86" font-family="'JetBrains Mono', monospace" font-size="11" fill="#1f2937" font-weight="600">
+        Win rate 4.3% → 25.5% · weakest leg rebalanced
+      </text>
+      <!-- Apply button -->
+      <rect x="318" y="62" width="92" height="44" rx="7" fill="#0a0c14"/>
+      <rect x="316" y="60" width="92" height="44" rx="7" fill="#16a34a" stroke="#0a0c14" stroke-width="1.5"/>
+      <text x="362" y="88" text-anchor="middle" font-size="16" font-weight="800" fill="#ffffff">Apply</text>
+    </g>
+  </g>
+</svg>
