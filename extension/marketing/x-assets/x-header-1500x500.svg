@@ -1,0 +1,118 @@
+<svg width="1500" height="500" viewBox="0 0 1500 500" xmlns="http://www.w3.org/2000/svg"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c14"/>
+      <stop offset="55%" stop-color="#0e1322"/>
+      <stop offset="100%" stop-color="#161a2e"/>
+    </linearGradient>
+    <radialGradient id="purpleGlow" cx="22%" cy="20%" r="55%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="amberGlow" cx="80%" cy="78%" r="42%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1500" height="500" fill="url(#bg)"/>
+  <rect width="1500" height="500" fill="url(#purpleGlow)"/>
+  <rect width="1500" height="500" fill="url(#amberGlow)"/>
+
+  <!-- Subtle dotted grid (X header twitter-safe-area approx the center) -->
+  <g opacity="0.05" stroke="#a5b4fc" stroke-width="1">
+    <line x1="0" y1="125" x2="1500" y2="125"/>
+    <line x1="0" y1="250" x2="1500" y2="250"/>
+    <line x1="0" y1="375" x2="1500" y2="375"/>
+  </g>
+
+  <!-- ============================================================
+       LEFT — PP monogram (matches the shipped extension icon) + lockup
+       ============================================================ -->
+  <g transform="translate(120 100)">
+    <!-- Icon tile background (rounded square, dark) -->
+    <rect width="160" height="160" rx="32" fill="#0a0c14" stroke="#6366f1" stroke-opacity="0.35" stroke-width="1.5"/>
+    <!-- The two P's — same path geometry as the extension icon, scaled to 160px -->
+    <g transform="translate(80 80)">
+      <!-- Left P (indigo) -->
+      <path d="M-44 -34 L-44 35 L-31 35 L-31 14 L-14 14 C0 14 10 4 10 -10 C10 -23 0 -34 -14 -34 L-44 -34 Z M-31 -21 L-14 -21 C-8 -21 -3 -16 -3 -10 C-3 -4 -8 1 -14 1 L-31 1 Z"
+            fill="#6366f1"/>
+      <!-- Right P (amber, overlapping down-right) -->
+      <path d="M9 -20 L9 49 L22 49 L22 28 L40 28 C53 28 64 17 64 4 C64 -10 53 -20 40 -20 L9 -20 Z M22 -7 L40 -7 C46 -7 51 -2 51 4 C51 10 46 15 40 15 L22 15 Z"
+            fill="#fbbf24"/>
+    </g>
+  </g>
+
+  <!-- Brand wordmark -->
+  <text x="310" y="170" font-size="72" font-weight="900" fill="#f9fafb" letter-spacing="-2">PolyParlay</text>
+  <text x="310" y="212" font-size="20" font-weight="700" fill="#a5b4fc" letter-spacing="2.5">PARLAY BUILDER FOR POLYMARKET</text>
+
+  <!-- ============================================================
+       MIDDLE — tagline
+       ============================================================ -->
+  <text x="120" y="310" font-size="38" font-weight="800" fill="#f9fafb">Multi-leg parlays.</text>
+  <text x="120" y="356" font-size="38" font-weight="800" fill="#f9fafb">10K Monte Carlo. Auto-rebalance weak legs.</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(120 408)">
+    <rect width="220" height="44" rx="22" fill="#6366f1" fill-opacity="0.14" stroke="#6366f1" stroke-opacity="0.45"/>
+    <text x="110" y="29" text-anchor="middle" font-size="15" font-weight="800" fill="#a5b4fc">CHROME EXTENSION</text>
+
+    <rect x="236" width="200" height="44" rx="22" fill="#22c55e" fill-opacity="0.14" stroke="#22c55e" stroke-opacity="0.45"/>
+    <text x="336" y="29" text-anchor="middle" font-size="15" font-weight="800" fill="#4ade80">FREE TO INSTALL</text>
+
+    <rect x="452" width="232" height="44" rx="22" fill="#fbbf24" fill-opacity="0.14" stroke="#fbbf24" stroke-opacity="0.45"/>
+    <text x="568" y="29" text-anchor="middle" font-size="15" font-weight="800" fill="#fbbf24">PRO: 149 USDC · ON-CHAIN</text>
+  </g>
+
+  <!-- ============================================================
+       RIGHT — payoff visualization: stacked parlay tickets with
+       a green WIN check on the top one (matches the in-app aesthetic).
+       ============================================================ -->
+  <g transform="translate(1100 100)">
+    <!-- Back ticket (rotated, lower opacity) -->
+    <g transform="translate(80 170) rotate(-10)">
+      <path d="M -60 -120 L 60 -120 L 60 100
+               L 50 110 L 40 100 L 30 110 L 20 100 L 10 110 L 0 100 L -10 110 L -20 100 L -30 110 L -40 100 L -50 110 L -60 100 Z"
+            fill="#1a1f3a" stroke="#6366f1" stroke-opacity="0.4" stroke-width="1.5"/>
+    </g>
+    <!-- Middle ticket -->
+    <g transform="translate(150 160) rotate(2)">
+      <path d="M -60 -120 L 60 -120 L 60 100
+               L 50 110 L 40 100 L 30 110 L 20 100 L 10 110 L 0 100 L -10 110 L -20 100 L -30 110 L -40 100 L -50 110 L -60 100 Z"
+            fill="#11141a" stroke="#6366f1" stroke-opacity="0.7" stroke-width="1.5"/>
+    </g>
+    <!-- Front ticket (the hero — full WIN treatment) -->
+    <g transform="translate(220 150) rotate(12)">
+      <path d="M -65 -125 L 65 -125 L 65 105
+               L 55 115 L 45 105 L 35 115 L 25 105 L 15 115 L 5 105 L -5 115 L -15 105 L -25 115 L -35 105 L -45 115 L -55 105 L -65 115 Z"
+            fill="#ffffff" stroke="#312e81" stroke-width="2"/>
+      <!-- Green WIN header strip -->
+      <rect x="-55" y="-118" width="110" height="14" rx="4" fill="#22c55e"/>
+      <text x="0" y="-108" text-anchor="middle" font-size="9" font-weight="900" fill="#0a0c14" letter-spacing="1.5">WINNING SLIP</text>
+      <!-- Body rows -->
+      <rect x="-52" y="-90" width="80" height="6" rx="3" fill="#1e1b4b"/>
+      <rect x="-52" y="-78" width="56" height="5" rx="2.5" fill="#6366f1" opacity="0.7"/>
+      <rect x="-52" y="-66" width="80" height="6" rx="3" fill="#1e1b4b"/>
+      <rect x="-52" y="-54" width="62" height="5" rx="2.5" fill="#6366f1" opacity="0.7"/>
+      <rect x="-52" y="-42" width="80" height="6" rx="3" fill="#1e1b4b"/>
+      <rect x="-52" y="-30" width="48" height="5" rx="2.5" fill="#6366f1" opacity="0.7"/>
+      <!-- Perforation -->
+      <line x1="-65" y1="-12" x2="65" y2="-12" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="-65" cy="-12" r="5" fill="#0a0c14"/>
+      <circle cx="65" cy="-12" r="5" fill="#0a0c14"/>
+      <!-- Stub: big multiplier -->
+      <text x="0" y="35" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif"
+            font-size="56" font-weight="900" fill="#7c2d12" letter-spacing="-2">3.9×</text>
+      <text x="0" y="60" text-anchor="middle" font-size="9" font-weight="800" fill="#92400e" letter-spacing="1.5">$39 PAYOUT</text>
+      <!-- Big green check badge -->
+      <circle cx="48" cy="-118" r="14" fill="#22c55e" stroke="#ffffff" stroke-width="2.5"/>
+      <path d="M 41 -118 L 46 -113 L 56 -123" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Domain anchor bottom-right -->
+  <text x="1380" y="470" text-anchor="end" font-size="16" font-weight="800" fill="#6b7280" letter-spacing="3">POLYPARLAY.APP</text>
+</svg>
