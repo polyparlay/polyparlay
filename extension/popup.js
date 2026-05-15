@@ -1315,26 +1315,35 @@ function drawCard() {
   const stake = Number(currentSlip.stake) || 0;
   ctx.textAlign = 'right';
 
-  ctx.fillStyle = C_MUTED;
-  ctx.font = `800 11px ${FONT_MONO}`;
-  ctx.fillText('SIM WIN RATE', W - 380, footerY + 22);
-  ctx.fillStyle = winRateColor;
-  ctx.font = `900 36px ${FONT_MONO}`;
-  ctx.fillText(winRateText, W - 380, footerY + 64);
+  // Three right-aligned metric columns. Equal font-size (32px / 900) so big
+  // payout numbers (e.g. "$176.75") can't grow wider than their slot and
+  // collide with STAKE. Differentiation is by color, not by font size.
+  // Column anchors are spaced ~170px apart with right-edge at W-60.
+  //   x = W-60   → MAX PAYOUT     (right edge of card, green)
+  //   x = W-230  → STAKE          (170px to the left, ink)
+  //   x = W-400  → SIM WIN RATE   (another 170px left, colored by edge)
+  const COL_X = { winRate: W - 400, stake: W - 230, payout: W - 60 };
 
   ctx.fillStyle = C_MUTED;
   ctx.font = `800 11px ${FONT_MONO}`;
-  ctx.fillText('STAKE', W - 220, footerY + 22);
+  ctx.fillText('SIM WIN RATE', COL_X.winRate, footerY + 22);
+  ctx.fillStyle = winRateColor;
+  ctx.font = `900 32px ${FONT_MONO}`;
+  ctx.fillText(winRateText, COL_X.winRate, footerY + 64);
+
+  ctx.fillStyle = C_MUTED;
+  ctx.font = `800 11px ${FONT_MONO}`;
+  ctx.fillText('STAKE', COL_X.stake, footerY + 22);
   ctx.fillStyle = C_INK;
   ctx.font = `900 32px ${FONT_MONO}`;
-  ctx.fillText('$' + stake.toFixed(0), W - 220, footerY + 64);
+  ctx.fillText('$' + stake.toFixed(0), COL_X.stake, footerY + 64);
 
   ctx.fillStyle = C_MUTED;
   ctx.font = `800 11px ${FONT_MONO}`;
-  ctx.fillText('MAX PAYOUT', W - 60, footerY + 22);
+  ctx.fillText('MAX PAYOUT', COL_X.payout, footerY + 22);
   ctx.fillStyle = C_GREEN;
-  ctx.font = `900 46px ${FONT_MONO}`;
-  ctx.fillText(fmt$(payout), W - 60, footerY + 70);
+  ctx.font = `900 32px ${FONT_MONO}`;
+  ctx.fillText(fmt$(payout), COL_X.payout, footerY + 64);
   ctx.textAlign = 'left';
 
   // === BOTTOM STRIP: domain + tagline ===

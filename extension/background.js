@@ -224,26 +224,20 @@ async function refreshSlipPrices() {
   return slip;
 }
 
-// Open the extension popup if the API is available (Chrome 127+),
-// otherwise fall back to opening popup.html in a new tab.
+// Open the extension popup. ONLY uses chrome.action.openPopup() — no new-tab
+// fallback. Per user direction: if the popup can't be opened, do nothing
+// (better silent than a confusing new tab). The user can always click the
+// toolbar icon themselves.
 async function openExtensionUI() {
-  // chrome.action.openPopup() requires a recent Chrome AND a user gesture
-  // that propagated from the content-script click through sendMessage.
   if (chrome.action && typeof chrome.action.openPopup === 'function') {
     try {
       await chrome.action.openPopup();
       return { ok: true, method: 'popup' };
     } catch (err) {
-      // fall through to tab fallback
+      return { ok: false, error: 'openPopup() rejected — likely no user gesture or unsupported Chrome version' };
     }
   }
-  try {
-    const url = chrome.runtime.getURL('popup.html');
-    await chrome.tabs.create({ url });
-    return { ok: true, method: 'tab' };
-  } catch (err) {
-    return { ok: false, error: String(err && err.message ? err.message : err) };
-  }
+  return { ok: false, error: 'chrome.action.openPopup not available' };
 }
 
 // External messages from the polyparlay.app upgrade page (defined in
@@ -251,7 +245,7 @@ async function openExtensionUI() {
 // page, the page calls chrome.runtime.sendMessage(EXTENSION_ID, {...}) to
 // flip the extension's proState to 'paid'.
 chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
-  if (!sender.url || !/^https:\/\/(?:[a-z0-9-]+\.)?polyparlay\.io\//.test(sender.url)) {
+  if (!sender.url || !/^https:\/\/(?:[a-z0-9-]+\.)?polyparlay\.app\//.test(sender.url)) {
     sendResponse({ ok: false, error: 'Origin not allowed' });
     return false;
   }

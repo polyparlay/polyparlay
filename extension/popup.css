@@ -210,9 +210,9 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
 .legs {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px;
-  max-height: 220px;
+  gap: 8px;
+  padding: 12px 14px;
+  max-height: 240px;
   overflow-y: auto;
   background: transparent;
   border: 0;
@@ -251,11 +251,11 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
 .ticket-perf::marker { display: none; }
 /* Stub (math footer) */
 .ticket-stub {
-  padding: 8px 12px 10px;
+  padding: 12px 14px 14px;
   background: var(--surface);
   background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.04), transparent);
 }
-.ticket-stub .row { padding: 3px 0; font-size: 12px; }
+.ticket-stub .row { padding: 5px 0; font-size: 12px; }
 .ticket-stub .row > span:last-child {
   font-weight: 700;
   color: var(--text-strong);
@@ -296,8 +296,8 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
 /* Run-sim button when inline inside the parlay-ticket. Flush, no outer
    margin, dashed dividers above/below to read as "between legs and stub." */
 .run-sim-box.run-sim-inline {
-  margin: 8px 10px;
-  width: calc(100% - 20px);
+  margin: 12px 12px 14px;
+  width: calc(100% - 24px);
   border-radius: 8px;
 }
 
@@ -308,8 +308,8 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
    Run-Sim button.
    ============================================================ */
 .risk-bar {
-  margin: 6px 10px 8px;
-  padding: 10px 12px 8px;
+  margin: 12px 12px 4px;
+  padding: 12px 14px 10px;
   background: var(--surface-2);
   border: 1.5px solid var(--line);
   border-radius: 9px;
@@ -920,8 +920,8 @@ summary.execute-summary {
    Free = parlay calculator (everything outside this section).
    Paid = the four cards below + Signal Archive lock-in mechanic. */
 .pro-section {
-  margin: 0 12px 12px;
-  padding: 14px;
+  margin: 0 12px 14px;
+  padding: 16px;
   background-color: #fef3c7;     /* light amber paper */
   border: 1.5px solid var(--line);
   border-radius: 10px;
@@ -1365,8 +1365,8 @@ summary.execute-summary {
 /* Analytics — brutalist light card. Ink border + offset accent shadow,
    so the eye reads it as the value-prop block (vs neutral parlay-ticket). */
 .free-analytics {
-  margin: 0 12px 12px;
-  padding: 12px 14px;
+  margin: 16px 12px 14px;
+  padding: 14px 16px;
   background-color: var(--surface-2);
   border: 1.5px solid var(--line);
   border-radius: 10px;

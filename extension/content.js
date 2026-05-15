@@ -255,6 +255,9 @@
         const m = String(err && err.message || err);
         if (/Extension context invalidated/i.test(m)) markContextInvalidated();
       }
+      // Close the drawer once the popup opens — sitting on top of the user's
+      // PM page is noise once they've moved focus to the extension popup.
+      hidePreview(true);
     });
     return p;
   }
