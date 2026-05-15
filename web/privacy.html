@@ -4,26 +4,158 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PolyParlay — Privacy Policy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
     <style>
-      body {
-        margin: 0; padding: 40px 20px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #0a0c12; color: #e5e7eb;
-        line-height: 1.6;
+      :root {
+        --bg: #f5f1e8;
+        --bg-2: #fdfcf7;
+        --ink: #0a0c14;
+        --ink-2: #1f2937;
+        --muted: #6b6f7a;
+        --accent: #4f46e5;
+        --amber: #fbbf24;
+        --green: #16a34a;
+        --shadow-md: 4px 4px 0 var(--ink);
+        --shadow-sm: 3px 3px 0 var(--ink);
       }
-      .wrap { max-width: 720px; margin: 0 auto; }
-      h1 { color: #f9fafb; margin-bottom: 6px; }
-      h2 { color: #f9fafb; margin-top: 32px; }
-      .updated { color: #6b7280; font-size: 13px; margin-bottom: 32px; }
-      a { color: #6366f1; }
-      ul li { margin-bottom: 6px; }
-      strong { color: #f9fafb; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--ink-2);
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(circle at 1px 1px, rgba(10, 12, 20, 0.08) 1px, transparent 0);
+        background-size: 22px 22px;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      .nav {
+        max-width: 880px; margin: 0 auto;
+        padding: 22px 24px;
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      .brand {
+        display: flex; align-items: center; gap: 12px;
+        font-weight: 800; color: var(--ink); text-decoration: none;
+        font-size: 17px; letter-spacing: -0.01em;
+      }
+      .brand-mark {
+        width: 40px; height: 40px;
+        border-radius: 8px;
+        background: var(--ink);
+        border: 1.5px solid var(--ink);
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 0 5px;
+        font-weight: 900; font-size: 22px; line-height: 1;
+        letter-spacing: -2px;
+        box-shadow: var(--shadow-sm);
+      }
+      .brand-mark .p1 { color: var(--accent); }
+      .brand-mark .p2 { color: var(--amber); }
+      .nav-back {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 13px; font-weight: 500;
+        color: var(--ink); text-decoration: none;
+        letter-spacing: 0.5px;
+      }
+      .nav-back:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+
+      .wrap { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+
+      h1 {
+        font-size: clamp(36px, 5vw, 52px);
+        line-height: 1.02;
+        margin: 0 0 12px;
+        color: var(--ink);
+        font-weight: 900;
+        letter-spacing: -0.035em;
+      }
+      .updated {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        margin-bottom: 36px;
+      }
+      h2 {
+        color: var(--ink);
+        font-size: clamp(20px, 2.4vw, 26px);
+        margin: 38px 0 14px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h2::before {
+        content: '// ';
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      p { color: var(--ink-2); margin: 0 0 14px; }
+      a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+      a:hover { text-decoration-thickness: 2px; }
+      ul { padding-left: 22px; margin: 0 0 18px; }
+      ul li {
+        margin-bottom: 8px;
+        padding-left: 4px;
+      }
+      ul li::marker { color: var(--accent); }
+      strong { color: var(--ink); font-weight: 700; }
+      code {
+        display: inline-block;
+        padding: 2px 7px;
+        background: var(--bg-2);
+        border: 1.5px solid var(--ink);
+        border-radius: 5px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .card {
+        background: var(--bg-2);
+        border: 1.5px solid var(--ink);
+        border-radius: 12px;
+        padding: 28px 30px;
+        margin: 24px 0;
+        box-shadow: var(--shadow-sm);
+      }
+      .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+
+      footer {
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1.5px solid var(--ink);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+      }
+      footer a {
+        color: var(--ink); text-decoration: none; font-weight: 600;
+        margin-right: 14px;
+      }
+      footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
     </style>
   </head>
   <body>
+    <nav class="nav">
+      <a class="brand" href="/">
+        <span class="brand-mark"><span class="p1">P</span><span class="p2">P</span></span>
+        PolyParlay
+      </a>
+      <a class="nav-back" href="/">← BACK TO HOME</a>
+    </nav>
+
     <div class="wrap">
-      <h1>PolyParlay Privacy Policy</h1>
-      <div class="updated">Last updated: 2026-05-10</div>
+      <h1>Privacy Policy</h1>
+      <div class="updated">LAST UPDATED · 2026-05-15</div>
 
       <p>
         PolyParlay ("we", "the extension") is a Chrome browser extension that helps users build
@@ -32,33 +164,37 @@
       </p>
 
       <h2>What the extension accesses</h2>
-      <ul>
-        <li>
-          <strong>Polymarket page URLs and DOM</strong> — when you click "Add to slip" on a Polymarket
-          market page, the extension reads the URL slug to identify the market. It does not read any
-          other browsing activity.
-        </li>
-        <li>
-          <strong>Public Polymarket Gamma API</strong> — the extension queries
-          <a href="https://gamma-api.polymarket.com" target="_blank" rel="noopener">gamma-api.polymarket.com</a>
-          to fetch market metadata (question text, current YES/NO prices, resolution date). This is
-          public on-chain data; no authentication is involved.
-        </li>
-        <li>
-          <strong>Local browser storage</strong> — the parlay slip you build (selected markets and stake
-          amount) is saved in <code>chrome.storage.local</code> on your device only. It is not transmitted
-          to any server.
-        </li>
-      </ul>
+      <div class="card">
+        <ul>
+          <li>
+            <strong>Polymarket page URLs.</strong> When you click "+ Add to slip" on a Polymarket market
+            page, the extension reads the URL slug to identify the market. It does not read any other
+            browsing activity.
+          </li>
+          <li>
+            <strong>Public Polymarket Gamma API.</strong> The extension queries
+            <a href="https://gamma-api.polymarket.com" target="_blank" rel="noopener">gamma-api.polymarket.com</a>
+            to fetch market metadata (question text, current YES/NO prices, resolution date). This is
+            public on-chain data; no authentication is involved.
+          </li>
+          <li>
+            <strong>Local browser storage.</strong> The parlay slip you build (selected markets and
+            stake amount) is saved in <code>chrome.storage.local</code> on your device only. It is
+            <strong>not transmitted</strong> to any server.
+          </li>
+        </ul>
+      </div>
 
       <h2>What we never collect</h2>
-      <ul>
-        <li>Your Polymarket login, password, or session credentials</li>
-        <li>Your wallet private keys or seed phrases (PolyParlay never asks for these)</li>
-        <li>Your browsing history outside Polymarket</li>
-        <li>Personally identifying information (name, address, phone)</li>
-        <li>Any data on third-party servers (the free tier has no backend)</li>
-      </ul>
+      <div class="card">
+        <ul>
+          <li>Your Polymarket login, password, or session credentials</li>
+          <li>Your wallet private keys or seed phrases (PolyParlay never asks for these)</li>
+          <li>Your browsing history outside Polymarket</li>
+          <li>Personally identifying information (name, address, phone)</li>
+          <li>Any data on third-party servers (the free tier has no backend)</li>
+        </ul>
+      </div>
 
       <h2>Shareable slip links</h2>
       <p>
@@ -68,41 +204,51 @@
         URL fragments stay client-side.
       </p>
 
-      <h2>Email capture</h2>
+      <h2>Pro tier — payment verification</h2>
       <p>
-        If you submit your email on <a href="https://polyparlay.app" target="_blank" rel="noopener">polyparlay.app</a>
-        for Pro launch notifications, your email is stored only for that purpose and will not be sold
-        or shared. You can request deletion at any time by emailing the address below.
+        Pro unlocks via a one-time payment of 149 USDC on Polygon to a wallet address we publish on
+        the <a href="/upgrade">upgrade page</a>. When you submit the wallet address you paid from,
+        our Cloudflare Worker queries Polygonscan to confirm the on-chain transfer occurred. The
+        worker receives your <em>public</em> wallet address only — never private keys. The wallet
+        address is not retained after verification.
       </p>
 
       <h2>Future Pro tier data handling</h2>
       <p>
-        The forthcoming Pro tier will read your public Polymarket wallet address (you provide it; the
-        extension never accesses any wallet). Wallet position data is fetched from public APIs and
-        processed client-side or in our backend solely to provide the features you subscribe to.
-        We will not sell, share, or use this data for any purpose other than the features described.
+        As Pro adds more analytics features (saved parlay history, win-rate tracking, etc.), data
+        accumulated under your Pro subscription stays scoped to your installation. We will not sell,
+        share, or transfer it. If your subscription lapses, the historical data locks but is preserved
+        — paying again unlocks it.
       </p>
 
       <h2>Permissions explained</h2>
-      <ul>
-        <li>
-          <strong>storage</strong> — to save your slip on your device
-        </li>
-        <li>
-          <strong>activeTab</strong> — to detect when you're on a Polymarket market page
-        </li>
-        <li>
-          <strong>host_permissions for Polymarket and Gamma API</strong> — to inject the "+ Add to slip"
-          button on Polymarket pages and fetch market data
-        </li>
-      </ul>
+      <div class="card">
+        <ul>
+          <li><strong>storage</strong> — saves your slip on your device</li>
+          <li><strong>activeTab</strong> — detects when you're on a Polymarket market page</li>
+          <li><strong>tabs</strong> — opens market pages when you click a leg's "Open" button</li>
+          <li>
+            <strong>host_permissions for Polymarket and Gamma API</strong> — injects the "+ Add to slip"
+            button on Polymarket pages and fetches market data
+          </li>
+          <li>
+            <strong>host_permissions for *.workers.dev and polyparlay.app</strong> — Pro payment
+            verification only; called when you submit a wallet address on the upgrade page
+          </li>
+        </ul>
+      </div>
 
       <h2>Contact</h2>
       <p>
         Questions or deletion requests: <a href="mailto:hello@polyparlay.app">hello@polyparlay.app</a>
       </p>
 
-      <p style="margin-top: 40px;"><a href="/">← Back</a></p>
+      <footer>
+        © 2026 POLYPARLAY · INFORMATION ONLY ·
+        <a href="/">HOME</a>
+        <a href="/upgrade">PRO</a>
+        <a href="https://polymarket.com" target="_blank" rel="noopener">POLYMARKET ↗</a>
+      </footer>
     </div>
   </body>
 </html>

@@ -5,222 +5,387 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Unlock PolyParlay Pro</title>
     <meta name="description" content="Pay 149 USDC on Polygon to unlock PolyParlay Pro for 365 days. No subscription. No data given to a payment processor." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
     <style>
       :root {
-        --bg: #0b0d12;
-        --surface: #11141a;
-        --surface-2: #161a22;
-        --line: #1e2230;
-        --muted: #6b7280;
-        --text: #e5e7eb;
-        --strong: #f9fafb;
-        --accent: #6366f1;
-        --green: #22c55e;
-        --pro: #f59e0b;
+        --bg: #f5f1e8;
+        --bg-2: #fdfcf7;
+        --ink: #0a0c14;
+        --ink-2: #1f2937;
+        --muted: #6b6f7a;
+        --accent: #4f46e5;
+        --amber: #fbbf24;
+        --green: #16a34a;
+        --red: #dc2626;
+        --shadow-md: 4px 4px 0 var(--ink);
+        --shadow-sm: 3px 3px 0 var(--ink);
       }
       * { box-sizing: border-box; }
       body {
-        margin: 0; padding: 40px 20px 80px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background:
-          radial-gradient(900px 500px at 100% -10%, rgba(99,102,241,0.18), transparent 60%),
-          radial-gradient(600px 400px at 0% 100%, rgba(245,158,11,0.12), transparent 60%),
-          #0a0c12;
-        color: var(--text);
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--ink);
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(circle at 1px 1px, rgba(10, 12, 20, 0.08) 1px, transparent 0);
+        background-size: 22px 22px;
         min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
       }
-      .wrap { max-width: 720px; margin: 0 auto; }
-      header {
-        display: flex; align-items: center; gap: 10px;
-        margin-bottom: 36px;
-      }
-      .dot {
-        width: 12px; height: 12px; border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 16px rgba(99,102,241,0.6);
-      }
-      header .brand { font-weight: 800; font-size: 18px; color: var(--strong); letter-spacing: 0.3px; }
+      .mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
 
-      .lede { margin-bottom: 28px; }
+      /* === TICKER === */
+      .ticker {
+        background: var(--ink);
+        color: var(--bg);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; font-weight: 500;
+        letter-spacing: 1.6px; text-transform: uppercase;
+        padding: 9px 0;
+        white-space: nowrap; overflow: hidden;
+        border-bottom: 1.5px solid var(--ink);
+      }
+      .ticker-inner { display: inline-block; animation: scroll 42s linear infinite; padding-left: 100%; }
+      .ticker-inner span { margin: 0 28px; }
+      .ticker-inner .live::before {
+        content: '●'; color: var(--green); margin-right: 8px; text-shadow: 0 0 6px var(--green);
+      }
+      .ticker-inner .hi { color: var(--amber); }
+      .ticker-inner .acc { color: #a5b4fc; }
+      @keyframes scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+      }
+
+      /* === NAV === */
+      .nav {
+        max-width: 880px; margin: 0 auto;
+        padding: 22px 24px;
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      .brand {
+        display: flex; align-items: center; gap: 12px;
+        font-weight: 800; color: var(--ink); text-decoration: none;
+        font-size: 17px; letter-spacing: -0.01em;
+      }
+      .brand-mark {
+        width: 40px; height: 40px;
+        border-radius: 8px;
+        background: var(--ink);
+        border: 1.5px solid var(--ink);
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 0 5px;
+        font-weight: 900; font-size: 22px; line-height: 1;
+        letter-spacing: -2px;
+        box-shadow: var(--shadow-sm);
+      }
+      .brand-mark .p1 { color: var(--accent); }
+      .brand-mark .p2 { color: var(--amber); }
+      .nav-back {
+        color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 500;
+        font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;
+      }
+      .nav-back:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+      /* === MAIN === */
+      .wrap { max-width: 880px; margin: 0 auto; padding: 40px 24px 100px; }
+
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; font-weight: 700;
+        letter-spacing: 2px; text-transform: uppercase;
+        background: var(--bg-2);
+        border: 1.5px solid var(--ink);
+        padding: 6px 12px;
+        border-radius: 6px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 22px;
+      }
+      .eyebrow .dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--amber);
+      }
+
       h1 {
-        font-size: clamp(28px, 4vw, 40px);
-        margin: 0 0 12px;
-        color: var(--strong);
-        letter-spacing: -0.01em;
-        font-weight: 800;
+        font-size: clamp(36px, 5vw, 56px);
+        line-height: 1.02;
+        margin: 0 0 18px;
+        font-weight: 900;
+        letter-spacing: -0.035em;
       }
       h1 .accent { color: var(--accent); }
-      .sub { color: var(--muted); font-size: 16px; line-height: 1.5; }
+      h1 .amber  { color: #b45309; }
+      .lede {
+        font-size: 17px; line-height: 1.55;
+        color: var(--ink-2);
+        max-width: 660px;
+        margin: 0 0 38px;
+      }
+      .lede strong { color: var(--ink); font-weight: 700; }
 
       .card {
-        background: rgba(17, 20, 26, 0.85);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 22px;
-        margin-bottom: 16px;
+        background: var(--bg-2);
+        border: 1.5px solid var(--ink);
+        border-radius: 12px;
+        padding: 28px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-md);
       }
       .card h2 {
-        margin: 0 0 14px;
-        font-size: 14px;
-        font-weight: 800;
-        letter-spacing: 0.5px;
+        margin: 0 0 18px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; font-weight: 700;
+        letter-spacing: 1.8px;
         text-transform: uppercase;
-        color: var(--muted);
+        color: var(--accent);
       }
 
+      /* === PRICE CARD === */
+      .price-card { background: var(--ink); color: var(--bg); }
+      .price-card h2 { color: var(--amber); }
       .price-block {
-        display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px;
+        display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px;
+        font-family: 'JetBrains Mono', monospace;
       }
       .price-block .price {
-        font-size: 48px; font-weight: 900; color: var(--strong); line-height: 1;
+        font-size: clamp(56px, 8vw, 84px);
+        font-weight: 900; line-height: 1;
+        letter-spacing: -0.04em;
+        color: var(--bg);
       }
-      .price-block .unit { color: var(--muted); font-size: 14px; }
-      .price-meta { color: var(--muted); font-size: 13px; }
+      .price-block .unit { color: #9ca3af; font-size: 14px; font-weight: 500; }
+      .price-meta { color: #9ca3af; font-size: 13.5px; line-height: 1.55; }
 
+      /* === STEPS === */
       .step {
         display: grid;
-        grid-template-columns: 28px 1fr;
-        gap: 12px;
-        padding: 10px 0;
-        border-bottom: 1px solid var(--line);
+        grid-template-columns: 36px 1fr;
+        gap: 14px;
+        padding: 14px 0;
+        border-top: 1px dashed rgba(10, 12, 20, 0.18);
       }
-      .step:last-child { border-bottom: 0; }
+      .step:first-of-type { border-top: 0; padding-top: 4px; }
+      .step:last-of-type { padding-bottom: 4px; }
       .step-num {
-        width: 24px; height: 24px;
-        background: rgba(99,102,241,0.18);
-        color: var(--accent);
+        width: 32px; height: 32px;
+        background: var(--ink);
+        color: var(--bg);
+        font-family: 'JetBrains Mono', monospace;
         font-weight: 800; font-size: 12px;
-        border-radius: 50%;
+        border-radius: 7px;
         display: inline-flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
       }
-      .step-body strong { color: var(--strong); }
+      .step-body { font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+      .step-body strong { color: var(--ink); font-weight: 700; }
       .step-body code {
         display: inline-block;
-        padding: 2px 6px;
-        background: var(--surface-2);
-        border: 1px solid var(--line);
-        border-radius: 4px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        padding: 3px 8px;
+        background: var(--bg);
+        border: 1.5px solid var(--ink);
+        border-radius: 5px;
+        font-family: 'JetBrains Mono', monospace;
         font-size: 12px;
-        color: var(--strong);
+        color: var(--ink);
+        font-weight: 600;
       }
 
       .addr-box {
-        margin-top: 10px;
-        padding: 12px;
-        background: var(--surface-2);
-        border: 1px solid var(--line);
+        margin-top: 12px;
+        padding: 16px;
+        background: var(--ink);
+        color: var(--bg);
+        border: 1.5px solid var(--ink);
         border-radius: 8px;
-        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        box-shadow: var(--shadow-sm);
       }
       .addr-box .addr {
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 13px;
-        color: var(--strong);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
         word-break: break-all;
+        font-weight: 600;
       }
       button.copy {
-        background: var(--accent);
-        color: white;
-        border: 0;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-weight: 700;
+        background: var(--amber);
+        color: var(--ink);
+        border: 1.5px solid var(--ink);
+        padding: 8px 14px;
+        border-radius: 7px;
+        font-weight: 800;
         font-size: 12px;
         cursor: pointer;
         flex-shrink: 0;
+        font-family: inherit;
+        box-shadow: 2px 2px 0 var(--bg);
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+        letter-spacing: 0.3px;
       }
-      button.copy:hover { filter: brightness(1.08); }
+      button.copy:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--bg); }
+      button.copy:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--bg); }
 
-      .verify-form {
-        display: grid;
-        gap: 10px;
-      }
+      /* === VERIFY FORM === */
+      .verify-form { display: grid; gap: 12px; }
       .verify-form input {
         width: 100%;
-        background: var(--surface-2);
-        border: 1px solid var(--line);
-        color: var(--strong);
-        padding: 12px 14px;
+        background: var(--bg);
+        border: 1.5px solid var(--ink);
+        color: var(--ink);
+        padding: 14px 16px;
         border-radius: 8px;
         font-size: 14px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-family: 'JetBrains Mono', monospace;
         outline: none;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
       }
-      .verify-form input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+      .verify-form input::placeholder { color: var(--muted); }
+      .verify-form input:focus {
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 var(--accent);
+        border-color: var(--accent);
+      }
       .verify-form button {
-        background: var(--pro);
-        color: #0a0c12;
-        border: 0;
-        padding: 12px 18px;
+        background: var(--accent);
+        color: white;
+        border: 1.5px solid var(--ink);
+        padding: 14px 22px;
         border-radius: 8px;
         font-weight: 800;
-        font-size: 14px;
+        font-size: 15px;
         cursor: pointer;
+        font-family: inherit;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+        letter-spacing: 0.2px;
       }
-      .verify-form button:hover { filter: brightness(1.05); }
-      .verify-form button:disabled { opacity: 0.55; cursor: not-allowed; }
+      .verify-form button:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+      .verify-form button:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+      .verify-form button:disabled {
+        background: var(--muted);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: var(--shadow-md);
+      }
+      .verify-form button:disabled:hover { transform: none; box-shadow: var(--shadow-md); }
+
       #verifyStatus {
-        margin-top: 8px;
-        padding: 10px 12px;
+        margin-top: 12px;
+        padding: 14px 16px;
         border-radius: 8px;
-        font-size: 13px;
+        border: 1.5px solid var(--ink);
+        font-size: 14px; line-height: 1.55;
         display: none;
       }
       #verifyStatus.ok {
         display: block;
-        background: rgba(34,197,94,0.12);
-        border: 1px solid rgba(34,197,94,0.32);
-        color: var(--green);
+        background: #dcfce7;
+        color: #14532d;
+        box-shadow: var(--shadow-sm);
       }
       #verifyStatus.err {
         display: block;
-        background: rgba(239,68,68,0.10);
-        border: 1px solid rgba(239,68,68,0.28);
-        color: #fca5a5;
+        background: #fee2e2;
+        color: #7f1d1d;
+        box-shadow: var(--shadow-sm);
       }
+      #verifyStatus strong { color: inherit; font-weight: 800; }
 
-      footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 32px; }
-      footer a { color: var(--text); }
+      /* === FOOTER === */
+      footer {
+        text-align: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-top: 38px;
+        padding-top: 24px;
+        border-top: 1.5px solid var(--ink);
+      }
+      footer a { color: var(--ink); text-decoration: none; font-weight: 600; }
+      footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+      @media (max-width: 600px) {
+        .wrap { padding: 28px 18px 60px; }
+        .card { padding: 22px 20px; }
+        .addr-box { flex-direction: column; align-items: flex-start; }
+      }
     </style>
   </head>
   <body>
+
+    <!-- TICKER -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-inner">
+        <span class="live">LIVE</span>
+        <span>POLYPARLAY V1.0</span>
+        <span class="hi">149 USDC · POLYGON · ONE-TIME</span>
+        <span class="acc">UNLOCKS 365 DAYS</span>
+        <span>ON-CHAIN VERIFIED</span>
+        <span class="hi">NO PAYMENT PROCESSOR · NO SUBSCRIPTION</span>
+        <span>USDC.e OR NATIVE USDC ACCEPTED</span>
+        <span class="acc">7-DAY FREE TRIAL FIRST</span>
+        <!-- duplicated for continuous loop -->
+        <span class="live">LIVE</span>
+        <span>POLYPARLAY V1.0</span>
+        <span class="hi">149 USDC · POLYGON · ONE-TIME</span>
+        <span class="acc">UNLOCKS 365 DAYS</span>
+      </div>
+    </div>
+
+    <!-- NAV -->
+    <nav class="nav">
+      <a class="brand" href="/">
+        <span class="brand-mark"><span class="p1">P</span><span class="p2">P</span></span>
+        PolyParlay
+      </a>
+      <a class="nav-back" href="/">← BACK TO HOME</a>
+    </nav>
+
     <div class="wrap">
-      <header>
-        <div class="dot"></div>
-        <div class="brand">PolyParlay</div>
-      </header>
 
-      <section class="lede">
-        <h1>Unlock <span class="accent">Pro</span> · pay once, 365 days</h1>
-        <p class="sub">
-          Send 149 USDC on Polygon to the address below. The extension verifies your payment
-          on-chain — no payment processor, no account, no monthly billing. Your access is
-          good for one year from the transaction timestamp.
-        </p>
-      </section>
+      <div class="eyebrow"><span class="dot"></span> Upgrade to Pro</div>
+      <h1>Unlock <span class="accent">Pro.</span><br/>Pay once. <span class="amber">365 days.</span></h1>
+      <p class="lede">
+        Send <strong>149 USDC on Polygon</strong> to the address below. The extension verifies your
+        payment on-chain via Polygonscan — <strong>no payment processor, no account, no monthly billing</strong>.
+        Access is good for one year from the transaction timestamp.
+      </p>
 
-      <section class="card">
-        <h2>Price</h2>
+      <!-- ============================================================
+           PRICE CARD (black inverse)
+           ============================================================ -->
+      <section class="card price-card">
+        <h2>★ PRICE</h2>
         <div class="price-block">
           <span class="price">149</span>
-          <span class="unit">USDC · Polygon · one-time</span>
+          <span class="unit">USDC · POLYGON · ONE-TIME</span>
         </div>
-        <div class="price-meta">Equivalent of $12.42/mo. Pay once, valid for 365 days.</div>
+        <div class="price-meta">≈ $12.42 / month. Pay once, valid 365 days from your transaction. USDC.e or native USDC both accepted.</div>
       </section>
 
+      <!-- ============================================================
+           HOW TO PAY
+           ============================================================ -->
       <section class="card">
-        <h2>How to pay</h2>
+        <h2>// HOW TO PAY</h2>
         <div class="step">
-          <div class="step-num">1</div>
+          <div class="step-num">01</div>
           <div class="step-body">
-            <strong>Open MetaMask</strong> (or any wallet) on the <strong>Polygon network</strong>.
-            Make sure you hold at least 149 USDC.
-            Contract: <code>0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174</code>
+            <strong>Open MetaMask</strong> (or any wallet) and switch to the <strong>Polygon network</strong>.
+            Make sure you hold at least 149 USDC.<br />
+            USDC (native, Circle): <code>0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359</code><br />
+            USDC.e (bridged): <code>0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174</code>
           </div>
         </div>
         <div class="step">
-          <div class="step-num">2</div>
+          <div class="step-num">02</div>
           <div class="step-body">
             <strong>Send 149 USDC</strong> to this address:
             <div class="addr-box">
@@ -230,42 +395,40 @@
           </div>
         </div>
         <div class="step">
-          <div class="step-num">3</div>
+          <div class="step-num">03</div>
           <div class="step-body">
-            <strong>Verify below.</strong> Enter the wallet address you paid <em>from</em>
-            (not the destination). The verifier checks Polygon for your transfer and unlocks Pro
-            in your extension.
+            <strong>Wait 30–60 seconds</strong> for Polygonscan to index your transaction, then verify
+            below using the wallet you paid <em>from</em>. The verifier finds your transfer on-chain
+            and unlocks Pro in your extension.
           </div>
         </div>
       </section>
 
+      <!-- ============================================================
+           VERIFY FORM
+           ============================================================ -->
       <section class="card">
-        <h2>Verify payment</h2>
+        <h2>// VERIFY PAYMENT</h2>
         <form class="verify-form" id="verifyForm">
           <input
             type="text"
             id="walletInput"
-            placeholder="0x… (the wallet you paid from)"
+            placeholder="0x… (the wallet you PAID FROM)"
             spellcheck="false"
             autocomplete="off"
           />
-          <button type="submit" id="verifyBtn">Verify payment &amp; unlock Pro</button>
+          <button type="submit" id="verifyBtn">Verify payment &amp; unlock Pro →</button>
         </form>
         <div id="verifyStatus"></div>
       </section>
 
       <footer>
-        <p>
-          On-chain verification powered by Polygonscan. No third-party payment processor.<br />
-          Questions? <a href="/privacy">Privacy</a> · <a href="https://polymarket.com" target="_blank" rel="noopener">Polymarket</a>
-        </p>
+        ON-CHAIN VERIFICATION VIA POLYGONSCAN · NO THIRD-PARTY PAYMENT PROCESSOR<br/>
+        <a href="/privacy">PRIVACY</a> · <a href="/">HOME</a> · <a href="https://polymarket.com" target="_blank" rel="noopener">POLYMARKET ↗</a>
       </footer>
     </div>
 
     <script>
-      // CONFIGURE before deploy:
-      //   - PAYMENT_ADDRESS: your Polygon wallet that receives the 149 USDC
-      //   - VERIFY_URL: your deployed Cloudflare Worker endpoint
       const PAYMENT_ADDRESS = '0x9548B8E9554a1968843B3C380431b10996247c88';
       const VERIFY_URL = 'https://polyparlay-verify.z-lew87.workers.dev/verify';
 
@@ -276,7 +439,7 @@
           await navigator.clipboard.writeText(PAYMENT_ADDRESS);
           const btn = document.getElementById('copyAddr');
           const t = btn.textContent;
-          btn.textContent = 'Copied';
+          btn.textContent = 'Copied ✓';
           setTimeout(() => (btn.textContent = t), 1400);
         } catch {
           prompt('Copy this address:', PAYMENT_ADDRESS);
@@ -293,7 +456,7 @@
 
         if (!/^0x[a-f0-9]{40}$/i.test(wallet)) {
           status.className = 'err';
-          status.textContent = 'That doesn\'t look like a valid wallet address. It should start with 0x and be 42 characters.';
+          status.textContent = "That doesn't look like a valid wallet address. It should start with 0x and be 42 characters.";
           return;
         }
 
@@ -307,13 +470,12 @@
             const expires = new Date(data.expires * 1000).toLocaleDateString();
             status.className = 'ok';
             status.innerHTML =
-              'Payment verified. Pro is active until <strong>' + expires + '</strong>. ' +
+              '<strong>✓ Payment verified.</strong> Pro is active until <strong>' + expires + '</strong>. ' +
               'Open the extension — your Pro features are unlocked.';
-            // Tell the extension via chrome.runtime so it can flip proState
             try {
               if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
                 chrome.runtime.sendMessage(
-                  'YOUR_EXTENSION_ID', // replace with your published extension ID
+                  'YOUR_EXTENSION_ID',
                   { type: 'proVerified', wallet, expires: data.expires, paidAt: data.paidAt }
                 );
               }
@@ -329,7 +491,7 @@
           status.textContent = 'Verification failed: ' + (err.message || err) + '. The Polygonscan API may be rate-limited — try again in a few seconds.';
         } finally {
           btn.disabled = false;
-          btn.textContent = 'Verify payment & unlock Pro';
+          btn.textContent = 'Verify payment & unlock Pro →';
         }
       });
     </script>
