@@ -1,48 +1,47 @@
+/* === NEO-BRUTALIST LIGHT THEME ===
+   Locked light (matches polyparlay.app site). Dark mode dropped — brand
+   identity is cream-paper-with-ink. CSS variables stay so cards/buttons
+   compose cleanly. */
 :root {
-  /* Dark theme variables (default for users with OS=dark or no preference) */
-  --bg: #0b0d12;
-  --surface: #11141a;
-  --surface-2: #161a22;
-  --line: #1e2230;
-  --muted: #6b7280;
-  --text: #e5e7eb;
-  --text-strong: #f9fafb;
-  --accent: #6366f1;
-  --green: #22c55e;
-  --amber: #f59e0b;
-  --red: #ef4444;
-  --pro: #f59e0b;
-}
-
-/* PRE-JS theme via OS preference — prevents the dark→light flash.
-   This is what the page renders with BEFORE chrome.storage / content script syncs. */
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #ffffff;
-    --surface: #f9fafb;
-    --surface-2: #f3f4f6;
-    --line: #e5e7eb;
-    --text: #1f2937;
-    --text-strong: #111827;
-  }
-}
-
-/* JS-driven overrides — applied once we know PM's theme (via content script) */
-body[data-theme="dark"] {
-  --bg: #0b0d12;
-  --surface: #11141a;
-  --surface-2: #161a22;
-  --line: #1e2230;
-  --text: #e5e7eb;
-  --text-strong: #f9fafb;
-}
-body[data-theme="light"] {
-  --bg: #ffffff;
-  --surface: #f9fafb;
-  --surface-2: #f3f4f6;
-  --line: #e5e7eb;
+  --bg: #f5f1e8;        /* warm cream paper */
+  --surface: #fdfcf7;   /* lighter card bg */
+  --surface-2: #ffffff; /* white for nested cards/inputs */
+  --line: #0a0c14;      /* near-black ink — used as hard border color */
+  --line-soft: rgba(10, 12, 20, 0.18); /* dashed dividers inside cards */
+  --muted: #6b6f7a;
   --text: #1f2937;
-  --text-strong: #111827;
+  --text-strong: #0a0c14;
+  --accent: #4f46e5;
+  --accent-2: #a5b4fc;
+  --green: #16a34a;
+  --amber: #f59e0b;
+  --red: #dc2626;
+  --pro: #fbbf24;
+
+  /* hard offset shadows for the brutalist look — small because popup is 380px */
+  --shadow-sm: 2px 2px 0 var(--line);
+  --shadow-md: 3px 3px 0 var(--line);
+}
+
+/* Force light brutalist regardless of OS or any legacy data-theme writes. */
+body, body[data-theme="dark"], body[data-theme="light"] {
+  --bg: #f5f1e8;
+  --surface: #fdfcf7;
+  --surface-2: #ffffff;
+  --line: #0a0c14;
+  --text: #1f2937;
+  --text-strong: #0a0c14;
+}
+@media (prefers-color-scheme: dark) {
+  /* override OS dark preference — extension always renders light brutalist */
+  :root, body {
+    --bg: #f5f1e8;
+    --surface: #fdfcf7;
+    --surface-2: #ffffff;
+    --line: #0a0c14;
+    --text: #1f2937;
+    --text-strong: #0a0c14;
+  }
 }
 
 * { box-sizing: border-box; }
@@ -50,12 +49,20 @@ body[data-theme="light"] {
 body {
   width: 380px;
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
+  /* subtle dot grid like the website */
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(10, 12, 20, 0.07) 1px, transparent 0);
+  background-size: 18px 18px;
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 13px;
   line-height: 1.4;
   overflow-x: hidden;
+}
+.mono, .ticket-stub .row > span:last-child, .free-analytics .row > span:last-child,
+.stake-input input, .hv-leg-price {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 header {
@@ -169,34 +176,29 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   cursor: not-allowed;
 }
 
-/* === PARLAY TICKET CARD ===
-   Legs body + perforated divider + math stub all baked into one card
-   styled like a real betting slip. */
+/* === PARLAY TICKET CARD — neo-brutalist light, paper-feel ===
+   Cream card with hard 1.5px ink border and small offset shadow. */
 .parlay-ticket {
   margin: 12px;
   background: var(--surface);
-  background-image: linear-gradient(165deg,
-    rgba(99, 102, 241, 0.10) 0%,
-    rgba(99, 102, 241, 0.04) 40%,
-    rgba(245, 158, 11, 0.04) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.30);
-  border-left: 3px solid var(--accent);
+  border: 1.5px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.07);
+  box-shadow: var(--shadow-md);
 }
 .ticket-head {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
   text-transform: uppercase;
   color: var(--accent);
-  border-bottom: 1px dashed rgba(99, 102, 241, 0.28);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.04));
+  border-bottom: 1.5px dashed var(--line);
+  background: var(--bg);
 }
 .ticket-head-title { flex: 1; }
 .ticket-head-count {
@@ -208,8 +210,8 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
 .legs {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 8px;
+  gap: 6px;
+  padding: 10px;
   max-height: 220px;
   overflow-y: auto;
   background: transparent;
@@ -291,16 +293,12 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   opacity: 0.85;
 }
 
-/* Run-sim button when inline inside the ticket — no outer margin, flush
-   with the ticket interior, separator above so it reads as "between
-   legs and math stub." */
+/* Run-sim button when inline inside the parlay-ticket. Flush, no outer
+   margin, dashed dividers above/below to read as "between legs and stub." */
 .run-sim-box.run-sim-inline {
-  margin: 0;
+  margin: 8px 10px;
+  width: calc(100% - 20px);
   border-radius: 8px;
-  border-top: 1px dashed var(--line);
-  border-left: 0;
-  border-right: 0;
-  border-bottom: 1px dashed var(--line);
 }
 
 /* Execute-menu inline inside the ticket footer — slim, full-width button */
@@ -355,12 +353,14 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   grid-template-columns: minmax(0, 1fr) auto 28px;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
-  background-color: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  transition: border-color 0.12s ease, transform 0.1s ease;
+  padding: 9px 12px;
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
+.leg:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--line); border-color: var(--line); }
 .leg .leg-body { min-width: 0; }
 .leg:hover {
   border-color: rgba(99, 102, 241, 0.32);
@@ -621,25 +621,35 @@ button.upgrade:hover { filter: brightness(1.05); }
   margin: 0;
 }
 button.primary, button.secondary {
-  border: 0;
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-weight: 600;
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-weight: 700;
   cursor: pointer;
   font-size: 12px;
+  font-family: inherit;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  box-shadow: var(--shadow-sm);
 }
 button.primary {
   background: var(--accent);
   color: white;
 }
-button.primary:hover { filter: brightness(1.08); }
+button.primary:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--line); }
+button.primary:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--line); }
 button.secondary {
   background: var(--surface-2);
-  color: var(--text);
-  border: 1px solid var(--line);
+  color: var(--text-strong);
 }
-button.secondary:hover { color: var(--text-strong); border-color: #2c3142; }
-button[disabled] { opacity: 0.45; cursor: not-allowed; }
+button.secondary:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--line); }
+button.secondary:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--line); }
+button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: var(--shadow-sm);
+  transform: none;
+}
+button[disabled]:hover { transform: none; box-shadow: var(--shadow-sm); }
 
 .card-wrap {
   padding: 10px 12px;
@@ -748,42 +758,38 @@ summary.execute-summary {
   gap: 12px;
   width: calc(100% - 24px);
   margin: 4px 12px 10px;
-  padding: 14px 16px;
-  background-color: var(--surface-2);
-  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(245, 158, 11, 0.10));
-  border: 1px solid rgba(99, 102, 241, 0.45);
-  border-radius: 10px;
-  color: var(--text);
+  padding: 13px 14px;
+  background-color: var(--line);
+  color: var(--bg);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.12);
-  transition: filter 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 3px 3px 0 var(--amber);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 .run-sim-box:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.22);
-  transform: translateY(-1px);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--amber);
 }
-.run-sim-box:active { transform: scale(0.99) translateY(0); }
-.run-sim-icon { font-size: 26px; line-height: 1; }
+.run-sim-box:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--amber); }
+.run-sim-icon { font-size: 24px; line-height: 1; }
 .run-sim-content { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-.run-sim-title { font-weight: 800; font-size: 14px; color: var(--text-strong); letter-spacing: 0.1px; }
-.run-sim-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.run-sim-title { font-weight: 800; font-size: 14px; color: var(--bg); letter-spacing: -0.01em; }
+.run-sim-desc { font-size: 11px; color: var(--accent-2); line-height: 1.4; }
 
 /* Single Pro section — Smart Money signals only.
    Free = parlay calculator (everything outside this section).
    Paid = the four cards below + Signal Archive lock-in mechanic. */
 .pro-section {
   margin: 0 12px 12px;
-  padding: 12px;
-  background-color: var(--surface-2);
-  background-image:
-    linear-gradient(135deg, rgba(245, 158, 11, 0.07) 0%, rgba(99, 102, 241, 0.04) 100%),
-    radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.06), transparent 60%);
-  border: 1px solid rgba(245, 158, 11, 0.32);
+  padding: 14px;
+  background-color: #fef3c7;     /* light amber paper */
+  border: 1.5px solid var(--line);
   border-radius: 10px;
   color: var(--text);
+  box-shadow: 3px 3px 0 var(--amber);
 }
 .pro-headline {
   font-size: 12px;
@@ -1219,17 +1225,15 @@ summary.execute-summary {
   opacity: 0.75;
 }
 
-/* Analytics — baked panel: free rows on top, blurred Pro rows below, inline
-   unlock CTA at the bottom. The blur+CTA is the conversion hook. */
+/* Analytics — brutalist light card. Ink border + offset accent shadow,
+   so the eye reads it as the value-prop block (vs neutral parlay-ticket). */
 .free-analytics {
   margin: 0 12px 12px;
-  padding: 10px 12px;
-  background-color: var(--surface);
-  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02));
-  border: 1px solid rgba(99, 102, 241, 0.32);
-  border-left: 3px solid var(--accent);
+  padding: 12px 14px;
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--line);
   border-radius: 10px;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.06);
+  box-shadow: 3px 3px 0 var(--accent);
 }
 .free-analytics .row {
   padding: 5px 0;
@@ -1326,19 +1330,19 @@ body.state-paid .analytics-pro .analytics-pro-text::before { content: "✓ "; }
   align-items: center;
   gap: 2px;
   width: 100%;
-  margin-top: 10px;
-  padding: 10px 12px;
-  border: 0;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--accent), #818cf8);
+  background: var(--accent);
   color: white;
   font-family: inherit;
   cursor: pointer;
-  transition: filter 0.12s ease, transform 0.1s ease;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.32);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  box-shadow: var(--shadow-md);
 }
-.analytics-unlock:hover { filter: brightness(1.06); }
-.analytics-unlock:active { transform: scale(0.99); }
+.analytics-unlock:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--line); }
+.analytics-unlock:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--line); }
 .analytics-unlock-headline {
   font-size: 13px;
   font-weight: 800;

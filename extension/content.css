@@ -1,61 +1,53 @@
-/* PolyParlay v0.1.3 — slim floating button + slide-out preview */
+/* PolyParlay — floating pill + slide-out drawer.
+   v1.0.x neo-brutalist light: cream bg, hard ink borders, offset shadows.
+   Locked light regardless of host page theme — matches the extension brand. */
 
 #polyparlay-floating-btn {
   position: fixed !important;
-  bottom: 80px !important;        /* lifted above PM's bottom UI */
+  bottom: 80px !important;
   right: 16px !important;
   z-index: 2147483647 !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 8px 16px 8px 8px !important;   /* always-expanded pill */
-  background: #1f2937 !important;
-  color: #f9fafb !important;
-  border: 1px solid #374151 !important;
+  padding: 9px 18px 9px 10px !important;
+  background: #fdfcf7 !important;
+  color: #0a0c14 !important;
+  border: 1.5px solid #0a0c14 !important;
   border-radius: 999px !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
   font-size: 13px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   cursor: pointer !important;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4) !important;
-  transition: background 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease !important;
+  box-shadow: 3px 3px 0 #0a0c14 !important;
+  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
   line-height: 1 !important;
   user-select: none !important;
   white-space: nowrap !important;
 }
 #polyparlay-floating-btn:hover {
-  background: #2b3848 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Light theme — sync with PM's light mode */
-#polyparlay-floating-btn[data-pw-theme="light"] {
-  background: #ffffff !important;
-  color: #111827 !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.12) !important;
-}
-#polyparlay-floating-btn[data-pw-theme="light"]:hover {
-  background: #f9fafb !important;
-}
-#polyparlay-floating-btn[data-pw-theme="light"].pw-disabled {
-  background: #f3f4f6 !important;
-}
-#polyparlay-floating-btn[data-pw-theme="light"].pw-disabled .pw-icon {
-  background: #d1d5db !important;
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0 #0a0c14 !important;
 }
 #polyparlay-floating-btn:active {
-  transform: translateY(0) !important;
+  transform: translate(1px, 1px) !important;
+  box-shadow: 1px 1px 0 #0a0c14 !important;
 }
 #polyparlay-floating-btn.pw-busy {
   opacity: 0.7 !important;
   pointer-events: none !important;
 }
-/* .pw-flash now only triggers brief color flash — pill is always expanded */
 #polyparlay-floating-btn.pw-disabled {
-  opacity: 0.55 !important;
-  background: #1a2030 !important;
+  background: #e5e3da !important;
+  color: #6b6f7a !important;
+}
+/* Legacy data-pw-theme overrides — flatten to the same brutalist light look */
+#polyparlay-floating-btn[data-pw-theme="dark"],
+#polyparlay-floating-btn[data-pw-theme="light"] {
+  background: #fdfcf7 !important;
+  color: #0a0c14 !important;
+  border-color: #0a0c14 !important;
+  box-shadow: 3px 3px 0 #0a0c14 !important;
 }
 #polyparlay-floating-btn .pw-icon {
   display: inline-flex !important;
@@ -120,89 +112,62 @@
 .polyparlay-inline-btn:hover { filter: brightness(1.1) !important; }
 
 /* Slide-out preview that appears after every successful add */
+/* Drawer — locked light brutalist regardless of host page theme. */
 #polyparlay-preview {
   position: fixed !important;
   bottom: 130px !important;
   right: 16px !important;
   z-index: 2147483646 !important;
   width: 320px !important;
-  background: #11141a !important;
-  color: #e5e7eb !important;
-  border: 1px solid #1e2230 !important;
+  background: #fdfcf7 !important;
+  color: #1f2937 !important;
+  border: 1.5px solid #0a0c14 !important;
   border-radius: 12px !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
   font-size: 13px !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
+  box-shadow: 5px 5px 0 #0a0c14 !important;
   transform: translateY(0) !important;
   opacity: 1 !important;
   transition: transform 0.2s ease, opacity 0.2s ease !important;
   overflow: hidden !important;
 }
-/* Light theme — applied by the JS data-pw-theme attribute OR by the
-   @media block below for any user whose OS is in light mode (no JS
-   required, so the drawer is correct on first paint). */
+/* Legacy data-pw-theme overrides — flatten to the same brutalist light look */
+#polyparlay-preview[data-pw-theme="dark"],
 #polyparlay-preview[data-pw-theme="light"] {
-  background: #ffffff !important;
-  color: #111827 !important;
-  border-color: #e5e7eb !important;
+  background: #fdfcf7 !important;
+  color: #1f2937 !important;
+  border: 1.5px solid #0a0c14 !important;
+  box-shadow: 5px 5px 0 #0a0c14 !important;
 }
+#polyparlay-preview[data-pw-theme="dark"] .pw-preview-head,
 #polyparlay-preview[data-pw-theme="light"] .pw-preview-head,
+#polyparlay-preview[data-pw-theme="dark"] .pw-pleg,
 #polyparlay-preview[data-pw-theme="light"] .pw-pleg,
+#polyparlay-preview[data-pw-theme="dark"] .pw-preview-summary,
 #polyparlay-preview[data-pw-theme="light"] .pw-preview-summary,
+#polyparlay-preview[data-pw-theme="dark"] .pw-preview-footer,
 #polyparlay-preview[data-pw-theme="light"] .pw-preview-footer {
-  border-color: #e5e7eb !important;
+  border-color: rgba(10, 12, 20, 0.18) !important;
 }
+#polyparlay-preview[data-pw-theme="dark"] .pw-preview-title,
 #polyparlay-preview[data-pw-theme="light"] .pw-preview-title,
+#polyparlay-preview[data-pw-theme="dark"] .pw-pleg-q,
 #polyparlay-preview[data-pw-theme="light"] .pw-pleg-q {
-  color: #111827 !important;
+  color: #0a0c14 !important;
 }
+#polyparlay-preview[data-pw-theme="dark"] .pw-pleg-num,
 #polyparlay-preview[data-pw-theme="light"] .pw-pleg-num {
-  background: #f3f4f6 !important;
-  color: #6b7280 !important;
+  background: #f5f1e8 !important;
+  color: #6b6f7a !important;
+  border: 1px solid rgba(10, 12, 20, 0.2) !important;
 }
+#polyparlay-preview[data-pw-theme="dark"] .pw-preview-footer,
 #polyparlay-preview[data-pw-theme="light"] .pw-preview-footer {
-  background: #f9fafb !important;
+  background: #f5f1e8 !important;
 }
+#polyparlay-preview[data-pw-theme="dark"] .pw-preview-summary strong,
 #polyparlay-preview[data-pw-theme="light"] .pw-preview-summary strong {
-  color: #111827 !important;
-}
-
-/* Same rules but driven by OS preference, so light-mode users see a
-   light drawer even before the content script runs. We scope to
-   :not([data-pw-theme="dark"]) so the JS can still force dark if the
-   user explicitly overrides. */
-@media (prefers-color-scheme: light) {
-  #polyparlay-preview:not([data-pw-theme="dark"]) {
-    background: #ffffff !important;
-    color: #111827 !important;
-    border-color: #e5e7eb !important;
-  }
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-head,
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-pleg,
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-summary,
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-footer {
-    border-color: #e5e7eb !important;
-  }
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-title,
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-pleg-q {
-    color: #111827 !important;
-  }
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-pleg-num {
-    background: #f3f4f6 !important;
-    color: #6b7280 !important;
-  }
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-footer {
-    background: #f9fafb !important;
-  }
-  #polyparlay-preview:not([data-pw-theme="dark"]) .pw-preview-summary strong {
-    color: #111827 !important;
-  }
-  /* Floating pill too */
-  #polyparlay-floating-btn:not([data-pw-theme="dark"]) {
-    background: #ffffff !important;
-    color: #111827 !important;
-    border-color: #e5e7eb !important;
-  }
+  color: #0a0c14 !important;
 }
 #polyparlay-preview.pw-hidden {
   transform: translateY(20px) !important;
@@ -214,21 +179,25 @@
   justify-content: space-between !important;
   align-items: center !important;
   padding: 10px 12px !important;
-  border-bottom: 1px solid #1e2230 !important;
+  border-bottom: 1.5px dashed rgba(10, 12, 20, 0.18) !important;
 }
 .pw-preview-title {
   font-weight: 700 !important;
-  color: #f9fafb !important;
+  color: #0a0c14 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 1.3px !important;
+  text-transform: uppercase !important;
 }
 .pw-preview-close {
   background: transparent !important;
   border: 0 !important;
-  color: #6b7280 !important;
+  color: #6b6f7a !important;
   font-size: 18px !important;
   cursor: pointer !important;
   padding: 0 4px !important;
 }
-.pw-preview-close:hover { color: #f9fafb !important; }
+.pw-preview-close:hover { color: #0a0c14 !important; }
 .pw-preview-legs {
   max-height: 220px !important;
   overflow-y: auto !important;
@@ -236,7 +205,7 @@
 .pw-preview-empty {
   padding: 24px 12px !important;
   text-align: center !important;
-  color: #6b7280 !important;
+  color: #6b6f7a !important;
   font-size: 12px !important;
 }
 .pw-pleg {
@@ -244,69 +213,78 @@
   grid-template-columns: 22px 1fr !important;
   gap: 8px !important;
   padding: 8px 12px !important;
-  border-bottom: 1px solid #1e2230 !important;
+  border-bottom: 1px dashed rgba(10, 12, 20, 0.16) !important;
   align-items: start !important;
 }
 .pw-pleg:last-child { border-bottom: 0 !important; }
 .pw-pleg-num {
   width: 20px !important; height: 20px !important;
-  border-radius: 50% !important;
-  background: #1e2230 !important;
-  color: #6b7280 !important;
+  border-radius: 5px !important;
+  background: #0a0c14 !important;
+  color: #fdfcf7 !important;
   font-size: 11px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
+  font-family: 'JetBrains Mono', monospace !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
 .pw-pleg-q {
-  color: #f9fafb !important;
-  font-weight: 500 !important;
+  color: #0a0c14 !important;
+  font-weight: 600 !important;
   font-size: 12px !important;
   line-height: 1.3 !important;
 }
 .pw-pleg-meta {
   display: block !important;
-  font-size: 11px !important;
-  color: #6b7280 !important;
-  margin-top: 2px !important;
+  font-size: 10.5px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  color: #6b6f7a !important;
+  margin-top: 3px !important;
+  letter-spacing: 0.3px !important;
 }
-.pw-yes { color: #22c55e !important; font-weight: 700 !important; }
-.pw-no { color: #ef4444 !important; font-weight: 700 !important; }
-.pw-other { color: #6366f1 !important; font-weight: 700 !important; }
+.pw-yes { color: #16a34a !important; font-weight: 700 !important; }
+.pw-no { color: #dc2626 !important; font-weight: 700 !important; }
+.pw-other { color: #4f46e5 !important; font-weight: 700 !important; }
 
 .pw-preview-summary {
   padding: 10px 12px !important;
-  border-top: 1px solid #1e2230 !important;
+  border-top: 1.5px dashed rgba(10, 12, 20, 0.18) !important;
   display: flex !important;
   justify-content: space-between !important;
   align-items: baseline !important;
 }
-.pw-preview-summary span { color: #6b7280 !important; }
+.pw-preview-summary span { color: #6b6f7a !important; font-size: 12px !important; }
 .pw-preview-summary strong {
-  color: #f9fafb !important;
+  color: #0a0c14 !important;
   font-size: 18px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 800 !important;
 }
 .pw-preview-footer {
   padding: 8px 12px !important;
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  background: #0f1218 !important;
-  border-top: 1px solid #1e2230 !important;
+  background: #f5f1e8 !important;
+  border-top: 1.5px dashed rgba(10, 12, 20, 0.18) !important;
 }
 .pw-preview-status {
   font-size: 11px !important;
-  color: #6b7280 !important;
+  color: #6b6f7a !important;
+  font-family: 'JetBrains Mono', monospace !important;
 }
 .pw-preview-popup {
-  background: #6366f1 !important;
+  background: #4f46e5 !important;
   color: #fff !important;
-  border: 0 !important;
+  border: 1.5px solid #0a0c14 !important;
   border-radius: 6px !important;
-  padding: 5px 10px !important;
+  padding: 6px 12px !important;
   font-size: 11px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   cursor: pointer !important;
+  box-shadow: 2px 2px 0 #0a0c14 !important;
+  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
 }
-.pw-preview-popup:hover { filter: brightness(1.08) !important; }
+.pw-preview-popup:hover { transform: translate(-1px, -1px) !important; box-shadow: 3px 3px 0 #0a0c14 !important; }
+.pw-preview-popup:active { transform: translate(1px, 1px) !important; box-shadow: 1px 1px 0 #0a0c14 !important; }
