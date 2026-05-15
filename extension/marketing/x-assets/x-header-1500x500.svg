@@ -10,76 +10,71 @@
   <rect width="1500" height="500" fill="#f5f1e8"/>
   <rect width="1500" height="500" fill="url(#dotgrid)"/>
 
-  <!-- Top ticker strip — black bar like the website -->
+  <!-- ============================================================
+       TOP TICKER — full-width black strip with rolling status
+       ============================================================ -->
   <rect x="0" y="0" width="1500" height="36" fill="#0a0c14"/>
   <text x="40" y="22" font-family="'JetBrains Mono', ui-monospace, monospace"
         font-size="12" font-weight="700" fill="#f5f1e8" letter-spacing="2.5">
-    ● LIVE · POLYPARLAY V1.0 · CHROME EXTENSION + WEB · 10,000 MONTE CARLO SIMS · PRO 149 USDC/YR · POLYGON ON-CHAIN · 7-DAY FREE TRIAL · NO WALLET CONNECT · ● LIVE
+    ● LIVE · POLYPARLAY V1.0 · CHROME EXTENSION + WEB · 10,000 MONTE CARLO SIMS · PRO 149 USDC/YR · POLYGON ON-CHAIN · 7-DAY FREE TRIAL · NO WALLET CONNECT
   </text>
-  <!-- Green live dot — overlay -->
   <circle cx="46" cy="18" r="3.5" fill="#16a34a"/>
 
   <!-- ============================================================
-       LEFT — brand lockup
+       SAFE-ZONE NOTE — X PROFILE PIC OVERLAPS BOTTOM-LEFT
+       Profile pic occupies roughly x=60-330, y=370-500 (cropped circle).
+       All critical content is placed at x>=380 to avoid being hidden.
        ============================================================ -->
-  <!-- PP monogram tile (dark, brand-identity-locked) -->
-  <g transform="translate(100 110)">
-    <rect width="120" height="120" rx="14" fill="#0a0c14" stroke="#0a0c14" stroke-width="1.5"/>
-    <!-- offset shadow effect via second rect behind -->
-    <rect x="6" y="6" width="120" height="120" rx="14" fill="#0a0c14" fill-opacity="0.18" transform="translate(-6 -6)"/>
-    <g transform="translate(60 60)">
-      <!-- Left P indigo -->
-      <path d="M-32 -25 L-32 26 L-22 26 L-22 11 L-8 11 C5 11 14 1 14 -7 C14 -16 5 -25 -8 -25 L-32 -25 Z M-22 -15 L-8 -15 C-3 -15 1 -11 1 -7 C1 -3 -3 1 -8 1 L-22 1 Z"
-            fill="#4f46e5"/>
-      <!-- Right P amber, offset down-right -->
-      <path d="M7 -15 L7 36 L17 36 L17 21 L31 21 C44 21 53 11 53 3 C53 -5 44 -15 31 -15 L7 -15 Z M17 -5 L31 -5 C36 -5 40 -1 40 3 C40 7 36 11 31 11 L17 11 Z"
-            fill="#fbbf24"/>
-    </g>
-  </g>
 
-  <!-- Brand wordmark -->
-  <text x="250" y="178" font-size="80" font-weight="900" fill="#0a0c14" letter-spacing="-3">PolyParlay</text>
+  <!-- Brand wordmark — large, right of profile-pic zone -->
+  <text x="380" y="148" font-size="72" font-weight="900"
+        fill="#0a0c14" letter-spacing="-2.5">PolyParlay</text>
 
-  <!-- Tagline -->
-  <text x="250" y="220" font-family="'JetBrains Mono', ui-monospace, monospace"
-        font-size="16" font-weight="700" fill="#4f46e5" letter-spacing="2.5">// PARLAY BUILDER FOR POLYMARKET</text>
-
-  <!-- Big claim -->
-  <text x="100" y="320" font-size="40" font-weight="900" fill="#0a0c14" letter-spacing="-1.5">Multi-leg parlays.</text>
-  <text x="100" y="362" font-size="40" font-weight="900" fill="#0a0c14" letter-spacing="-1.5">
-    10K Monte Carlo. <tspan fill="#b45309">Improve Odds.</tspan>
+  <!-- Mono tagline directly under the wordmark -->
+  <text x="380" y="186" font-family="'JetBrains Mono', ui-monospace, monospace"
+        font-size="14" font-weight="700" fill="#4f46e5" letter-spacing="2.5">
+    // PARLAY BUILDER FOR POLYMARKET
   </text>
 
-  <!-- Feature pills (brutalist) -->
-  <g transform="translate(100 410)">
-    <!-- Pill 1 -->
-    <rect width="200" height="44" rx="22" fill="#fdfcf7" stroke="#0a0c14" stroke-width="1.5"/>
-    <rect x="3" y="3" width="200" height="44" rx="22" fill="none"/>
-    <text x="100" y="28" text-anchor="middle"
+  <!-- Big claim — two lines, ALL content right of x=380 -->
+  <text x="380" y="262" font-size="44" font-weight="900"
+        fill="#0a0c14" letter-spacing="-1.5">Multi-leg parlays.</text>
+  <text x="380" y="312" font-size="44" font-weight="900"
+        fill="#0a0c14" letter-spacing="-1.5">
+    10K Monte Carlo.
+    <tspan fill="#b45309">Improve Odds.</tspan>
+  </text>
+
+  <!-- Brutalist feature pills — kept right of profile pic, above bottom edge -->
+  <g transform="translate(380 360)">
+    <!-- Pill 1 — Chrome Extension -->
+    <rect width="220" height="46" rx="23" fill="#fdfcf7" stroke="#0a0c14" stroke-width="1.5"/>
+    <text x="110" y="29" text-anchor="middle"
           font-family="'JetBrains Mono', ui-monospace, monospace"
           font-size="13" font-weight="800" fill="#0a0c14" letter-spacing="1.2">CHROME EXTENSION</text>
 
-    <!-- Pill 2 -->
-    <rect x="216" width="200" height="44" rx="22" fill="#dcfce7" stroke="#0a0c14" stroke-width="1.5"/>
-    <text x="316" y="28" text-anchor="middle"
+    <!-- Pill 2 — Free -->
+    <rect x="236" width="180" height="46" rx="23" fill="#dcfce7" stroke="#0a0c14" stroke-width="1.5"/>
+    <text x="326" y="29" text-anchor="middle"
           font-family="'JetBrains Mono', ui-monospace, monospace"
-          font-size="13" font-weight="800" fill="#0a0c14" letter-spacing="1.2">● FREE TO INSTALL</text>
+          font-size="13" font-weight="800" fill="#0a0c14" letter-spacing="1.2">● FREE</text>
 
-    <!-- Pill 3 -->
-    <rect x="432" width="240" height="44" rx="22" fill="#fef3c7" stroke="#0a0c14" stroke-width="1.5"/>
-    <text x="552" y="28" text-anchor="middle"
+    <!-- Pill 3 — Pro -->
+    <rect x="432" width="220" height="46" rx="23" fill="#fef3c7" stroke="#0a0c14" stroke-width="1.5"/>
+    <text x="542" y="29" text-anchor="middle"
           font-family="'JetBrains Mono', ui-monospace, monospace"
           font-size="13" font-weight="800" fill="#0a0c14" letter-spacing="1.2">★ PRO 149 USDC/YR</text>
   </g>
 
   <!-- ============================================================
        RIGHT — light brutalist parlay-ticket mockup
+       Sized to fit clearly in the right third without overflow.
        ============================================================ -->
-  <g transform="translate(1010 80)">
-    <!-- Offset shadow (rendered first, behind the card) -->
-    <rect x="6" y="6" width="380" height="380" rx="14" fill="#0a0c14"/>
+  <g transform="translate(1080 70)">
+    <!-- Ink offset shadow behind card -->
+    <rect x="6" y="6" width="380" height="360" rx="14" fill="#0a0c14"/>
     <!-- Main card -->
-    <rect width="380" height="380" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="1.5"/>
+    <rect width="380" height="360" rx="14" fill="#fdfcf7" stroke="#0a0c14" stroke-width="1.5"/>
 
     <!-- Card header strip -->
     <rect x="0" y="0" width="380" height="36" fill="#f5f1e8"/>
@@ -91,49 +86,48 @@
 
     <!-- Leg 1 -->
     <g transform="translate(16 50)">
-      <rect width="348" height="62" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
-      <rect x="2" y="2" width="348" height="62" rx="7" fill="none"/>
+      <rect width="348" height="58" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
       <text x="14" y="22" font-size="14" font-weight="700" fill="#0a0c14">Fed cuts rates in June 2026</text>
-      <text x="14" y="44" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" letter-spacing="0.6" fill="#6b6f7a">
+      <text x="14" y="42" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" letter-spacing="0.6" fill="#6b6f7a">
         <tspan font-weight="700" fill="#16a34a">YES</tspan> · RESOLVES 18 JUN
       </text>
-      <text x="334" y="38" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
+      <text x="334" y="36" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
             font-size="16" font-weight="700" fill="#0a0c14">$0.62</text>
     </g>
 
-    <!-- Leg 2 (flipped — green shadow) -->
-    <g transform="translate(16 124)">
-      <rect x="3" y="3" width="348" height="62" rx="7" fill="#16a34a"/>
-      <rect width="348" height="62" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
+    <!-- Leg 2 (flipped — green offset shadow) -->
+    <g transform="translate(16 118)">
+      <rect x="3" y="3" width="348" height="58" rx="7" fill="#16a34a"/>
+      <rect width="348" height="58" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
       <text x="14" y="22" font-size="14" font-weight="700" fill="#0a0c14">BTC above $100K by May 31
         <tspan font-family="'JetBrains Mono', ui-monospace, monospace" font-size="9.5" font-weight="800"
                fill="#16a34a" letter-spacing="1">  ↗ FLIPPED</tspan>
       </text>
-      <text x="14" y="44" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" letter-spacing="0.6" fill="#6b6f7a">
+      <text x="14" y="42" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" letter-spacing="0.6" fill="#6b6f7a">
         <tspan font-weight="700" fill="#dc2626">NO</tspan> · RESOLVES 31 MAY
       </text>
-      <text x="334" y="38" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
+      <text x="334" y="36" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
             font-size="16" font-weight="700" fill="#0a0c14">$0.71</text>
     </g>
 
     <!-- Leg 3 -->
-    <g transform="translate(16 198)">
-      <rect width="348" height="62" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
-      <text x="14" y="22" font-size="14" font-weight="700" fill="#0a0c14">Trump signs exec order this week</text>
-      <text x="14" y="44" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" letter-spacing="0.6" fill="#6b6f7a">
+    <g transform="translate(16 186)">
+      <rect width="348" height="58" rx="7" fill="#ffffff" stroke="#0a0c14" stroke-width="1.5"/>
+      <text x="14" y="22" font-size="14" font-weight="700" fill="#0a0c14">Trump signs exec order this wk</text>
+      <text x="14" y="42" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" letter-spacing="0.6" fill="#6b6f7a">
         <tspan font-weight="700" fill="#16a34a">YES</tspan> · RESOLVES 16 MAY
       </text>
-      <text x="334" y="38" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
+      <text x="334" y="36" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
             font-size="16" font-weight="700" fill="#0a0c14">$0.58</text>
     </g>
 
-    <!-- Perforation -->
-    <line x1="0" y1="280" x2="380" y2="280" stroke="#0a0c14" stroke-width="1.5" stroke-dasharray="4 4"/>
-    <circle cx="0" cy="280" r="5" fill="#f5f1e8" stroke="#0a0c14" stroke-width="1.5"/>
-    <circle cx="380" cy="280" r="5" fill="#f5f1e8" stroke="#0a0c14" stroke-width="1.5"/>
+    <!-- Perforated divider -->
+    <line x1="0" y1="264" x2="380" y2="264" stroke="#0a0c14" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <circle cx="0" cy="264" r="5" fill="#f5f1e8" stroke="#0a0c14" stroke-width="1.5"/>
+    <circle cx="380" cy="264" r="5" fill="#f5f1e8" stroke="#0a0c14" stroke-width="1.5"/>
 
     <!-- Math stub -->
-    <g transform="translate(20 296)">
+    <g transform="translate(20 280)">
       <text x="0" y="20" font-size="13" fill="#6b6f7a">You'll actually get</text>
       <text x="340" y="20" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
             font-size="16" font-weight="800" fill="#16a34a">$16.72 MAX</text>
@@ -144,12 +138,12 @@
 
       <text x="0" y="68" font-size="13" fill="#6b6f7a">Hypothetical parlay</text>
       <text x="340" y="68" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace"
-            font-size="13" font-weight="600" fill="#0a0c14" opacity="0.72">$41.06</text>
+            font-size="13" font-weight="600" fill="#0a0c14" opacity="0.7">$41.06</text>
     </g>
   </g>
 
-  <!-- Domain anchor bottom-right -->
-  <text x="1440" y="478" text-anchor="end"
+  <!-- Domain anchor bottom-right (won't collide w/ Edit-profile btn — it's higher) -->
+  <text x="1460" y="472" text-anchor="end"
         font-family="'JetBrains Mono', ui-monospace, monospace"
-        font-size="14" font-weight="800" fill="#0a0c14" letter-spacing="3">POLYPARLAY.APP</text>
+        font-size="13" font-weight="800" fill="#0a0c14" letter-spacing="2.5">POLYPARLAY.APP</text>
 </svg>
