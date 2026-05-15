@@ -479,90 +479,105 @@ function truncate(s, n) {
 // Picks whichever yields the bigger win-rate improvement. Flip is preferred
 // when tied because it preserves the user's intent (they get a position, just
 // on the other side) rather than removing it outright.
+/**
+ * Find the best single-leg rebalance that maximizes win rate.
+ *
+ * Searches EVERY leg for two candidate operations:
+ *   1. FLIP to the other binary outcome (only if other side is higher prob)
+ *   2. DROP the leg entirely (only if 3+ legs remain so we don't reduce to 1)
+ *
+ * Picks the candidate with the highest resulting joint win rate.
+ *
+ * Threshold for surfacing: the candidate must beat the original by at
+ * least +2pp absolute OR +20% relative win-rate gain. Below that the
+ * slip is already near-optimal and a "rebalance" wouldn't help.
+ *
+ * NO price-floor on which leg to consider — every leg is a candidate.
+ * The previous version only fired on parlays with a leg priced under
+ * $0.20, which made normal slips (all legs $0.30-$0.80) get no suggestion.
+ */
 function suggestRebalance(legs) {
   if (!legs.length || legs.length <= 1) return null;
-
-  let worstIdx = 0;
-  let worstPrice = Number(legs[0].price) || 1;
-  for (let i = 1; i < legs.length; i++) {
-    const p = Number(legs[i].price) || 1;
-    if (p < worstPrice) {
-      worstPrice = p;
-      worstIdx = i;
-    }
-  }
-  if (worstPrice >= 0.20) return null; // parlay isn't lottery-shaped
 
   const oldCost = legs.reduce((acc, l) => acc * (Number(l.price) || 0), 1);
   if (oldCost <= 0) return null;
 
-  const worstLeg = legs[worstIdx];
+  let best = null;
+  let bestNewCost = oldCost;
 
-  // -- Option A: FLIP direction --
-  // Works when the leg has 2+ outcomes and the other outcome is meaningfully
-  // higher priced. Multi-outcome markets (e.g. 'Trump | Harris | Other') skip
-  // this — we only flip true binary YES/NO pairs.
-  let flipOption = null;
-  if (Array.isArray(worstLeg.outcomes) && worstLeg.outcomes.length >= 2 &&
-      Array.isArray(worstLeg.prices) && worstLeg.prices.length >= 2) {
-    const curIdx = typeof worstLeg.selectedIndex === 'number' ? worstLeg.selectedIndex : 0;
-    const otherIdx = curIdx === 0 ? 1 : 0;
-    const otherPrice = Number(worstLeg.prices[otherIdx]) || 0;
-    if (otherPrice > worstPrice + 0.05) {
-      const flipPrices = legs.map((l, i) => (i === worstIdx ? otherPrice : Number(l.price) || 0));
-      const flipCost = flipPrices.reduce((a, b) => a * b, 1);
-      if (flipCost > 0) {
-        flipOption = {
-          type: 'flip',
-          legIdx: worstIdx,
-          flipLegId: worstLeg.id,
-          flipFromLabel: worstLeg.outcomes[curIdx] || worstLeg.direction || 'YES',
-          flipToLabel: worstLeg.outcomes[otherIdx] || 'NO',
-          legQuestion: worstLeg.question,
-          legPrice: worstPrice,
-          newLegPrice: otherPrice,
+  for (let i = 0; i < legs.length; i++) {
+    const leg = legs[i];
+    const curPrice = Number(leg.price) || 0;
+    if (curPrice <= 0) continue;
+
+    // Option A: flip this leg to its other binary outcome
+    if (Array.isArray(leg.outcomes) && leg.outcomes.length >= 2 &&
+        Array.isArray(leg.prices) && leg.prices.length >= 2) {
+      const curIdx = typeof leg.selectedIndex === 'number' ? leg.selectedIndex : 0;
+      const otherIdx = curIdx === 0 ? 1 : 0;
+      const otherPrice = Number(leg.prices[otherIdx]) || 0;
+      // Only flip if the other side is meaningfully higher prob (>2¢ better)
+      if (otherPrice > curPrice + 0.02) {
+        const flipCost = legs.reduce(
+          (acc, l, idx) => acc * (idx === i ? otherPrice : (Number(l.price) || 0)),
+          1
+        );
+        if (flipCost > bestNewCost) {
+          bestNewCost = flipCost;
+          best = {
+            type: 'flip',
+            legIdx: i,
+            flipLegId: leg.id,
+            flipFromLabel: leg.outcomes[curIdx] || leg.direction || 'YES',
+            flipToLabel: leg.outcomes[otherIdx] || 'NO',
+            legQuestion: leg.question,
+            legPrice: curPrice,
+            newLegPrice: otherPrice,
+            oldWinRate: oldCost,
+            newWinRate: flipCost,
+            oldMultiplier: 1 / oldCost,
+            newMultiplier: 1 / flipCost
+          };
+        }
+      }
+    }
+
+    // Option B: drop this leg entirely (only if 3+ legs would remain)
+    if (legs.length >= 3) {
+      const dropCost = legs.reduce(
+        (acc, l, idx) => (idx === i ? acc : acc * (Number(l.price) || 0)),
+        1
+      );
+      if (dropCost > bestNewCost) {
+        bestNewCost = dropCost;
+        best = {
+          type: 'drop',
+          legIdx: i,
+          removeLegId: leg.id,
+          removedQuestion: leg.question,
+          removedPrice: curPrice,
           oldWinRate: oldCost,
-          newWinRate: flipCost,
+          newWinRate: dropCost,
           oldMultiplier: 1 / oldCost,
-          newMultiplier: 1 / flipCost
+          newMultiplier: 1 / dropCost
         };
       }
     }
   }
 
-  // -- Option B: DROP leg --
-  const remaining = legs.filter((_, i) => i !== worstIdx);
-  const dropCost = remaining.reduce((acc, l) => acc * (Number(l.price) || 0), 1);
-  const dropOption = dropCost > 0
-    ? {
-        type: 'drop',
-        legIdx: worstIdx,
-        removeLegId: worstLeg.id,
-        removedQuestion: worstLeg.question,
-        removedPrice: worstPrice,
-        oldWinRate: oldCost,
-        newWinRate: dropCost,
-        oldMultiplier: 1 / oldCost,
-        newMultiplier: 1 / dropCost
-      }
-    : null;
+  if (!best) return null;
 
-  // Pick the better option (higher new win rate). Tie-break to flip since it
-  // preserves the user's exposure to the event instead of removing it.
-  const candidates = [flipOption, dropOption].filter(Boolean);
-  if (!candidates.length) return null;
-  candidates.sort((a, b) => {
-    if (a.newWinRate !== b.newWinRate) return b.newWinRate - a.newWinRate;
-    return a.type === 'flip' ? -1 : 1;
-  });
+  // Threshold: only surface if the gain is meaningful.
+  // +2pp absolute OR +20% relative improvement.
+  const absoluteGain = best.newWinRate - best.oldWinRate;
+  const relativeGain = best.oldWinRate > 0 ? absoluteGain / best.oldWinRate : 0;
+  if (absoluteGain < 0.02 && relativeGain < 0.20) return null;
 
-  // Normalize so renderImproveOdds + Apply handler can read common fields
-  const winner = candidates[0];
   return {
-    ...winner,
-    // legacy compatibility fields used by the rebalance banner on the slip card
-    removedQuestion: winner.legQuestion || winner.removedQuestion,
-    removedPrice: winner.legPrice || winner.removedPrice
+    ...best,
+    // legacy compat: rebalance banner on slip card reads these field names
+    removedQuestion: best.legQuestion || best.removedQuestion,
+    removedPrice: best.legPrice || best.removedPrice
   };
 }
 
