@@ -21,23 +21,18 @@
       </div>
     </header>
 
-    <!-- Lifetime impact tally — running tally of demonstrated value vs the
-         $149/yr Pro price. Visible during trial+paid. Two rows:
-           Row 1: big EV number ("+$31 EV gained") + status copy
-           Row 2: progress bar that fills as EV accumulates toward $149
-         When EV ≥ $149: progress bar fills completely, copy flips to
-         "✓ Pro has paid for itself" — the strongest possible
-         conversion lever at trial-end. -->
+    <!-- Lifetime impact tally — a single load-bearing number: dollars of
+         expected value PolyParlay has added to the user's actual bets via
+         Improve Odds rebalances. No price-of-Pro reference — the user does
+         their own math. -->
     <div id="impactStrip" class="impact-strip hidden">
-      <div class="impact-strip-row1">
+      <div class="impact-strip-head">
         <span class="impact-strip-icon">↗</span>
-        <span class="impact-strip-label">YOUR IMPACT</span>
-        <span class="impact-strip-ev" id="impactEv">+$0.00 EV gained</span>
-        <span class="impact-strip-foot" id="impactFoot">vs $149/yr Pro</span>
+        <span class="impact-strip-label">POLYPARLAY IMPACT</span>
       </div>
-      <div class="impact-strip-bar">
-        <div class="impact-strip-bar-fill" id="impactBarFill" style="width:0%"></div>
-        <span class="impact-strip-bar-label" id="impactBarLabel">Run sims · Apply Improve Odds to start accumulating</span>
+      <div class="impact-strip-ev" id="impactEv">+$0.00</div>
+      <div class="impact-strip-sub" id="impactSub">
+        Apply Improve Odds on a parlay to start adding $ to your bets
       </div>
     </div>
 

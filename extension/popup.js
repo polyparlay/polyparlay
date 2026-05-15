@@ -957,18 +957,16 @@ async function accumulateImpactStats(delta) {
 }
 
 /**
- * Renders the lifetime-impact strip. Value-framing:
+ * Renders the lifetime-impact strip. Single load-bearing number:
  *
- *   "+$31.40 EV gained · 21% of your $149/yr Pro covered"
- *   ████████░░░░░░░░░░░░░░░░░░░░░░  21%
+ *     ↗ POLYPARLAY IMPACT
+ *     +$48.20
+ *     across 4 rebalanced parlays · avg +21pp better odds
  *
- * The big EV figure is the literal value the rebalances have added. The
- * progress bar contextualizes it against the $149 cost so the user sees
- * "this is paying for itself" in real time. When EV crosses $149, the
- * strip flips into a celebratory "✓ Pro has paid for itself" state.
+ * The big number IS the value — dollars of expected value PolyParlay
+ * has added to actual user bets via Improve Odds rebalances. No
+ * reference to the Pro price — the user does their own math.
  */
-const PRO_COST_USD = 149;
-
 async function renderImpactStrip() {
   const strip = document.getElementById('impactStrip');
   if (!strip) return;
@@ -982,53 +980,34 @@ async function renderImpactStrip() {
     strip.classList.remove('hidden');
 
     const { lifetimeStats } = await chrome.storage.local.get(['lifetimeStats']);
-    const ev    = lifetimeStats ? Number(lifetimeStats.evGainTotal) || 0 : 0;
-    const reb   = lifetimeStats ? Number(lifetimeStats.rebalancesApplied) || 0 : 0;
-    const sims  = lifetimeStats ? Number(lifetimeStats.simsRun) || 0 : 0;
+    const ev   = lifetimeStats ? Number(lifetimeStats.evGainTotal) || 0 : 0;
+    const reb  = lifetimeStats ? Number(lifetimeStats.rebalancesApplied) || 0 : 0;
+    const liftAvg = reb > 0 ? Number(lifetimeStats.winRateLiftTotal) / reb : 0;
 
-    const evEl    = document.getElementById('impactEv');
-    const footEl  = document.getElementById('impactFoot');
-    const barFill = document.getElementById('impactBarFill');
-    const barLbl  = document.getElementById('impactBarLabel');
+    const evEl  = document.getElementById('impactEv');
+    const subEl = document.getElementById('impactSub');
 
-    // EV figure (always shown — big number)
+    // The big number
     const sign = ev >= 0 ? '+' : '-';
-    if (evEl) evEl.textContent = `${sign}$${Math.abs(ev).toFixed(2)} EV gained`;
+    if (evEl) {
+      evEl.textContent = `${sign}$${Math.abs(ev).toFixed(2)}`;
+      evEl.classList.toggle('impact-strip-ev-zero', ev === 0);
+    }
 
-    // Status copy (right side of row 1) — context-aware
-    if (footEl) {
-      if (ev >= PRO_COST_USD) {
-        footEl.textContent = '✓ Pro paid for itself';
-        footEl.className = 'impact-strip-foot is-paid';
-      } else if (reb === 0 && sims === 0) {
-        footEl.textContent = 'vs $149/yr Pro';
-        footEl.className = 'impact-strip-foot';
-      } else if (reb === 0) {
-        footEl.textContent = `${sims} sim${sims === 1 ? '' : 's'} run · apply Improve Odds`;
-        footEl.className = 'impact-strip-foot';
+    // Subline copy — context-aware, all about what made up that number
+    if (subEl) {
+      if (reb === 0) {
+        subEl.textContent = 'Apply Improve Odds on a parlay to start adding $ to your bets';
+        subEl.classList.add('is-empty');
       } else {
-        footEl.textContent = `${reb} rebalance${reb === 1 ? '' : 's'} · ${sims} sim${sims === 1 ? '' : 's'}`;
-        footEl.className = 'impact-strip-foot';
+        subEl.classList.remove('is-empty');
+        const liftStr = Math.round(Math.abs(liftAvg));
+        subEl.textContent =
+          `across ${reb} rebalanced ${reb === 1 ? 'parlay' : 'parlays'} · avg +${liftStr}pp better odds`;
       }
     }
 
-    // Progress bar: 0–100% of $149 covered, capped at 100 for the fill width.
-    const pct = Math.max(0, Math.min(100, (ev / PRO_COST_USD) * 100));
-    if (barFill) {
-      barFill.style.width = pct.toFixed(1) + '%';
-      barFill.classList.toggle('is-paid', ev >= PRO_COST_USD);
-    }
-    if (barLbl) {
-      if (ev >= PRO_COST_USD) {
-        barLbl.textContent = `Pro covered · every additional $ is pure upside`;
-      } else if (reb === 0) {
-        barLbl.textContent = `Run sims · Apply Improve Odds to start covering your $149`;
-      } else {
-        barLbl.textContent = `${pct.toFixed(0)}% of your $149 covered · ${(149 - ev).toFixed(2)} to go`;
-      }
-    }
-    // Visual: an "empty-shell" modifier when no progress yet (dimmer bg)
-    strip.classList.toggle('impact-strip-empty', ev <= 0);
+    strip.classList.toggle('impact-strip-empty', ev === 0);
   } catch {}
 }
 
