@@ -21,24 +21,24 @@
       </div>
     </header>
 
-    <!-- Lifetime impact tally — running totals of how much value PolyParlay
-         has demonstrably added to the user's slips. Visible during trial+paid;
-         shows an empty-state hint until the first Improve Odds Apply, then
-         tallies $ EV / rebalances / win-rate-lift. Strongest conversion lever
-         at trial-end. -->
+    <!-- Lifetime impact tally — running tally of demonstrated value vs the
+         $149/yr Pro price. Visible during trial+paid. Two rows:
+           Row 1: big EV number ("+$31 EV gained") + status copy
+           Row 2: progress bar that fills as EV accumulates toward $149
+         When EV ≥ $149: progress bar fills completely, copy flips to
+         "✓ Pro has paid for itself" — the strongest possible
+         conversion lever at trial-end. -->
     <div id="impactStrip" class="impact-strip hidden">
-      <span class="impact-strip-icon">↗</span>
-      <span class="impact-strip-label">YOUR IMPACT</span>
-      <!-- Empty state: shown when no rebalances yet -->
-      <span class="impact-strip-stat impact-empty">
-        Run Monte Carlo → click Apply on Improve Odds to start tracking
-      </span>
-      <!-- Populated state: shown after first Apply (3 stats inline) -->
-      <span class="impact-strip-stat impact-populated"><strong id="impactEv">+$0</strong> ev gained</span>
-      <span class="impact-strip-sep impact-populated">·</span>
-      <span class="impact-strip-stat impact-populated"><strong id="impactReb">0</strong> rebalances</span>
-      <span class="impact-strip-sep impact-populated">·</span>
-      <span class="impact-strip-stat impact-populated">+<strong id="impactLift">0</strong>pp avg lift</span>
+      <div class="impact-strip-row1">
+        <span class="impact-strip-icon">↗</span>
+        <span class="impact-strip-label">YOUR IMPACT</span>
+        <span class="impact-strip-ev" id="impactEv">+$0.00 EV gained</span>
+        <span class="impact-strip-foot" id="impactFoot">vs $149/yr Pro</span>
+      </div>
+      <div class="impact-strip-bar">
+        <div class="impact-strip-bar-fill" id="impactBarFill" style="width:0%"></div>
+        <span class="impact-strip-bar-label" id="impactBarLabel">Run sims · Apply Improve Odds to start accumulating</span>
+      </div>
     </div>
 
     <!-- Parlay ticket — legs body + perforated divider + math stub baked

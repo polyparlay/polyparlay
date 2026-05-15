@@ -956,6 +956,19 @@ async function accumulateImpactStats(delta) {
   }
 }
 
+/**
+ * Renders the lifetime-impact strip. Value-framing:
+ *
+ *   "+$31.40 EV gained · 21% of your $149/yr Pro covered"
+ *   ████████░░░░░░░░░░░░░░░░░░░░░░  21%
+ *
+ * The big EV figure is the literal value the rebalances have added. The
+ * progress bar contextualizes it against the $149 cost so the user sees
+ * "this is paying for itself" in real time. When EV crosses $149, the
+ * strip flips into a celebratory "✓ Pro has paid for itself" state.
+ */
+const PRO_COST_USD = 149;
+
 async function renderImpactStrip() {
   const strip = document.getElementById('impactStrip');
   if (!strip) return;
@@ -966,22 +979,56 @@ async function renderImpactStrip() {
       strip.classList.add('hidden');
       return;
     }
-    // Visible during trial/paid regardless of whether any rebalances have
-    // been applied yet. Toggles between empty-state guidance and the
-    // populated 3-stat tally.
     strip.classList.remove('hidden');
+
     const { lifetimeStats } = await chrome.storage.local.get(['lifetimeStats']);
-    const reb = lifetimeStats ? Number(lifetimeStats.rebalancesApplied) || 0 : 0;
-    if (reb === 0) {
-      strip.classList.add('impact-strip-empty');
-      return;
+    const ev    = lifetimeStats ? Number(lifetimeStats.evGainTotal) || 0 : 0;
+    const reb   = lifetimeStats ? Number(lifetimeStats.rebalancesApplied) || 0 : 0;
+    const sims  = lifetimeStats ? Number(lifetimeStats.simsRun) || 0 : 0;
+
+    const evEl    = document.getElementById('impactEv');
+    const footEl  = document.getElementById('impactFoot');
+    const barFill = document.getElementById('impactBarFill');
+    const barLbl  = document.getElementById('impactBarLabel');
+
+    // EV figure (always shown — big number)
+    const sign = ev >= 0 ? '+' : '-';
+    if (evEl) evEl.textContent = `${sign}$${Math.abs(ev).toFixed(2)} EV gained`;
+
+    // Status copy (right side of row 1) — context-aware
+    if (footEl) {
+      if (ev >= PRO_COST_USD) {
+        footEl.textContent = '✓ Pro paid for itself';
+        footEl.className = 'impact-strip-foot is-paid';
+      } else if (reb === 0 && sims === 0) {
+        footEl.textContent = 'vs $149/yr Pro';
+        footEl.className = 'impact-strip-foot';
+      } else if (reb === 0) {
+        footEl.textContent = `${sims} sim${sims === 1 ? '' : 's'} run · apply Improve Odds`;
+        footEl.className = 'impact-strip-foot';
+      } else {
+        footEl.textContent = `${reb} rebalance${reb === 1 ? '' : 's'} · ${sims} sim${sims === 1 ? '' : 's'}`;
+        footEl.className = 'impact-strip-foot';
+      }
     }
-    strip.classList.remove('impact-strip-empty');
-    const ev = Number(lifetimeStats.evGainTotal) || 0;
-    const liftAvg = Number(lifetimeStats.winRateLiftTotal) / reb;
-    setText('impactEv', (ev >= 0 ? '+' : '-') + '$' + Math.abs(ev).toFixed(2));
-    setText('impactReb', String(reb));
-    setText('impactLift', Math.round(Math.abs(liftAvg)).toString());
+
+    // Progress bar: 0–100% of $149 covered, capped at 100 for the fill width.
+    const pct = Math.max(0, Math.min(100, (ev / PRO_COST_USD) * 100));
+    if (barFill) {
+      barFill.style.width = pct.toFixed(1) + '%';
+      barFill.classList.toggle('is-paid', ev >= PRO_COST_USD);
+    }
+    if (barLbl) {
+      if (ev >= PRO_COST_USD) {
+        barLbl.textContent = `Pro covered · every additional $ is pure upside`;
+      } else if (reb === 0) {
+        barLbl.textContent = `Run sims · Apply Improve Odds to start covering your $149`;
+      } else {
+        barLbl.textContent = `${pct.toFixed(0)}% of your $149 covered · ${(149 - ev).toFixed(2)} to go`;
+      }
+    }
+    // Visual: an "empty-shell" modifier when no progress yet (dimmer bg)
+    strip.classList.toggle('impact-strip-empty', ev <= 0);
   } catch {}
 }
 
@@ -1826,7 +1873,31 @@ function runAndShowSim() {
     const result = runMonteCarlo(eligible, stake, iterations);
     if (desc) desc.textContent = 'Distribution of payouts, win rate, drawdown — runs in your browser';
     renderSimResults(result);
+    // Track that a sim ran — increments simsRun + stakeAnalyzed in the
+    // lifetime stats so the impact strip can show usage even before the
+    // user applies an Improve Odds rebalance.
+    trackSimRun(stake);
   }, 30);
+}
+
+/** Bumps the sim counter + stake analyzed. Idempotent if called repeatedly. */
+async function trackSimRun(stake) {
+  try {
+    const { lifetimeStats } = await chrome.storage.local.get(['lifetimeStats']);
+    const stats = lifetimeStats || {
+      rebalancesApplied: 0,
+      evGainTotal: 0,
+      winRateLiftTotal: 0,
+      stakeAnalyzed: 0,
+      simsRun: 0,
+      firstAt: Date.now()
+    };
+    stats.simsRun = (Number(stats.simsRun) || 0) + 1;
+    stats.stakeAnalyzed = (Number(stats.stakeAnalyzed) || 0) + (Number(stake) || 0);
+    stats.lastAt = Date.now();
+    await chrome.storage.local.set({ lifetimeStats: stats });
+    renderImpactStrip();
+  } catch {}
 }
 
 function fmtPercentSmart(p) {
