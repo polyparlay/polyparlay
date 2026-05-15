@@ -336,7 +336,7 @@ async function getProState() {
 
 // Cloudflare Worker URL for Pro verification.
 // REPLACE with your deployed worker URL after `wrangler deploy`.
-const VERIFY_URL = 'https://polyparlay-verify.YOUR_SUBDOMAIN.workers.dev/verify';
+const VERIFY_URL = 'https://polyparlay-verify.z-lew87.workers.dev/verify';
 const VERIFY_CACHE_MS = 60 * 60 * 1000; // re-check the worker at most once per hour
 
 async function syncProFromWorker() {
