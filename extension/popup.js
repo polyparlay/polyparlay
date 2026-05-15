@@ -994,15 +994,19 @@ async function renderImpactStrip() {
       evEl.classList.toggle('impact-strip-ev-zero', ev === 0);
     }
 
-    // Subline copy — context-aware, kept terse so the row stays single-line.
+    // Subline copy — explicitly says what the dollar amount represents
+    // and where it came from, so the user understands the number isn't
+    // abstract: it's actual EV PolyParlay added to real bets.
     if (subEl) {
       if (reb === 0) {
-        subEl.textContent = 'Apply Improve Odds →';
+        subEl.textContent = 'Apply Improve Odds on any parlay to start gaining $ on your bets';
         subEl.classList.add('is-empty');
       } else {
         subEl.classList.remove('is-empty');
         const liftStr = Math.round(Math.abs(liftAvg));
-        subEl.textContent = `${reb} rebalance${reb === 1 ? '' : 's'} · +${liftStr}pp avg`;
+        const noun = reb === 1 ? 'bet' : 'bets';
+        subEl.textContent =
+          `expected value added across ${reb} ${noun} · avg +${liftStr}pp better odds`;
       }
     }
 
