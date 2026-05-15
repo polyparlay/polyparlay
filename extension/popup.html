@@ -22,18 +22,23 @@
     </header>
 
     <!-- Lifetime impact tally — running totals of how much value PolyParlay
-         has demonstrably added to the user's slips. Visible only to trial /
-         paid users who've actually applied at least one Improve Odds rebalance.
-         Strongest conversion lever at trial-end: shows in $ terms why $149
-         pays for itself. -->
+         has demonstrably added to the user's slips. Visible during trial+paid;
+         shows an empty-state hint until the first Improve Odds Apply, then
+         tallies $ EV / rebalances / win-rate-lift. Strongest conversion lever
+         at trial-end. -->
     <div id="impactStrip" class="impact-strip hidden">
       <span class="impact-strip-icon">↗</span>
       <span class="impact-strip-label">YOUR IMPACT</span>
-      <span class="impact-strip-stat"><strong id="impactEv">+$0</strong> ev gained</span>
-      <span class="impact-strip-sep">·</span>
-      <span class="impact-strip-stat"><strong id="impactReb">0</strong> rebalances</span>
-      <span class="impact-strip-sep">·</span>
-      <span class="impact-strip-stat">+<strong id="impactLift">0</strong>pp avg lift</span>
+      <!-- Empty state: shown when no rebalances yet -->
+      <span class="impact-strip-stat impact-empty">
+        Run Monte Carlo → click Apply on Improve Odds to start tracking
+      </span>
+      <!-- Populated state: shown after first Apply (3 stats inline) -->
+      <span class="impact-strip-stat impact-populated"><strong id="impactEv">+$0</strong> ev gained</span>
+      <span class="impact-strip-sep impact-populated">·</span>
+      <span class="impact-strip-stat impact-populated"><strong id="impactReb">0</strong> rebalances</span>
+      <span class="impact-strip-sep impact-populated">·</span>
+      <span class="impact-strip-stat impact-populated">+<strong id="impactLift">0</strong>pp avg lift</span>
     </div>
 
     <!-- Parlay ticket — legs body + perforated divider + math stub baked

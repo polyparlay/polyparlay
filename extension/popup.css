@@ -198,6 +198,14 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   color: var(--text-strong);
 }
 .impact-strip.hidden { display: none; }
+/* By default both empty + populated are visible — the strip's class controls
+   which set actually renders. Default behavior: populated stats visible,
+   empty hint hidden. */
+.impact-strip .impact-empty { display: none; }
+.impact-strip .impact-populated { display: inline; }
+/* When the strip has no data yet, flip: show empty hint, hide stats. */
+.impact-strip.impact-strip-empty .impact-empty { display: inline; color: #6b6f7a; font-style: italic; }
+.impact-strip.impact-strip-empty .impact-populated { display: none; }
 .impact-strip-icon {
   font-size: 14px;
   color: #b45309;

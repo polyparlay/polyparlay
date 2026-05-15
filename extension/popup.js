@@ -962,19 +962,26 @@ async function renderImpactStrip() {
   try {
     const state = await getProState();
     const isElevated = state.tier === 'trial' || state.tier === 'paid';
-    if (!isElevated) { strip.classList.add('hidden'); return; }
-    const { lifetimeStats } = await chrome.storage.local.get(['lifetimeStats']);
-    if (!lifetimeStats || !lifetimeStats.rebalancesApplied) {
+    if (!isElevated) {
       strip.classList.add('hidden');
       return;
     }
+    // Visible during trial/paid regardless of whether any rebalances have
+    // been applied yet. Toggles between empty-state guidance and the
+    // populated 3-stat tally.
+    strip.classList.remove('hidden');
+    const { lifetimeStats } = await chrome.storage.local.get(['lifetimeStats']);
+    const reb = lifetimeStats ? Number(lifetimeStats.rebalancesApplied) || 0 : 0;
+    if (reb === 0) {
+      strip.classList.add('impact-strip-empty');
+      return;
+    }
+    strip.classList.remove('impact-strip-empty');
     const ev = Number(lifetimeStats.evGainTotal) || 0;
-    const reb = Number(lifetimeStats.rebalancesApplied) || 0;
-    const liftAvg = reb > 0 ? (Number(lifetimeStats.winRateLiftTotal) / reb) : 0;
-    setText('impactEv', (ev >= 0 ? '+' : '') + '$' + Math.abs(ev).toFixed(2));
+    const liftAvg = Number(lifetimeStats.winRateLiftTotal) / reb;
+    setText('impactEv', (ev >= 0 ? '+' : '-') + '$' + Math.abs(ev).toFixed(2));
     setText('impactReb', String(reb));
     setText('impactLift', Math.round(Math.abs(liftAvg)).toString());
-    strip.classList.remove('hidden');
   } catch {}
 }
 
