@@ -994,16 +994,15 @@ async function renderImpactStrip() {
       evEl.classList.toggle('impact-strip-ev-zero', ev === 0);
     }
 
-    // Subline copy — context-aware, all about what made up that number
+    // Subline copy — context-aware, kept terse so the row stays single-line.
     if (subEl) {
       if (reb === 0) {
-        subEl.textContent = 'Apply Improve Odds on a parlay to start adding $ to your bets';
+        subEl.textContent = 'Apply Improve Odds →';
         subEl.classList.add('is-empty');
       } else {
         subEl.classList.remove('is-empty');
         const liftStr = Math.round(Math.abs(liftAvg));
-        subEl.textContent =
-          `across ${reb} rebalanced ${reb === 1 ? 'parlay' : 'parlays'} · avg +${liftStr}pp better odds`;
+        subEl.textContent = `${reb} rebalance${reb === 1 ? '' : 's'} · +${liftStr}pp avg`;
       }
     }
 
@@ -1569,14 +1568,26 @@ document.addEventListener('DOMContentLoaded', () => {
     setStake(Number(e.target.value || 0));
     markSimStaleIfNeeded();
   });
-  // Risk slider — drives the stake live as the user drags.
+  // Risk slider — drives the stake live as the user drags. After the
+  // user stops dragging, auto-rerun the sim (if visible) so $ numbers
+  // refresh immediately. Win rate itself is leg-probability-only and
+  // won't visibly change with stake — that's mathematically correct,
+  // but the user sees other dollar metrics tick to confirm sim re-ran.
   const riskSlider = document.getElementById('riskSlider');
   if (riskSlider) {
+    let _sliderRerunTimer = null;
     riskSlider.addEventListener('input', (e) => {
       const v = Number(e.target.value);
       applyRiskZone(v);
       setStake(sliderValueToStake(v));
       markSimStaleIfNeeded();
+      if (_sliderRerunTimer) clearTimeout(_sliderRerunTimer);
+      _sliderRerunTimer = setTimeout(() => {
+        const panel = document.getElementById('simResults');
+        if (panel && !panel.classList.contains('hidden')) {
+          runAndShowSim();
+        }
+      }, 280);
     });
   }
   document.getElementById('legs').addEventListener('click', (e) => {

@@ -239,7 +239,7 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   color: var(--muted);
 }
 
-/* Subline — small, descriptive, sits between label (left) and number (right) */
+/* Subline — single-line, ellipsis if it ever overflows */
 .impact-strip-sub {
   font-size: 11px;
   color: var(--text);
@@ -247,6 +247,9 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   flex: 1;
   min-width: 0;
   order: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .impact-strip-sub.is-empty {
   color: var(--muted);
