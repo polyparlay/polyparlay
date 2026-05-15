@@ -12,7 +12,14 @@
 // Deploy with: wrangler deploy
 // See ./README.md for setup.
 
-const USDC_CONTRACT = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'; // Polygon mainnet USDC
+// Polygon has TWO USDC contracts. We check BOTH so we don't reject a
+// payment based on which version the user holds.
+//   USDC_E    — bridged ("USDC.e", the old default, deployed 2020)
+//   USDC      — native USDC, Circle-issued, the new default (2023+)
+const USDC_CONTRACTS = [
+  '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', // bridged USDC.e
+  '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359'  // native USDC
+];
 const REQUIRED_AMOUNT_RAW = '149000000'; // 149 USDC, 6 decimals (annual Pro)
 const ONE_YEAR_SECONDS = 365 * 24 * 60 * 60;
 const TRIAL_SECONDS = 7 * 24 * 60 * 60; // 7-day free trial window
@@ -66,33 +73,46 @@ export default {
     const cached = await cache.match(cacheKey);
     if (cached) return cached;
 
-    const apiUrl =
-      `https://api.polygonscan.com/api` +
-      `?module=account&action=tokentx` +
-      `&contractaddress=${USDC_CONTRACT}` +
-      `&address=${paymentAddress}` +
-      `&page=1&offset=200&sort=desc` +
-      `&apikey=${apiKey}`;
+    // Query Polygonscan for both USDC contracts in parallel — a Pro payment
+    // could be in either USDC.e or native USDC.
+    const fetches = USDC_CONTRACTS.map((contract) =>
+      fetch(
+        `https://api.polygonscan.com/api` +
+        `?module=account&action=tokentx` +
+        `&contractaddress=${contract}` +
+        `&address=${paymentAddress}` +
+        `&page=1&offset=200&sort=desc` +
+        `&apikey=${apiKey}`
+      ).then((res) => (res.ok ? res.json() : null)).catch(() => null)
+    );
 
-    let data;
+    let results;
     try {
-      const res = await fetch(apiUrl);
-      if (!res.ok) return json({ ok: false, error: 'Polygonscan unavailable' }, 502);
-      data = await res.json();
+      results = await Promise.all(fetches);
     } catch (err) {
       return json({ ok: false, error: 'Polygonscan fetch failed: ' + (err.message || err) }, 502);
     }
 
-    // Polygonscan returns { status: '1', result: [...] } on success.
-    // Status '0' with message 'No transactions found' is a valid empty result.
-    if (data.status !== '1') {
-      const resp = json({ ok: true, pro: false, wallet, reason: data.message || 'no transactions' });
+    // Merge transfer lists from both contracts. status==='1' means data,
+    // status==='0' with "No transactions found" is a valid empty list.
+    const txs = [];
+    let anyDataReturned = false;
+    for (const data of results) {
+      if (!data) continue;
+      anyDataReturned = true;
+      if (data.status === '1' && Array.isArray(data.result)) {
+        txs.push(...data.result);
+      }
+    }
+    if (!anyDataReturned) {
+      return json({ ok: false, error: 'Polygonscan unavailable' }, 502);
+    }
+    if (txs.length === 0) {
+      const resp = json({ ok: true, pro: false, wallet, reason: 'no transactions' });
       resp.headers.set('Cache-Control', 'public, max-age=300');
       await cache.put(cacheKey, resp.clone());
       return resp;
     }
-
-    const txs = Array.isArray(data.result) ? data.result : [];
     const now = Math.floor(Date.now() / 1000);
 
     const valid = txs.find((tx) => {
