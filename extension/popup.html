@@ -21,6 +21,21 @@
       </div>
     </header>
 
+    <!-- Lifetime impact tally — running totals of how much value PolyParlay
+         has demonstrably added to the user's slips. Visible only to trial /
+         paid users who've actually applied at least one Improve Odds rebalance.
+         Strongest conversion lever at trial-end: shows in $ terms why $149
+         pays for itself. -->
+    <div id="impactStrip" class="impact-strip hidden">
+      <span class="impact-strip-icon">↗</span>
+      <span class="impact-strip-label">YOUR IMPACT</span>
+      <span class="impact-strip-stat"><strong id="impactEv">+$0</strong> ev gained</span>
+      <span class="impact-strip-sep">·</span>
+      <span class="impact-strip-stat"><strong id="impactReb">0</strong> rebalances</span>
+      <span class="impact-strip-sep">·</span>
+      <span class="impact-strip-stat">+<strong id="impactLift">0</strong>pp avg lift</span>
+    </div>
+
     <!-- Parlay ticket — legs body + perforated divider + math stub baked
          into one cohesive card so the slip feels like an actual betting slip. -->
     <section class="parlay-ticket">

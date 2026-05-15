@@ -379,6 +379,10 @@ async function applyProState() {
   const state = await getProState();
   document.body.classList.remove('state-free', 'state-trial', 'state-paid', 'state-expired');
   document.body.classList.add(`state-${state.tier}`);
+  // Show/hide the lifetime-impact strip whenever the tier changes — e.g.
+  // the strip should appear the moment a user upgrades from free → trial,
+  // and disappear if they ever revert.
+  renderImpactStrip();
 
   const cta = document.getElementById('proMainCta');
   if (cta) {
@@ -916,6 +920,62 @@ async function loadSlip() {
   renderLegs();
   renderSummary();
   syncRiskSliderFromStake();
+  renderImpactStrip();
+}
+
+/* ============================================================
+   LIFETIME IMPACT TRACKER
+   Accumulates demonstrated value across every Improve-Odds Apply.
+   Strongest argument for the $149 conversion at trial-end: shows
+   the user, in dollars, what PolyParlay has saved them.
+   Storage shape (chrome.storage.local.lifetimeStats):
+     { rebalancesApplied, evGainTotal, winRateLiftTotal,
+       stakeAnalyzed, firstAt, lastAt }
+   ============================================================ */
+async function accumulateImpactStats(delta) {
+  try {
+    const { lifetimeStats } = await chrome.storage.local.get(['lifetimeStats']);
+    const stats = lifetimeStats || {
+      rebalancesApplied: 0,
+      evGainTotal: 0,
+      winRateLiftTotal: 0,
+      stakeAnalyzed: 0,
+      firstAt: Date.now()
+    };
+    stats.rebalancesApplied += 1;
+    stats.evGainTotal       += Number(delta.evDelta) || 0;
+    stats.winRateLiftTotal  += Number(delta.lift) || 0;
+    stats.stakeAnalyzed     += Number(delta.stake) || 0;
+    stats.lastAt = Date.now();
+    await chrome.storage.local.set({ lifetimeStats: stats });
+    renderImpactStrip();
+  } catch (err) {
+    // Stats accumulator must never break the apply flow.
+    // eslint-disable-next-line no-console
+    console.warn('[PolyParlay] accumulateImpactStats failed', err);
+  }
+}
+
+async function renderImpactStrip() {
+  const strip = document.getElementById('impactStrip');
+  if (!strip) return;
+  try {
+    const state = await getProState();
+    const isElevated = state.tier === 'trial' || state.tier === 'paid';
+    if (!isElevated) { strip.classList.add('hidden'); return; }
+    const { lifetimeStats } = await chrome.storage.local.get(['lifetimeStats']);
+    if (!lifetimeStats || !lifetimeStats.rebalancesApplied) {
+      strip.classList.add('hidden');
+      return;
+    }
+    const ev = Number(lifetimeStats.evGainTotal) || 0;
+    const reb = Number(lifetimeStats.rebalancesApplied) || 0;
+    const liftAvg = reb > 0 ? (Number(lifetimeStats.winRateLiftTotal) / reb) : 0;
+    setText('impactEv', (ev >= 0 ? '+' : '') + '$' + Math.abs(ev).toFixed(2));
+    setText('impactReb', String(reb));
+    setText('impactLift', Math.round(Math.abs(liftAvg)).toString());
+    strip.classList.remove('hidden');
+  } catch {}
 }
 
 async function refreshPrices() {
@@ -1912,6 +1972,17 @@ async function renderImproveOdds() {
         newWinRate: suggest.newWinRate,
         at: Date.now()
       };
+      // Accumulate lifetime impact stats — EV delta = (new winRate × new
+      // multiplier × stake - stake) − (old winRate × old multiplier × stake
+      // - stake). Drives the running tally strip at the top of the popup.
+      try {
+        const _stake = Number(currentSlip.stake) || 0;
+        const _oldEV = (suggest.oldWinRate * suggest.oldMultiplier - 1) * _stake;
+        const _newEV = (suggest.newWinRate * suggest.newMultiplier - 1) * _stake;
+        const _evDelta = _newEV - _oldEV;
+        const _liftPp = (suggest.newWinRate - suggest.oldWinRate) * 100;
+        accumulateImpactStats({ evDelta: _evDelta, lift: _liftPp, stake: _stake });
+      } catch {}
       // Branch by amendment type — flip (preserves exposure) or drop
       if (suggest.type === 'flip') {
         await chrome.runtime.sendMessage({ type: 'flipLeg', legId: suggest.flipLegId });

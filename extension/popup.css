@@ -176,6 +176,59 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   cursor: not-allowed;
 }
 
+/* ============================================================
+   LIFETIME IMPACT STRIP
+   Thin running-tally bar at the top of the popup. Visible only
+   for trial/paid users who've applied at least one Improve Odds
+   rebalance. Accumulates across all rebalances so by trial-end
+   the user sees a concrete $ value PolyParlay has added.
+   ============================================================ */
+.impact-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 12px 0;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fef3c7, #fffbeb);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 2px 2px 0 var(--amber);
+  font-size: 11.5px;
+  color: var(--text-strong);
+}
+.impact-strip.hidden { display: none; }
+.impact-strip-icon {
+  font-size: 14px;
+  color: #b45309;
+  font-weight: 900;
+}
+.impact-strip-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #b45309;
+}
+.impact-strip-stat {
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+.impact-strip-stat strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  color: var(--text-strong);
+  font-size: 12.5px;
+}
+/* The EV stat — green when positive (Improve Odds actually added value) */
+#impactEv { color: var(--green); }
+.impact-strip-sep {
+  color: rgba(10, 12, 20, 0.32);
+  font-weight: 600;
+}
+
 /* === PARLAY TICKET CARD — neo-brutalist light, paper-feel ===
    Cream card with hard 1.5px ink border and small offset shadow. */
 .parlay-ticket {
