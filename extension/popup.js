@@ -573,8 +573,42 @@ function suggestRebalance(legs) {
   const relativeGain = best.oldWinRate > 0 ? absoluteGain / best.oldWinRate : 0;
   if (absoluteGain < 0.02 && relativeGain < 0.20) return null;
 
+  // ===== Kelly-half stake recommendation =====
+  // After the rebalance, what's the optimal bet size? Half-Kelly is the
+  // industry-standard variance-reduced size:
+  //   f = (winRate * (mult - 1) - (1 - winRate)) / (mult - 1)
+  //   recommended stake = max(1, round(0.5 * f * bankroll))
+  // Bankroll is a notional reference (no actual bankroll tracking); we
+  // use $500 which approximates a typical active-PM-bettor's monthly
+  // PM allocation. Result: a concrete stake number the user can act on.
+  const newMult = best.newMultiplier;
+  const newWinRate = best.newWinRate;
+  const b = newMult - 1;
+  let newStake = null;
+  if (b > 0 && newWinRate > 0) {
+    const f = (newWinRate * b - (1 - newWinRate)) / b;
+    if (f > 0) {
+      newStake = Math.max(1, Math.round(500 * (f / 2)));
+    }
+  }
+
+  // Per-leg share counts the suggested stake would buy (independent-leg
+  // basis) — Polymarket settles legs separately, so what you actually
+  // own per leg is stake / leg.price shares of that leg's outcome.
+  const sharesPerLeg = newStake
+    ? legs
+        .filter((_, i) => i !== best.legIdx || best.type !== 'drop')
+        .map((l, idx) => {
+          const isFlippedLeg = best.type === 'flip' && idx === best.legIdx;
+          const price = isFlippedLeg ? best.newLegPrice : Number(l.price) || 0;
+          return price > 0 ? newStake / price : 0;
+        })
+    : null;
+
   return {
     ...best,
+    newStake,
+    sharesPerLeg,
     // legacy compat: rebalance banner on slip card reads these field names
     removedQuestion: best.legQuestion || best.removedQuestion,
     removedPrice: best.legPrice || best.removedPrice
@@ -2015,19 +2049,37 @@ async function renderImproveOdds() {
 
   if (isPro) {
     desc.classList.remove('improve-odds-pitch');
+    const curStake = Number(currentSlip.stake) || 10;
+    const stakeBlock = (suggest.newStake && Math.abs(suggest.newStake - curStake) >= Math.max(2, curStake * 0.3))
+      ? ` Stake $${curStake} → <strong>$${suggest.newStake}</strong> (half-Kelly).`
+      : '';
+    // Per-leg share allocation — the most concrete thing the user can
+    // act on. Shows shares = stake / price for each leg under the new
+    // configuration. Polymarket settles legs independently so this
+    // maps directly to what they'd actually own.
+    let sharesBlock = '';
+    if (suggest.sharesPerLeg && suggest.newStake) {
+      const top = suggest.sharesPerLeg
+        .slice(0, 3)
+        .map((s) => Number(s).toFixed(1))
+        .join(' / ');
+      sharesBlock = ` <span class="rebal-shares">Shares per leg: ${top}</span>`;
+    }
     if (suggest.type === 'flip') {
       desc.innerHTML =
         `Flip "<strong>${escapeHtml(truncate(suggest.legQuestion, 28))}</strong>" ` +
         `from <strong>${escapeHtml(suggest.flipFromLabel)}</strong> → ` +
         `<strong>${escapeHtml(suggest.flipToLabel)}</strong> ` +
         `(${fmtPrice(suggest.legPrice)} → ${fmtPrice(suggest.newLegPrice)}). ` +
-        `Win rate <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>.`;
+        `Win rate <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>.` +
+        stakeBlock + sharesBlock;
     } else {
       desc.innerHTML =
         `Drop "<strong>${escapeHtml(truncate(suggest.removedQuestion, 32))}</strong>" ` +
         `(priced ${fmtPrice(suggest.removedPrice)}). ` +
         `Win rate <span class="rebal-up">${fmtPercentSmart(suggest.oldWinRate)} → ${fmtPercentSmart(suggest.newWinRate)}</span>. ` +
-        `Multiplier ${suggest.oldMultiplier.toFixed(1)}× → ${suggest.newMultiplier.toFixed(1)}×.`;
+        `Multiplier ${suggest.oldMultiplier.toFixed(1)}× → ${suggest.newMultiplier.toFixed(1)}×.` +
+        stakeBlock + sharesBlock;
     }
   } else {
     desc.classList.add('improve-odds-pitch');
@@ -2076,10 +2128,16 @@ async function renderImproveOdds() {
       } else {
         await chrome.runtime.sendMessage({ type: 'removeLeg', legId: suggest.removeLegId });
       }
+      // Apply the recommended stake (half-Kelly) — materially changes the
+      // bet amount + per-leg shares, not just the leg combination.
+      if (suggest.newStake && suggest.newStake > 0) {
+        await chrome.runtime.sendMessage({ type: 'setStake', stake: suggest.newStake });
+      }
       const resp = await chrome.runtime.sendMessage({ type: 'getSlip' });
       if (resp && resp.ok) currentSlip = resp.slip;
       renderLegs();
       renderSummary();
+      syncRiskSliderFromStake(); // slider position reflects the new stake
       runAndShowSim(); // re-run so user sees the improved outcome
     } finally {
       apply.disabled = false;

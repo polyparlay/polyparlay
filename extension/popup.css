@@ -1899,6 +1899,19 @@ body.state-expired .run-sim-box .run-sim-icon {
 }
 .improve-odds-desc strong { color: var(--text-strong); font-weight: 600; }
 .improve-odds-desc .rebal-up { color: var(--green); font-weight: 700; }
+.improve-odds-desc .rebal-shares {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 6px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--text-strong);
+}
 /* Free state: pitch text — slightly muted so the green title + Apply button stand out */
 .improve-odds-desc.improve-odds-pitch {
   color: var(--muted);
