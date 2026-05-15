@@ -953,6 +953,7 @@ async function flipLeg(id) {
   if (resp && resp.ok) currentSlip = resp.slip;
   renderLegs();
   renderSummary();
+  markSimStaleIfNeeded();
 }
 
 async function removeLeg(id) {
@@ -960,6 +961,35 @@ async function removeLeg(id) {
   if (resp && resp.ok) currentSlip = resp.slip;
   renderLegs();
   renderSummary();
+  markSimStaleIfNeeded();
+}
+
+// ---------- Monte Carlo staleness ----------
+// After a sim runs we snapshot the slip fingerprint. On any leg mutation
+// (flip / remove / add via the storage listener), if the panel is open and
+// the slip differs from the snapshot, mark the results stale and show a
+// "↻ Rerun" affordance so users know the numbers no longer reflect their
+// current slip.
+let lastSimSlipFingerprint = null;
+function slipFingerprint(slip) {
+  if (!slip || !Array.isArray(slip.legs)) return '';
+  return slip.legs
+    .map((l) => `${l.id || ''}:${l.selectedIndex || 0}:${l.price != null ? l.price : ''}`)
+    .join('|') + ':' + (slip.stake || 0);
+}
+function markSimStaleIfNeeded() {
+  const panel = document.getElementById('simResults');
+  const rerun = document.getElementById('simRerun');
+  if (!panel || panel.classList.contains('hidden')) return;
+  if (!lastSimSlipFingerprint) return;
+  const currentFp = slipFingerprint(currentSlip);
+  if (currentFp === lastSimSlipFingerprint) {
+    panel.classList.remove('sim-stale');
+    if (rerun) rerun.classList.add('hidden');
+    return;
+  }
+  panel.classList.add('sim-stale');
+  if (rerun) rerun.classList.remove('hidden');
 }
 
 // ---------- canvas card ----------
@@ -1364,6 +1394,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('clear').addEventListener('click', clearSlip);
   document.getElementById('stake').addEventListener('change', (e) => {
     setStake(Number(e.target.value || 0));
+    markSimStaleIfNeeded();
   });
   document.getElementById('legs').addEventListener('click', (e) => {
     const t = e.target;
@@ -1457,6 +1488,16 @@ document.addEventListener('DOMContentLoaded', () => {
       // location instead of pushing below the fold).
       const btn = document.getElementById('runSimBtn');
       if (btn) btn.classList.remove('hidden');
+      // Clear the stale flag too so a fresh open starts clean.
+      lastSimSlipFingerprint = null;
+    });
+  }
+  // Rerun button — shows when the slip has changed since the last sim.
+  // Re-runs the simulation against the current leg state in place.
+  const simRerun = document.getElementById('simRerun');
+  if (simRerun) {
+    simRerun.addEventListener('click', () => {
+      runAndShowSim();
     });
   }
 
@@ -1675,6 +1716,14 @@ function renderSimResults(r) {
   setText('simHeadLabel', `Monte Carlo · ${itLabel} sims`);
   toggleHidden('simResults', false);
 
+  // Snapshot the slip fingerprint at sim time so future leg mutations
+  // can be detected as making the results stale.
+  lastSimSlipFingerprint = slipFingerprint(currentSlip);
+  const panelEl = document.getElementById('simResults');
+  if (panelEl) panelEl.classList.remove('sim-stale');
+  const rerunBtn = document.getElementById('simRerun');
+  if (rerunBtn) rerunBtn.classList.add('hidden');
+
   // Hide the Run Sim button while the results panel is open — the panel takes
   // its place in the layout so users see the simulation expand FROM where they
   // clicked, not get pushed off-screen requiring a scroll.
@@ -1892,6 +1941,7 @@ chrome.storage.onChanged.addListener((changes) => {
     currentSlip = changes.slip.newValue || { legs: [], stake: 10 };
     renderLegs();
     renderSummary();
+    markSimStaleIfNeeded();
   }
   // pmTheme storage updates intentionally ignored — OS prefers-color-scheme
   // is the single source of truth (see applyTheme).

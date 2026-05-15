@@ -1387,24 +1387,47 @@ body.state-paid .analytics-pro .analytics-pro-text::before { content: "✓ "; }
    Renders entirely client-side (no server), so the user can test the simulation
    without a Pro subscription. */
 .sim-results {
-  margin: 0 12px 12px;
+  margin: 8px 10px;
   padding: 0;
-  background-color: var(--surface);
-  border: 1px solid var(--accent);
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
+  box-shadow: 3px 3px 0 var(--accent);
+  transition: box-shadow 0.15s ease;
 }
 .sim-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(245, 158, 11, 0.10));
-  border-bottom: 1px solid var(--line);
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--bg);
+  border-bottom: 1.5px dashed var(--line);
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  font-size: 12px;
-  color: var(--text-strong);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--accent);
 }
+#simHeadLabel { flex: 1; min-width: 0; }
+.sim-rerun {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  background: var(--amber);
+  color: var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--line);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.sim-rerun:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--line); }
+.sim-rerun:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--line); }
 .sim-close {
   background: transparent;
   color: var(--muted);
@@ -1412,8 +1435,24 @@ body.state-paid .analytics-pro .analytics-pro-text::before { content: "✓ "; }
   font-size: 18px;
   cursor: pointer;
   padding: 0 4px;
+  line-height: 1;
 }
-.sim-close:hover { color: var(--text-strong); }
+.sim-close:hover { color: var(--line); }
+
+/* Stale state — slip changed since the sim ran. Numbers go faded, header
+   text shifts to amber (matching the rerun button), shadow swaps to amber
+   so the whole panel reads as "needs refresh". */
+.sim-results.sim-stale {
+  box-shadow: 3px 3px 0 var(--amber);
+}
+.sim-results.sim-stale .sim-head {
+  background: #fef3c7;
+  color: #92400e;
+}
+.sim-results.sim-stale .sim-grid {
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
 .sim-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1761,46 +1800,10 @@ body.state-expired .run-sim-box .run-sim-icon {
   line-height: 1.4;
 }
 
-/* Run Simulation — prominent secondary CTA, locked */
-.run-sim {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: calc(100% - 24px);
-  margin: 0 12px 12px;
-  padding: 12px 14px;
-  background-color: var(--surface-2);
-  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(245, 158, 11, 0.08));
-  border: 1px solid rgba(99, 102, 241, 0.32);
-  border-radius: 10px;
-  color: var(--text);
-  cursor: pointer;
-  font-family: inherit;
-  transition: filter 0.12s ease, transform 0.12s ease;
-}
-.run-sim:hover {
-  filter: brightness(1.08);
-}
-.run-sim:active { transform: scale(0.99); }
-.run-sim-icon { font-size: 22px; }
-.run-sim-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  flex: 1;
-  text-align: left;
-}
-.run-sim-title {
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--text-strong);
-}
-.run-sim-desc {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.4;
-}
+/* (dead .run-sim standalone CTA + duplicate .run-sim-title/.run-sim-desc
+   block removed — was overriding the new dark-tile run-sim-box's text
+   colors, which made the title invisible on the black background.
+   Canonical rules live at lines ~755-780.) */
 
 /* Execute parlay dropdown */
 .execute-menu {
