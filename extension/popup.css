@@ -301,6 +301,143 @@ button.ghost:hover { color: var(--text-strong); border-color: #2c3142; }
   border-radius: 8px;
 }
 
+/* ============================================================
+   RISK BAR — three-zone slider that modulates stake + recolors
+   the analytics card per zone. Replaces the obtrusive "Leg 4+ Pro"
+   banner. Lives inside the parlay-ticket between legs and the
+   Run-Sim button.
+   ============================================================ */
+.risk-bar {
+  margin: 6px 10px 8px;
+  padding: 10px 12px 8px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 2px 2px 0 var(--line);
+}
+.risk-bar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.risk-bar-stake {
+  color: var(--text-strong);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+body.risk-rookie  .risk-bar-stake { color: var(--green); }
+body.risk-maxxing .risk-bar-stake { color: #b45309; }
+body.risk-degen   .risk-bar-stake { color: var(--red); }
+
+.risk-bar-track {
+  position: relative;
+  height: 28px;
+  margin-bottom: 6px;
+}
+.risk-bar-zones {
+  position: absolute;
+  inset: 9px 0 9px 0;
+  display: flex;
+  border: 1.5px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.rz { display: block; height: 100%; }
+.rz-rookie  { flex: 33; background: linear-gradient(90deg, #bbf7d0, #86efac); }
+.rz-maxxing { flex: 33; background: linear-gradient(90deg, #fde68a, #fbbf24); }
+.rz-degen   { flex: 34; background: linear-gradient(90deg, #fca5a5, #dc2626); }
+
+/* The native range input — make it transparent, just expose the thumb */
+.risk-bar-track input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+}
+.risk-bar-track input[type="range"]::-webkit-slider-runnable-track {
+  height: 28px;
+  background: transparent;
+  border: 0;
+}
+.risk-bar-track input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 24px;
+  background: var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 3px;
+  cursor: grab;
+  box-shadow: 2px 2px 0 var(--bg);
+  margin-top: 0;
+}
+.risk-bar-track input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
+.risk-bar-track input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 24px;
+  background: var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 3px;
+  cursor: grab;
+}
+
+.risk-bar-zone-labels {
+  display: flex;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rzl { flex: 1; text-align: center; opacity: 0.55; transition: opacity 0.15s ease, color 0.15s ease; }
+body.risk-rookie  .rzl-rookie  { opacity: 1; color: var(--green); font-weight: 800; }
+body.risk-maxxing .rzl-maxxing { opacity: 1; color: #b45309; font-weight: 800; }
+body.risk-degen   .rzl-degen   { opacity: 1; color: var(--red); font-weight: 800; }
+
+/* === Zone-themed accents on the analytics card ===
+   The analytics card's default offset shadow is indigo. When user
+   enters Degen, swap to red; ROI maxxing → amber; Rookie → green.
+   Same panel, three reads. */
+body.risk-rookie .free-analytics  { box-shadow: 3px 3px 0 var(--green); }
+body.risk-maxxing .free-analytics { box-shadow: 3px 3px 0 var(--amber); }
+body.risk-degen .free-analytics   { box-shadow: 3px 3px 0 var(--red); }
+
+/* Same logic on the analytics-head dot for instant feedback */
+body.risk-rookie  .analytics-head-dot { background: var(--green); box-shadow: 0 0 8px var(--green); }
+body.risk-maxxing .analytics-head-dot { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+body.risk-degen   .analytics-head-dot { background: var(--red);   box-shadow: 0 0 8px var(--red); }
+
+/* Per-leg position badge — small mono chip under each leg's price showing
+   "X shares · Y% of stake if independent." */
+.leg-pos-chip {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 2px 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text-strong);
+}
+
 /* Execute-menu inline inside the ticket footer — slim, full-width button */
 .execute-menu-inline {
   margin-top: 8px;

@@ -31,7 +31,33 @@
 
       <div id="legs" class="legs"></div>
 
-      <section id="locked" class="locked hidden">
+      <!-- Risk slider — three-zone crypto-leverage style. Modulates stake +
+           recolors analytics by risk zone. Replaces the old "Leg 4+ — Pro"
+           obtrusive banner. -->
+      <div class="risk-bar" id="riskBar">
+        <div class="risk-bar-head">
+          <span class="risk-bar-label">// RISK</span>
+          <span class="risk-bar-stake mono" id="riskBarStake">$10 · 1% of $1k</span>
+        </div>
+        <div class="risk-bar-track">
+          <div class="risk-bar-zones" aria-hidden="true">
+            <span class="rz rz-rookie"></span>
+            <span class="rz rz-maxxing"></span>
+            <span class="rz rz-degen"></span>
+          </div>
+          <input type="range" id="riskSlider" min="0" max="100" value="22" aria-label="Risk slider" />
+        </div>
+        <div class="risk-bar-zone-labels">
+          <span class="rzl rzl-rookie" data-zone="rookie">Rookie numbers</span>
+          <span class="rzl rzl-maxxing" data-zone="maxxing">ROI maxxing</span>
+          <span class="rzl rzl-degen" data-zone="degen">Degen mode</span>
+        </div>
+      </div>
+
+      <!-- Leg 4+ locked block kept hidden in DOM (legacy code still references
+           its IDs); the visible upgrade prompt is now driven by the Pro section
+           below the ticket, not by an obtrusive in-ticket banner. -->
+      <section id="locked" class="locked hidden" style="display:none">
         <div class="locked-title">Leg 4+ — Pro</div>
         <div id="lockedPreview" class="locked-preview"></div>
         <button id="upgrade" class="upgrade">Start 7-day free trial</button>

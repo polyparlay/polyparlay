@@ -915,6 +915,7 @@ async function loadSlip() {
   if (resp && resp.ok) currentSlip = resp.slip;
   renderLegs();
   renderSummary();
+  syncRiskSliderFromStake();
 }
 
 async function refreshPrices() {
@@ -946,6 +947,53 @@ async function setStake(v) {
   const resp = await chrome.runtime.sendMessage({ type: 'setStake', stake: v });
   if (resp && resp.ok) currentSlip = resp.slip;
   renderSummary();
+  syncRiskSliderFromStake();
+}
+
+/* ============================================================
+   RISK SLIDER — three-zone bar that modulates stake + recolors the
+   analytics card. Slider value (0-100) maps to a stake in $ via a
+   piecewise curve so the three zones feel meaningfully different:
+     Rookie  (0-33)   →  $1-$20
+     Maxxing (34-66)  →  $20-$100
+     Degen   (67-100) →  $100-$500
+   The mapping is monotonic so dragging always increases stake.
+   ============================================================ */
+function sliderValueToStake(v) {
+  const x = Math.max(0, Math.min(100, Number(v) || 0));
+  if (x <= 33)  return Math.round(1   + (20 - 1)   * (x / 33));
+  if (x <= 66)  return Math.round(20  + (100 - 20) * ((x - 33) / 33));
+  return Math.round(100 + (500 - 100) * ((x - 66) / 34));
+}
+function stakeToSliderValue(stake) {
+  const s = Math.max(0, Number(stake) || 0);
+  if (s <= 20)  return Math.round((s - 1) / (20 - 1) * 33);
+  if (s <= 100) return Math.round(33 + (s - 20) / (100 - 20) * 33);
+  if (s <= 500) return Math.round(66 + (s - 100) / (500 - 100) * 34);
+  return 100;
+}
+function zoneForSliderValue(v) {
+  if (v <= 33) return 'rookie';
+  if (v <= 66) return 'maxxing';
+  return 'degen';
+}
+function applyRiskZone(v) {
+  const zone = zoneForSliderValue(v);
+  document.body.classList.remove('risk-rookie', 'risk-maxxing', 'risk-degen');
+  document.body.classList.add('risk-' + zone);
+  const stake = sliderValueToStake(v);
+  const pctOf1k = ((stake / 1000) * 100);
+  const pctLabel = pctOf1k < 1 ? pctOf1k.toFixed(1) : Math.round(pctOf1k);
+  setText('riskBarStake', `$${stake} · ${pctLabel}% of $1k`);
+}
+/* Keep the slider in sync if stake is changed via the input or programmatically. */
+function syncRiskSliderFromStake() {
+  const stake = Number(currentSlip && currentSlip.stake) || 10;
+  const slider = document.getElementById('riskSlider');
+  if (!slider) return;
+  const v = stakeToSliderValue(stake);
+  slider.value = String(v);
+  applyRiskZone(v);
 }
 
 async function flipLeg(id) {
@@ -1013,107 +1061,145 @@ function drawCard() {
   const W = canvas.width;   // 1200
   const H = canvas.height;  // 630
 
-  // --- BACKGROUND: deep gradient with subtle vignette accent ---
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#0a0c14');
-  bg.addColorStop(0.55, '#0e1322');
-  bg.addColorStop(1, '#161a2e');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
+  // === BRUTALIST LIGHT PALETTE (matches website + popup) ===
+  const C_BG       = '#f5f1e8';
+  const C_INK      = '#0a0c14';
+  const C_MUTED    = '#6b6f7a';
+  const C_TEXT     = '#1f2937';
+  const C_SURFACE  = '#fdfcf7';
+  const C_WHITE    = '#ffffff';
+  const C_ACCENT   = '#4f46e5';
+  const C_AMBER    = '#fbbf24';
+  const C_AMBER_DK = '#b45309';
+  const C_GREEN    = '#16a34a';
+  const C_RED      = '#dc2626';
+  const FONT_SANS  = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+  const FONT_MONO  = "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 
-  // Top-right accent glow
-  const glow = ctx.createRadialGradient(W * 0.82, H * 0.1, 10, W * 0.82, H * 0.1, 380);
-  glow.addColorStop(0, 'rgba(99,102,241,0.32)');
-  glow.addColorStop(1, 'rgba(99,102,241,0)');
-  ctx.fillStyle = glow;
+  // === BACKGROUND: cream paper with subtle dot grid ===
+  ctx.fillStyle = C_BG;
   ctx.fillRect(0, 0, W, H);
+  // dot grid (every 22px)
+  ctx.fillStyle = 'rgba(10, 12, 20, 0.07)';
+  for (let gx = 1; gx < W; gx += 22) {
+    for (let gy = 1; gy < H; gy += 22) {
+      ctx.fillRect(gx, gy, 1, 1);
+    }
+  }
 
-  // Bottom-left amber accent
-  const glow2 = ctx.createRadialGradient(80, H - 60, 10, 80, H - 60, 320);
-  glow2.addColorStop(0, 'rgba(245,158,11,0.18)');
-  glow2.addColorStop(1, 'rgba(245,158,11,0)');
-  ctx.fillStyle = glow2;
-  ctx.fillRect(0, 0, W, H);
-
-  // --- HEADER: brand mark + tagline ---
-  // Purple dot mark
-  ctx.fillStyle = '#6366f1';
+  // === TOP TICKER STRIP (matches website's black ticker) ===
+  ctx.fillStyle = C_INK;
+  ctx.fillRect(0, 0, W, 36);
+  ctx.fillStyle = C_GREEN;
   ctx.beginPath();
-  ctx.arc(64, 64, 10, 0, Math.PI * 2);
+  ctx.arc(36, 18, 4, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = 'rgba(99,102,241,0.32)';
-  ctx.beginPath();
-  ctx.arc(64, 64, 18, 0, Math.PI * 2);
+  ctx.fillStyle = C_BG;
+  ctx.font = `700 12px ${FONT_MONO}`;
+  ctx.textBaseline = 'middle';
+  ctx.fillText('LIVE  ·  POLYPARLAY V1.0  ·  10K MONTE CARLO  ·  POLYPARLAY.APP', 50, 18);
+  ctx.textBaseline = 'alphabetic';
+
+  // === HEADER: brand mark (dark PP tile) + wordmark + Pro/date badge ===
+  // PP brand tile
+  ctx.fillStyle = C_INK;
+  roundRect(ctx, 60, 64, 56, 56, 10);
   ctx.fill();
+  ctx.fillStyle = C_ACCENT;
+  ctx.font = `900 32px ${FONT_SANS}`;
+  ctx.fillText('P', 70, 104);
+  ctx.fillStyle = C_AMBER;
+  ctx.fillText('P', 92, 104);
 
-  ctx.fillStyle = '#f9fafb';
-  ctx.font = '800 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-  ctx.fillText('PolyParlay', 88, 73);
+  // Wordmark + tagline
+  ctx.fillStyle = C_INK;
+  ctx.font = `900 36px ${FONT_SANS}`;
+  ctx.fillText('PolyParlay', 132, 100);
+  ctx.fillStyle = C_ACCENT;
+  ctx.font = `700 12px ${FONT_MONO}`;
+  ctx.fillText('// PARLAY BUILDER FOR POLYMARKET', 132, 124);
 
-  ctx.fillStyle = '#a5b4fc';
-  ctx.font = '600 13px -apple-system, sans-serif';
-  ctx.fillText('MONTE CARLO + ODDS OPTIMIZER', 88, 96);
-
-  // Top-right corner — for Pro users, show a gold PRO badge instead of the
-  // date stamp. Creates a visual status symbol that free users see in shared
-  // cards (aspirational lever for upgrade).
+  // Top-right Pro/date badge
   const isPro = document.body.classList.contains('state-paid') ||
                 document.body.classList.contains('state-trial');
   if (isPro) {
-    ctx.fillStyle = '#fbbf24';
-    roundRect(ctx, W - 110, 50, 60, 28, 6);
+    // Ink shadow then amber pill
+    ctx.fillStyle = C_INK;
+    roundRect(ctx, W - 116, 76, 70, 32, 7);
     ctx.fill();
-    ctx.fillStyle = '#0a0c14';
-    ctx.font = '900 14px -apple-system, sans-serif';
+    ctx.fillStyle = C_AMBER;
+    roundRect(ctx, W - 118, 74, 70, 32, 7);
+    ctx.fill();
+    ctx.strokeStyle = C_INK;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, W - 118, 74, 70, 32, 7);
+    ctx.stroke();
+    ctx.fillStyle = C_INK;
+    ctx.font = `900 13px ${FONT_MONO}`;
     ctx.textAlign = 'center';
-    ctx.fillText('PRO', W - 80, 70);
+    ctx.fillText('★ PRO', W - 83, 94);
     ctx.textAlign = 'left';
   } else {
     const now = new Date();
     const dateStr = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '500 13px -apple-system, sans-serif';
+    ctx.fillStyle = C_MUTED;
+    ctx.font = `700 12px ${FONT_MONO}`;
     ctx.textAlign = 'right';
-    ctx.fillText(dateStr.toUpperCase(), W - 60, 73);
+    ctx.fillText(dateStr.toUpperCase(), W - 60, 100);
     ctx.textAlign = 'left';
   }
 
-  // --- LEGS ---
-  const startY = 160;
-  const lineH = 70;
+  // === LEGS — white ticket rows with hard ink borders + offset shadows ===
+  const startY = 158;
+  const rowH   = 72;
   eligible.forEach((leg, i) => {
-    const y = startY + i * lineH;
-
-    // Number badge (small purple square instead of circle — more modern)
-    ctx.fillStyle = 'rgba(99,102,241,0.16)';
-    roundRect(ctx, 60, y - 22, 32, 32, 8);
+    const ty = startY + i * rowH;
+    // Offset shadow behind row
+    ctx.fillStyle = C_INK;
+    roundRect(ctx, 64, ty + 4, W - 120, 60, 8);
     ctx.fill();
-    ctx.fillStyle = '#a5b4fc';
-    ctx.font = '800 14px -apple-system, sans-serif';
+    // Row
+    ctx.fillStyle = C_WHITE;
+    roundRect(ctx, 60, ty, W - 120, 60, 8);
+    ctx.fill();
+    ctx.strokeStyle = C_INK;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, 60, ty, W - 120, 60, 8);
+    ctx.stroke();
+
+    // Number tile (dark ink with mono number)
+    ctx.fillStyle = C_INK;
+    roundRect(ctx, 76, ty + 13, 34, 34, 6);
+    ctx.fill();
+    ctx.fillStyle = C_BG;
+    ctx.font = `800 14px ${FONT_MONO}`;
     ctx.textAlign = 'center';
-    ctx.fillText(String(i + 1), 76, y - 1);
+    ctx.fillText(String(i + 1).padStart(2, '0'), 93, ty + 35);
     ctx.textAlign = 'left';
 
-    // Direction pill (YES/NO/etc) — bumped to 14px font / 25px tall for thumbnail legibility
+    // Direction pill — colored fill with ink border
     const label = (leg.direction || (leg.outcomes && leg.outcomes[leg.selectedIndex || 0]) || 'YES').toUpperCase();
     let dirBg, dirFg;
-    if (/^YES$/i.test(label)) { dirBg = 'rgba(34,197,94,0.22)'; dirFg = '#4ade80'; }
-    else if (/^NO$/i.test(label)) { dirBg = 'rgba(239,68,68,0.22)'; dirFg = '#f87171'; }
-    else { dirBg = 'rgba(99,102,241,0.22)'; dirFg = '#a5b4fc'; }
-    ctx.font = '800 14px -apple-system, sans-serif';
-    const dirW = ctx.measureText(label).width + 20;
+    if (/^YES$/i.test(label))      { dirBg = '#dcfce7'; dirFg = '#14532d'; }
+    else if (/^NO$/i.test(label))  { dirBg = '#fee2e2'; dirFg = '#7f1d1d'; }
+    else                            { dirBg = '#e0e7ff'; dirFg = '#312e81'; }
+    ctx.font = `800 14px ${FONT_MONO}`;
+    const dirW = ctx.measureText(label).width + 22;
     ctx.fillStyle = dirBg;
-    roundRect(ctx, 105, y - 18, dirW, 25, 6);
+    roundRect(ctx, 124, ty + 16, dirW, 28, 6);
     ctx.fill();
+    ctx.strokeStyle = C_INK;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, 124, ty + 16, dirW, 28, 6);
+    ctx.stroke();
     ctx.fillStyle = dirFg;
-    ctx.fillText(label, 115, y - 1);
+    ctx.fillText(label, 135, ty + 36);
 
-    // Question — bumped 21px → 24px so it stays legible after X feed thumbnail crop.
-    // Word-boundary truncation (avoids cutting mid-word like '$7.0B at market...')
-    const questionX = 113 + dirW + 8;
-    ctx.fillStyle = '#f9fafb';
-    ctx.font = '600 24px -apple-system, sans-serif';
-    const maxW = W - questionX - 200;
+    // Question — bold ink. Word-boundary truncation as before.
+    const questionX = 134 + dirW + 12;
+    ctx.fillStyle = C_INK;
+    ctx.font = `700 22px ${FONT_SANS}`;
+    const maxW = W - questionX - 170;
     let q = leg.question || 'Market';
     if (ctx.measureText(q).width > maxW) {
       const words = q.split(' ');
@@ -1124,7 +1210,6 @@ function drawCard() {
         if (ctx.measureText(candidate).width <= maxW) { trimmed = candidate; break; }
       }
       if (!trimmed) {
-        // Single very-long word — fall back to char truncation
         trimmed = q;
         while (trimmed.length > 4 && ctx.measureText(trimmed + '…').width > maxW) {
           trimmed = trimmed.slice(0, -1);
@@ -1133,153 +1218,142 @@ function drawCard() {
       }
       q = trimmed;
     }
-    ctx.fillText(q, questionX, y);
+    ctx.fillText(q, questionX, ty + 32);
 
     // Resolution date subtitle
     if (leg.endDate) {
       const d = new Date(leg.endDate);
       if (!isNaN(d.getTime())) {
-        ctx.fillStyle = '#6b7280';
-        ctx.font = '500 13px -apple-system, sans-serif';
-        ctx.fillText('Resolves ' + d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), questionX, y + 24);
+        ctx.fillStyle = C_MUTED;
+        ctx.font = `600 11px ${FONT_MONO}`;
+        ctx.fillText('RESOLVES ' + d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }).toUpperCase(), questionX, ty + 50);
       }
     }
 
-    // Price (adaptive precision, right-aligned). Dropped the redundant "LEG N"
-    // caption — the number badge on the left already conveys position.
-    ctx.fillStyle = '#f9fafb';
-    ctx.font = '800 28px -apple-system, sans-serif';
+    // Price — mono, ink, right-aligned
+    ctx.fillStyle = C_INK;
+    ctx.font = `800 26px ${FONT_MONO}`;
     const p = Number(leg.price) || 0;
     const priceText = p > 0 && p < 0.01 ? '$' + p.toFixed(4) : p < 0.10 ? '$' + p.toFixed(3) : '$' + p.toFixed(2);
     ctx.textAlign = 'right';
-    ctx.fillText(priceText, W - 60, y);
+    ctx.fillText(priceText, W - 76, ty + 38);
     ctx.textAlign = 'left';
   });
 
-  // --- STORY BANNER ---
-  // Story this card needs to tell: PolyParlay's algorithm made this parlay
-  // viable (rebalance case) OR ran a real simulation behind the multiplier
-  // (default case). Either way fills the dead-space above the footer.
-  const bannerY = H - 270;
+  // === STORY BANNER ===
+  const bannerY = H - 244;
   if (lastRebalance) {
-    // Green rebalance banner — punchier, dramatic copy
-    ctx.fillStyle = 'rgba(34, 197, 94, 0.12)';
-    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
+    // Green rebalance — light-green bg, ink border + green offset shadow
+    ctx.fillStyle = C_GREEN;
+    roundRect(ctx, 64, bannerY + 4, W - 120, 56, 8);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(34, 197, 94, 0.42)';
-    ctx.lineWidth = 1;
-    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
+    ctx.fillStyle = '#dcfce7';
+    roundRect(ctx, 60, bannerY, W - 120, 56, 8);
+    ctx.fill();
+    ctx.strokeStyle = C_INK;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, 60, bannerY, W - 120, 56, 8);
     ctx.stroke();
-
-    ctx.fillStyle = '#4ade80';
-    ctx.font = '800 13px -apple-system, sans-serif';
-    ctx.fillText('↗ ODDS REBALANCED BY POLYPARLAY', 80, bannerY + 20);
-
-    ctx.fillStyle = '#f9fafb';
-    ctx.font = '700 16px -apple-system, sans-serif';
+    ctx.fillStyle = '#14532d';
+    ctx.font = `900 13px ${FONT_MONO}`;
+    ctx.fillText('↗ ODDS REBALANCED BY POLYPARLAY', 80, bannerY + 22);
+    ctx.fillStyle = C_INK;
+    ctx.font = `700 16px ${FONT_SANS}`;
     const before = fmtPercentSmart(lastRebalance.oldWinRate);
-    const after = fmtPercentSmart(lastRebalance.newWinRate);
-    ctx.fillText(`Win rate ${before} → ${after}`, 80, bannerY + 40);
+    const after  = fmtPercentSmart(lastRebalance.newWinRate);
+    ctx.fillText(`Win rate ${before} → ${after}`, 80, bannerY + 44);
   } else {
-    // Default state — small Monte Carlo provenance pill so the space tells
-    // a story even without a rebalance. Subtle purple, brand-affirming.
-    ctx.fillStyle = 'rgba(99, 102, 241, 0.10)';
-    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
+    // Default — amber pop with mono provenance label
+    ctx.fillStyle = C_AMBER;
+    roundRect(ctx, 64, bannerY + 4, W - 120, 56, 8);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(99, 102, 241, 0.32)';
-    ctx.lineWidth = 1;
-    roundRect(ctx, 60, bannerY, W - 120, 52, 10);
+    ctx.fillStyle = '#fef3c7';
+    roundRect(ctx, 60, bannerY, W - 120, 56, 8);
+    ctx.fill();
+    ctx.strokeStyle = C_INK;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, 60, bannerY, W - 120, 56, 8);
     ctx.stroke();
-
-    ctx.fillStyle = '#a5b4fc';
-    ctx.font = '800 13px -apple-system, sans-serif';
-    ctx.fillText('🎲 MONTE CARLO SIMULATED · 10,000 OUTCOMES', 80, bannerY + 20);
-
-    ctx.fillStyle = '#cbd5ff';
-    ctx.font = '500 14px -apple-system, sans-serif';
-    ctx.fillText('Win rate computed live · not just the implied multiplier', 80, bannerY + 40);
+    ctx.fillStyle = C_AMBER_DK;
+    ctx.font = `900 13px ${FONT_MONO}`;
+    ctx.fillText('🎲 MONTE CARLO · 10,000 SIMULATED OUTCOMES', 80, bannerY + 22);
+    ctx.fillStyle = C_INK;
+    ctx.font = `600 14px ${FONT_SANS}`;
+    ctx.fillText('Real win-rate distribution — not just the implied multiplier.', 80, bannerY + 44);
   }
 
-  // --- FOOTER PAYOUT BLOCK ---
-  const footerY = H - 200;
+  // === FOOTER: multiplier (hero left) + sim win rate / stake / payout cluster ===
+  const footerY = H - 180;
 
-  // Divider
-  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(60, footerY - 10);
-  ctx.lineTo(W - 60, footerY - 10);
-  ctx.stroke();
-
-  // Multiplier — hero number on left. Sized BIG so it survives X feed thumbnail
-  // crops (which scale 1200×630 down to ~600×315 in timeline). Has to read at
-  // that size or the share is wasted.
+  // Multiplier - hero number left
   const mult = multiplier(eligible);
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '800 12px -apple-system, sans-serif';
-  ctx.fillText('IF ALL HIT', 60, footerY + 18);
-
+  ctx.fillStyle = C_AMBER_DK;
+  ctx.font = `800 12px ${FONT_MONO}`;
+  ctx.fillText('IF ALL HIT', 60, footerY + 22);
+  ctx.fillStyle = C_INK;
+  ctx.font = `900 112px ${FONT_MONO}`;
   const multText = fmtMult(mult);
-  ctx.fillStyle = '#a5b4fc';
-  ctx.font = '900 112px -apple-system, sans-serif';
-  ctx.fillText(multText, 60, footerY + 110);
+  ctx.fillText(multText, 60, footerY + 122);
 
-  // Run Monte Carlo for win rate (adaptive iterations)
+  // Sim win rate (adaptive iterations)
   let winRateText = '—';
-  let winRateColor = '#fbbf24'; // default amber
+  let winRateColor = C_AMBER_DK;
   if (eligible.length) {
     const cost = combinedCost(eligible);
     const sims = cost != null && cost < 0.001 ? 100000 : 10000;
     const r = runMonteCarlo(eligible, currentSlip.stake || 10, sims);
     if (r) {
       winRateText = fmtPercentSmart(r.winRate);
-      // Color-code: green if sim win rate is at/above implied (favorable),
-      // red if sim is meaningfully below (unfavorable), amber otherwise.
       if (cost != null) {
-        if (r.winRate >= cost * 1.02) winRateColor = '#4ade80';
-        else if (r.winRate < cost * 0.98) winRateColor = '#f87171';
+        if (r.winRate >= cost * 1.02) winRateColor = C_GREEN;
+        else if (r.winRate < cost * 0.98) winRateColor = C_RED;
       }
     }
   }
 
-  // Right-side metrics cluster: WIN RATE / STAKE / MAX PAYOUT
   const payout = maxPayout(eligible, currentSlip.stake);
   const stake = Number(currentSlip.stake) || 0;
   ctx.textAlign = 'right';
 
-  // WIN RATE — bumped 28→36px and color-coded (this is our unique value-add)
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '800 12px -apple-system, sans-serif';
-  ctx.fillText('SIM WIN RATE', W - 380, footerY + 18);
+  ctx.fillStyle = C_MUTED;
+  ctx.font = `800 11px ${FONT_MONO}`;
+  ctx.fillText('SIM WIN RATE', W - 380, footerY + 22);
   ctx.fillStyle = winRateColor;
-  ctx.font = '900 36px -apple-system, sans-serif';
-  ctx.fillText(winRateText, W - 380, footerY + 60);
+  ctx.font = `900 36px ${FONT_MONO}`;
+  ctx.fillText(winRateText, W - 380, footerY + 64);
 
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '800 12px -apple-system, sans-serif';
-  ctx.fillText('STAKE', W - 220, footerY + 18);
-  ctx.fillStyle = '#f9fafb';
-  ctx.font = '800 32px -apple-system, sans-serif';
-  ctx.fillText('$' + stake.toFixed(0), W - 220, footerY + 60);
+  ctx.fillStyle = C_MUTED;
+  ctx.font = `800 11px ${FONT_MONO}`;
+  ctx.fillText('STAKE', W - 220, footerY + 22);
+  ctx.fillStyle = C_INK;
+  ctx.font = `900 32px ${FONT_MONO}`;
+  ctx.fillText('$' + stake.toFixed(0), W - 220, footerY + 64);
 
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '800 12px -apple-system, sans-serif';
-  ctx.fillText('MAX PAYOUT', W - 60, footerY + 18);
-  ctx.fillStyle = '#4ade80';
-  ctx.font = '900 48px -apple-system, sans-serif';
-  ctx.fillText(fmt$(payout), W - 60, footerY + 66);
+  ctx.fillStyle = C_MUTED;
+  ctx.font = `800 11px ${FONT_MONO}`;
+  ctx.fillText('MAX PAYOUT', W - 60, footerY + 22);
+  ctx.fillStyle = C_GREEN;
+  ctx.font = `900 46px ${FONT_MONO}`;
+  ctx.fillText(fmt$(payout), W - 60, footerY + 70);
   ctx.textAlign = 'left';
 
-  // --- WATERMARK ---
-  // Dropped the "Information only" disclaimer that was on the right — pure
-  // visual noise in a shareable image. Just the brand watermark now.
-  ctx.fillStyle = '#6b7280';
-  ctx.font = '700 14px -apple-system, sans-serif';
-  ctx.fillText('polyparlay.app', 60, H - 28);
-  ctx.fillStyle = '#4b5563';
-  ctx.font = '500 12px -apple-system, sans-serif';
+  // === BOTTOM STRIP: domain + tagline ===
+  ctx.strokeStyle = C_INK;
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(60, H - 48);
+  ctx.lineTo(W - 60, H - 48);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = C_INK;
+  ctx.font = `800 14px ${FONT_MONO}`;
+  ctx.fillText('POLYPARLAY.APP', 60, H - 22);
+  ctx.fillStyle = C_MUTED;
+  ctx.font = `600 12px ${FONT_MONO}`;
   ctx.textAlign = 'right';
-  ctx.fillText('Built with Monte Carlo + Odds Optimizer', W - 60, H - 28);
+  ctx.fillText('BUILT WITH MONTE CARLO · IMPROVE ODDS', W - 60, H - 22);
   ctx.textAlign = 'left';
 }
 
@@ -1393,6 +1467,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setStake(Number(e.target.value || 0));
     markSimStaleIfNeeded();
   });
+  // Risk slider — drives the stake live as the user drags.
+  const riskSlider = document.getElementById('riskSlider');
+  if (riskSlider) {
+    riskSlider.addEventListener('input', (e) => {
+      const v = Number(e.target.value);
+      applyRiskZone(v);
+      setStake(sliderValueToStake(v));
+      markSimStaleIfNeeded();
+    });
+  }
   document.getElementById('legs').addEventListener('click', (e) => {
     const t = e.target;
     if (t.dataset.flip) flipLeg(t.dataset.flip);
