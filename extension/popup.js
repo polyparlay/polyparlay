@@ -979,17 +979,14 @@ function slipFingerprint(slip) {
 }
 function markSimStaleIfNeeded() {
   const panel = document.getElementById('simResults');
-  const rerun = document.getElementById('simRerun');
   if (!panel || panel.classList.contains('hidden')) return;
   if (!lastSimSlipFingerprint) return;
   const currentFp = slipFingerprint(currentSlip);
   if (currentFp === lastSimSlipFingerprint) {
     panel.classList.remove('sim-stale');
-    if (rerun) rerun.classList.add('hidden');
     return;
   }
   panel.classList.add('sim-stale');
-  if (rerun) rerun.classList.remove('hidden');
 }
 
 // ---------- canvas card ----------
@@ -1717,12 +1714,12 @@ function renderSimResults(r) {
   toggleHidden('simResults', false);
 
   // Snapshot the slip fingerprint at sim time so future leg mutations
-  // can be detected as making the results stale.
+  // can be detected as making the results stale. The Rerun button stays
+  // visible always — users may want to re-roll Monte Carlo even on the
+  // same slip (stochastic results vary between runs).
   lastSimSlipFingerprint = slipFingerprint(currentSlip);
   const panelEl = document.getElementById('simResults');
   if (panelEl) panelEl.classList.remove('sim-stale');
-  const rerunBtn = document.getElementById('simRerun');
-  if (rerunBtn) rerunBtn.classList.add('hidden');
 
   // Hide the Run Sim button while the results panel is open — the panel takes
   // its place in the layout so users see the simulation expand FROM where they
